@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7DEF6AFE-4D55-482A-894C-654AEBAA3BC1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Property.BLL</RootNamespace>
+    <AssemblyName>Property.BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionBLL.cs" />
+    <Compile Include="ActionItemBLL.cs" />
+    <Compile Include="ApplyInfoBLL.cs" />
+    <Compile Include="AppUserShippingAddressBLL.cs" />
+    <Compile Include="BaseBLL.cs" />
+    <Compile Include="BuildBLL.cs" />
+    <Compile Include="BuildCompanyBLL.cs" />
+    <Compile Include="BuildDoorBLL.cs" />
+    <Compile Include="BuildUnitBLL.cs" />
+    <Compile Include="CityBLL.cs" />
+    <Compile Include="CompanyOpreateLogBLL.cs" />
+    <Compile Include="CompanyPostBLL.cs" />
+    <Compile Include="CompanyRoleBLL.cs" />
+    <Compile Include="CompanyUserBLL.cs" />
+    <Compile Include="CountyBLL.cs" />
+    <Compile Include="DisposeQuestionBLL.cs" />
+    <Compile Include="ExpressCompanyBLL.cs" />
+    <Compile Include="FeedbackBLL.cs" />
+    <Compile Include="GoodsCategoryBLL.cs" />
+    <Compile Include="HouseUserBLL.cs" />
+    <Compile Include="HouseUserExpenseDetailsBLL.cs" />
+    <Compile Include="HouseUserExpenseTemplateBLL.cs" />
+    <Compile Include="InspectionCategoryBLL.cs" />
+    <Compile Include="InspectionExceptionDisposeBLL.cs" />
+    <Compile Include="InspectionPlanBLL.cs" />
+    <Compile Include="InspectionPointBLL.cs" />
+    <Compile Include="InspectionResultBLL.cs" />
+    <Compile Include="InspectionTimePlanBLL.cs" />
+    <Compile Include="LifeBillBLL.cs" />
+    <Compile Include="LifeBillTypeBLL.cs" />
+    <Compile Include="LifePayTypeBLL.cs" />
+    <Compile Include="MenuBLL.cs" />
+    <Compile Include="MobileVersionBLL.cs" />
+    <Compile Include="OrderBLL.cs" />
+    <Compile Include="OrderDetailsBLL.cs" />
+    <Compile Include="PhoneValidateBLL.cs" />
+    <Compile Include="PostBarTopicBLL.cs" />
+    <Compile Include="PostBarTopicDiscussBLL.cs" />
+    <Compile Include="PostBarTopicTypeBLL.cs" />
+    <Compile Include="PropertyAccountBLL.cs" />
+    <Compile Include="PropertyExpenseNoBLL.cs" />
+    <Compile Include="PropertyExpenseTypeBLL.cs" />
+    <Compile Include="PropertyIdentityVerificationBLL.cs" />
+    <Compile Include="PropertyOpreateLogBLL.cs" />
+    <Compile Include="PlatformOpreateLogBLL.cs" />
+    <Compile Include="PlatformRoleBLL.cs" />
+    <Compile Include="PlatformUserBLL.cs" />
+    <Compile Include="PostBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyCompanyBLL.cs" />
+    <Compile Include="SocialCircleBLL.cs" />
+    <Compile Include="SocialCircleChatBLL.cs" />
+    <Compile Include="SocialCircleMassTextingBLL.cs" />
+    <Compile Include="UserPlaceBLL.cs" />
+    <Compile Include="PropertyPlaceBLL.cs" />
+    <Compile Include="PropertyRoleBLL.cs" />
+    <Compile Include="PropertyUserBLL.cs" />
+    <Compile Include="PropertyUserPushBLL.cs" />
+    <Compile Include="ProvinceBLL.cs" />
+    <Compile Include="ShopAccountBLL.cs" />
+    <Compile Include="ShopBLL.cs" />
+    <Compile Include="ShopPaymentManagementBLL.cs" />
+    <Compile Include="ShopSaleBLL.cs" />
+    <Compile Include="ShopShippingCostBLL.cs" />
+    <Compile Include="ShopUserBLL.cs" />
+    <Compile Include="ShopUserPushBLL.cs" />
+    <Compile Include="SystemMessageBLL.cs" />
+    <Compile Include="UserBLL.cs" />
+    <Compile Include="QuestionBLL.cs" />
+    <Compile Include="UserPushBLL.cs" />
+    <Compile Include="UserSocialCircleBLL.cs" />
+    <Compile Include="UserSocialCircleMassTextingBLL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Property.Entity\Property.Entity.csproj">
+      <Project>{c07a9f18-0858-4e01-8ac4-7bc920fcc8ea}</Project>
+      <Name>Property.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.FactoryDAL\Property.FactoryDAL.csproj">
+      <Project>{89609c16-0bda-4044-ac8d-1b908eabf85a}</Project>
+      <Name>Property.FactoryDAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.IBLL\Property.IBLL.csproj">
+      <Project>{7605edaf-9557-449c-bf8f-91b478e89ab9}</Project>
+      <Name>Property.IBLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.IDAL\Property.IDAL.csproj">
+      <Project>{ccde6e9d-39a3-41af-bf6b-6d6f7b82f6ce}</Project>
+      <Name>Property.IDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

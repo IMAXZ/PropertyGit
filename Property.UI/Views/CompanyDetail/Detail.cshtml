@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "物业总公司详细";
+}
+@model Property.UI.Models.PropertyCompanyModel
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox product-detail">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-6 text-left">
+                            <h2 class="font-bold m-b-xs">
+                                <span><img src="@Model.Img" class="img-circle" alt="" width="40" height="40" /></span>
+                                @Model.Name
+                            </h2>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            @if (Html.IsHasButton("/CompanyDetail/SetCompanyInfo"))
+                            {
+                                <a class="btn btn-group-sm btn-primary" href="/CompanyDetail/SetCompanyInfo?id=@Model.Id">设置图标</a>
+                            }
+                            @if (Html.IsHasButton("/CompanyDetail/EditCompany"))
+                            {
+                                <a class="btn btn-group-sm btn-primary" href="/CompanyDetail/EditCompany?id=@Model.Id">编辑</a>
+                            }
+                        </div>
+                    </div>
+                    <hr>
+                    <h4>公司介绍</h4>
+                    <div>
+                        @Html.Raw(Model.Content)
+                    </div>
+                </div>
+                <div class="ibox-footer">
+                    <span class="pull-right">
+                        联系电话 - <i class="fa fa-phone"></i> @Model.Tel
+                    </span>
+                    地址 - <i class="fa fa-map-marker"></i> @Model.Address
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,105 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "设置小区图标";
+    ViewBag.Url = "/CompanyPlace/PlaceList";
+}
+@Html.Partial("~/Views/PlaceShared/_UploadImg.cshtml")
+
+<link href="~/Content/plugins/cropper/cropper.min.css" rel="stylesheet">
+<link href="~/Content/animate.css" rel="stylesheet">
+<link href="~/Content/style.css" rel="stylesheet">
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/inspinia")
+    @Scripts.Render("~/plugins/imagecropper")
+}
+<script src="~/Scripts/jquery-2.1.1.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/common.js"></script>
+<script src="~/Scripts/plugins/cropper/cropper.min.js"></script>
+<script src="~/Scripts/plugins/metisMenu/metisMenu.min.js"></script>
+<script src="~/Scripts/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var $image = $(".image-crop > img")
+        $($image).cropper({
+            aspectRatio: 1.618,
+            preview: ".img-preview",
+            done: function (data) {
+
+            },
+            crop: function (e) {
+
+            }
+        });
+
+        var $inputImage = $("#inputImage");
+
+        if (window.FileReader) {
+            $inputImage.change(function () {
+                var fileReader = new FileReader(),
+                        files = this.files,
+                        file;
+
+                if (!files.length) {
+                    return;
+                }
+
+                file = files[0];
+
+                if (/^image\/\w+$/.test(file.type)) {
+                    fileReader.readAsDataURL(file);
+                    fileReader.onload = function () {
+                        $inputImage.val("");
+                        $image.cropper("reset", true).cropper("replace", this.result);
+                    };
+                } else {
+                    showMessage("请选择图片文件.");
+                }
+            });
+        } else {
+            $inputImage.addClass("hide");
+        }
+
+        $("#zoomIn").click(function () {
+            $image.cropper("zoom", 0.1);
+        });
+
+        $("#zoomOut").click(function () {
+            $image.cropper("zoom", -0.1);
+        });
+    });
+
+    function sub() {
+        var $image = $(".image-crop > img")
+        var te = $image.cropper("getDataURL")
+        if (te == "" || te == undefined || te.length == 0) {
+            swal("请选择图片!", "", "warning");
+            return;
+        }
+        te = te.replace(/^data:image\/(png|jpg);base64,/, "")
+        $.ajax({
+            url: "/CompanyPlace/UploadImg",
+            data: { data: te, id: $("#placeId").val() },
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                if (data.Code == "OK") {
+                    window.location.href = "/CompanyPlace/PlaceList";
+                }
+                else {
+                    swal("请求失败!", data.Msg, "warning");
+                }
+            },
+            error: function (err) {
+                swal({
+                    title: err.responseJSON.Msg,
+                    type: "warning",
+                    text: ""
+                });
+            }
+        })
+    }
+</script>

@@ -1,0 +1,51 @@
+﻿@model Property.UI.Models.PropertyPlaceModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                @Html.HiddenFor(model => model.PlaceId, new { id = "placeId" })
+                <div class="ibox-title">
+                    设置小区图标
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="image-crop">
+                                @if (string.IsNullOrEmpty(Model.Img))
+                                {
+                                    <img src="~/Images/default.png" alt="" class="cropper-hidden" />
+                                }
+                                else
+                                {
+                                    <img src="@Model.Img" alt="" class="cropper-hidden" />
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>图标预览</h4>
+                            <div class="img-preview fa-border img-preview-sm"><img src="" style="min-width: 0px !important; min-height: 0px !important; max-width: none !important; max-height: none !important; width: 722px; height: 483px; margin-left: -72px; margin-top: -63px;"></div>
+                            <div class="btn-group">
+                                <label title="Upload image file" for="inputImage" class="btn btn-primary">
+                                    <input type="file" accept="image/*" name="file" id="inputImage" class="hide">
+                                    选择图片
+                                </label>
+                                <button class="btn btn-white" id="zoomIn" type="button"><i class="fa fa-search-plus"></i>放大</button>
+                                <button class="btn btn-white" id="zoomOut" type="button"><i class="fa fa-search-minus"></i>缩小</button>
+
+                                <a class="btn btn-primary" onclick="sub()" id="download">上传</a>
+                                <a class="btn btn-white" href="@ViewBag.Url">取消</a>
+                            </div>
+                            <div class="col-md-12">
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

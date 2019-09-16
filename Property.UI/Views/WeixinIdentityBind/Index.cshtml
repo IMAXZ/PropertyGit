@@ -1,0 +1,138 @@
+﻿@{
+    ViewBag.Title = "绑定小区";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model IEnumerable<Property.UI.Models.Weixin.BindPlaceModel>
+
+@if (Model.Count() > 0)
+{
+    <div class="weui_cells weui_cells_access">
+        <div style="padding:10px 15px">
+            <a href="#" onclick="openDel()" style="font-size: 16px; color:#0172ff"><i class="del_btn_icon"></i><span style="vertical-align:middle;margin-left:2px" id="right_btn">删除</span></a>
+        </div>
+        @foreach (var item in Model)
+        {
+            string url = "";
+            if (item.VerifyStatus == -1)
+            {
+                url = "/WeixinIdentityBind/IdentityVerification?placeId=" + item.PlaceId;
+            }
+            else
+            {
+                url = "/WeixinIdentityBind/PlaceBindResult/" + item.PlaceId;
+            }
+            <a href="@url" class="weui_cell">
+                <div class="weui_cell_hd" style="margin-right:10px;display:none">
+                    <img src="~/Images/Weixin/place_del_1.png" style="width:25px;height:25px" onclick="delPlace(@item.PlaceId)" />
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <h3 style="margin: 0;color:#000">@item.PlaceName</h3>
+                    <h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0">物业：@item.CompanyName</h5>
+                </div>
+                <div class="weui_cell_ft" style="font-size:16px">
+                    @switch (item.VerifyStatus)
+                    {
+                        case -1:
+                            <span style="color:#0172ff">未验证</span>
+                            break;
+                        case 0:
+                        <span style="color:#ff6300">审核中</span>
+                            break;
+                        case 1:
+                        <span style="color:#00BC00">已通过</span>
+                            break;
+                        case 2:
+                        <span style="color:#ff0000">已驳回</span>
+                            break;
+                    }
+
+                </div>
+            </a>
+
+        }
+    </div>
+}
+else 
+{
+    <div style="text-align:center;margin-top:20px;padding:20px 0">
+        <h3 style="font-weight:500;color:#808080">您还未绑定小区</h3>
+    </div>
+}
+<div class="weui_cells weui_cells_access" style="margin:20px 0">
+    <div class="weui_cell" onclick="addPlace()">
+        <div class="weui_cell_bd weui_cell_primary">
+            <h3 style="margin: 0;color:#000;text-align:center;vertical-align:middle"><i class="btn_icon"></i> <span style="vertical-align:middle">添加小区</span></h3>
+        </div>
+    </div>
+</div>
+@section Styles{
+    <style type="text/css">
+        .btn_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 25px;
+            height: 25px;
+            background: url(/Images/Weixin/add_place_icon.png) no-repeat;
+            background-size: 25px 25px;
+        }
+
+        .del_btn_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 12px;
+            height: 16px;
+            background: url(/Images/Weixin/place_del_0.png) no-repeat;
+            background-size: 12px 16px;
+        }
+    </style>
+}
+@section Scripts{
+
+    <script type="text/javascript">
+
+        function openDel() {
+            if ($("#right_btn").text() == "删除") {
+                $("#right_btn").text("取消");
+                $("a").click(function () {
+                    return false;
+                });
+                $(".weui_cell_hd").show();
+            } else if ($("#right_btn").text() == "取消") {
+                $("#right_btn").text("删除");
+                $(".weui_cell_hd").hide();
+                $("a").unbind("click");
+            }
+        }
+        function delPlace(placeId) {
+
+            var result = confirm("确定要删除绑定的小区吗？");
+            if (result == true) {
+                //删除
+                $.ajax({
+                    type: "post",
+                    url: "/WeixinIdentityBind/DelPlace/" + placeId,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            window.location.reload();
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("删除失败");
+                    }
+                });
+            }
+        }
+
+        //添加小区
+        function addPlace() {
+            $("#right_btn").text("删除");
+            $(".weui_cell_hd").hide();
+            $("a").unbind("click");
+
+            location.href = "/WeixinIdentityBind/AddPlace";
+        }
+    </script>
+}

@@ -1,0 +1,249 @@
+﻿@{
+    ViewBag.Title = "个人资料";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.PersonInfoModel
+
+<div style="padding: 20px 0" id="container">
+    <div style="text-align: center; height:80px;">
+        @if (string.IsNullOrEmpty(Model.HeadPath))
+        {
+            <img id="Head" src="~/Images/Weixin/header_default.png" style="width: 85px; height: 85px;" class="img-circle">
+        }
+        else
+        {
+            <img id="Head" src="@Model.HeadPath" style="width: 85px; height: 85px; " class="img-circle">
+        }
+        <div>
+            <input type="image" accept="image/*" style="display:none" id="imgFile" />
+            <a @*href="#"*@ onclick="chooseUploadImg()">
+                <img src="/Images/Weixin/camera.png" style="width:35px;height:35px;position:relative;left:26px;top:-30px" />
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="bd">
+    @Html.HiddenFor(m => m.UserId)
+    <div class="weui_cells weui_cells_access">
+        <a class="weui_cell" href="/WeixinPersonalCenter/UserNameInfo">
+            <div class="weui_cell_bd weui_cell_primary">
+                <label class="weui_label" style="margin-bottom:0">用户名</label>
+            </div>
+            <div class="weui_cell_ft">
+                @Model.UserName
+            </div>
+        </a>
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                <label class="weui_label" style="margin-bottom:0">性别</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary" onchange="getGender()">
+                @Html.DropDownListFor(m => m.Gender, Model.GenderList, "请选择性别", new { @class = "weui_select" })
+            </div>
+        </div>
+    </div>
+    <div class="weui_cells weui_cells_access">
+        <a class="weui_cell" href="/WeixinPersonalCenter/PhoneInfo">
+            <div class="weui_cell_bd weui_cell_primary">
+                <label class="weui_label" style="margin-bottom:0">手机号</label>
+            </div>
+            <div class="weui_cell_ft">
+                @Model.Phone
+            </div>
+        </a>
+        <a class="weui_cell" href="/WeixinPersonalCenter/EmailInfo">
+            <div class="weui_cell_bd weui_cell_primary">
+                <label class="weui_label" style="margin-bottom:0">邮箱</label>
+            </div>
+            <div class="weui_cell_ft">
+                @Model.Email
+            </div>
+        </a>
+    </div>
+</div>
+
+
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_input {
+            width: 100%;
+        }
+
+        .weui_btn_plain_blue {
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .weui_btn_plain_blue:active {
+            color: #1a31ea;
+            border-color: #1a31ea;
+        }
+
+        .weui_btn_plain_blue:after {
+            border-width: 0;
+        }
+
+        select, select option {
+            direction: rtl;
+        }
+    </style>
+}
+
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+    <script>
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+              'checkJsApi',
+              'onMenuShareTimeline',
+              'onMenuShareAppMessage',
+              'onMenuShareQQ',
+              'onMenuShareWeibo',
+              'hideMenuItems',
+              'showMenuItems',
+              'hideAllNonBaseMenuItem',
+              'showAllNonBaseMenuItem',
+              'translateVoice',
+              'startRecord',
+              'stopRecord',
+              'onRecordEnd',
+              'playVoice',
+              'pauseVoice',
+              'stopVoice',
+              'uploadVoice',
+              'downloadVoice',
+              'chooseImage',
+              'previewImage',
+              'uploadImage',
+              'downloadImage',
+              'getNetworkType',
+              'openLocation',
+              'getLocation',
+              'hideOptionMenu',
+              'showOptionMenu',
+              'closeWindow',
+              'scanQRCode',
+              'chooseWXPay',
+              'openProductSpecificView',
+              'addCard',
+              'chooseCard',
+              'openCard'
+            ]
+        });
+        wx.error(function (res)
+        {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function ()
+        {
+            wx.hideOptionMenu();
+        });
+
+        //$(function ()
+        //{
+        //    var width = $(".cyImg").width();
+        //    $(".cyImg").css({ "height": width });
+        //});
+
+        var imglocalId = "";
+        //选择上传头像
+        function chooseUploadImg()
+        {
+            wx.chooseImage({
+                count: 1,
+                success: function (res)
+                {
+                    imglocalId = res.localIds[0];
+                    $("#Head").attr("src", imglocalId);
+
+                    wx.uploadImage({
+                        localId: imglocalId,
+                        success: function (res)
+                        {
+                            //上传图片
+                            $.ajax({
+                                type: "POST",
+                                url: "/WeixinPersonalCenter/HeadImgInfo",
+                                data: { Img: res.serverId }, //Id: circleId,
+                                dataType: "json",
+                                success: function (data)
+                                {
+                                    if (data.Code == "OK")
+                                    {
+                                        location.reload(true);
+                                    } else
+                                    {
+                                        alert(data.Msg);
+                                    }
+                                }, error: function (error)
+                                {
+                                    alert("头像上传失败");
+                                }
+                            });
+                        },
+                        fail: function (res)
+                        {
+                            alert(JSON.stringify(res));
+                        }
+                    });
+                }
+            });
+        }
+
+
+        //修改性别
+        function getGender()
+        {
+            var gender = document.getElementById("Gender");
+            var Gender = gender.value;
+            $.ajax({
+                type: "post",
+                url: "/WeixinPersonalCenter/GenderInfo?Gerder=" + Gender,
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data)
+                {
+                    if (data.Code == "OK")
+                    {
+                        window.location.reload();
+                    } else
+                    {
+                        alert(data.Msg);
+                    }
+                },
+                error: function (err)
+                {
+                    alert("修改失败");
+                }
+            });
+        }
+    </script>
+}

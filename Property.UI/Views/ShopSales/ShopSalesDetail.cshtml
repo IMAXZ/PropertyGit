@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "查看商品详细";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.Entity.T_ShopSale
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="ibox product-detail">
+                <div class="ibox-title">
+                    <h5>查看商品详细</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table dataTable table-bordered">
+                        <tr>
+                            <td class="col-md-2"><label>商品名称</label></td>
+                            <td>@Model.Title</td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2"><label>商品分类</label></td>
+                            <td>@Model.GoodsCategory.Name</td>
+                        </tr>
+                        <tr>
+                            <td><label>详细描述</label></td>
+                            <td>@Model.Content</td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2"><label>商品价格</label></td>
+                            <td>@Model.Price 元</td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2"><label>商品库存</label></td>
+                            <td>@Model.RemainingAmout</td>
+                        </tr>
+                        <tr>
+                            <td><label>商家名称</label></td>
+                            <td colspan="3">
+                                @Model.GoodsCategory.Shop.ShopName
+                                @if (!string.IsNullOrEmpty(Model.Phone))
+                                {
+                                    <span>（@Model.Phone）</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

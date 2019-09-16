@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CCDE6E9D-39A3-41AF-BF6B-6D6F7B82F6CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Property.IDAL</RootNamespace>
+    <AssemblyName>Property.IDAL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IActionDAL.cs" />
+    <Compile Include="IActionItemDAL.cs" />
+    <Compile Include="IApplyInfoDAL.cs" />
+    <Compile Include="IAppUserShippingAddressDAL.cs" />
+    <Compile Include="IBaseDAL.cs" />
+    <Compile Include="IBuildCompanyDAL.cs" />
+    <Compile Include="IBuildDAL.cs" />
+    <Compile Include="IBuildDoorDAL.cs" />
+    <Compile Include="IBuildUnitDAL.cs" />
+    <Compile Include="ICityDAL.cs" />
+    <Compile Include="ICompanyOpreateLogDAL.cs" />
+    <Compile Include="ICompanyPostDAL.cs" />
+    <Compile Include="ICompanyRoleDAL.cs" />
+    <Compile Include="ICompanyUserDAL.cs" />
+    <Compile Include="ICountyDAL.cs" />
+    <Compile Include="IDisposeQuestionDAL.cs" />
+    <Compile Include="IExpressCompanyDAL.cs" />
+    <Compile Include="IFeedbackDAL.cs" />
+    <Compile Include="IGoodsCategoryDAL.cs" />
+    <Compile Include="IHouseUserDAL.cs" />
+    <Compile Include="IHouseUserExpenseDetailsDAL.cs" />
+    <Compile Include="IHouseUserExpenseTemplateDAL.cs" />
+    <Compile Include="IInspectionCategoryDAL.cs" />
+    <Compile Include="IInspectionExceptionDisposeDAL.cs" />
+    <Compile Include="IInspectionPlanDAL.cs" />
+    <Compile Include="IInspectionPointDAL.cs" />
+    <Compile Include="IInspectionResultDAL.cs" />
+    <Compile Include="IInspectionTimePlanDAL.cs" />
+    <Compile Include="ILifeBillDAL.cs" />
+    <Compile Include="ILifeBillTypeDAL.cs" />
+    <Compile Include="ILifePayTypeDAL.cs" />
+    <Compile Include="IMenuDAL.cs" />
+    <Compile Include="IMobileVersionDAL.cs" />
+    <Compile Include="IOrderDAL.cs" />
+    <Compile Include="IOrderDetailsDAL.cs" />
+    <Compile Include="IPhoneValidateDAL.cs" />
+    <Compile Include="IPostBarTopicDAL.cs" />
+    <Compile Include="IPostBarTopicDiscussDAL.cs" />
+    <Compile Include="IPostBarTopicTypeDAL.cs" />
+    <Compile Include="IPropertyAccountDAL.cs" />
+    <Compile Include="IPropertyExpenseNoDAL.cs" />
+    <Compile Include="IPropertyExpenseTypeDAL.cs" />
+    <Compile Include="IPropertyIdentityVerificationDAL.cs" />
+    <Compile Include="IPropertyOpreateLogDAL.cs" />
+    <Compile Include="IPlatformOpreateLogDAL.cs" />
+    <Compile Include="IPlatformRoleDAL.cs" />
+    <Compile Include="IPlatformUserDAL.cs" />
+    <Compile Include="IPostDAL.cs" />
+    <Compile Include="IPropertyCompanyDAL.cs" />
+    <Compile Include="IPropertyPlaceDAL.cs" />
+    <Compile Include="IPropertyRoleDAL.cs" />
+    <Compile Include="IPropertyUserDAL.cs" />
+    <Compile Include="IPropertyUserPushDAL.cs" />
+    <Compile Include="IProvinceDAL.cs" />
+    <Compile Include="IShopAccountDAL.cs" />
+    <Compile Include="IShopDAL.cs" />
+    <Compile Include="IShopPaymentManagementDAL.cs" />
+    <Compile Include="IShopSaleDAL.cs" />
+    <Compile Include="IShopShippingCostDAL.cs" />
+    <Compile Include="IShopUserDAL.cs" />
+    <Compile Include="IShopUserPushDAL.cs" />
+    <Compile Include="ISocialCircleChatDAL.cs" />
+    <Compile Include="ISocialCircleDAL.cs" />
+    <Compile Include="ISocialCircleMassTextingDAL.cs" />
+    <Compile Include="ISystemMessageDAL.cs" />
+    <Compile Include="IUserPlaceDAL.cs" />
+    <Compile Include="IUserDAL.cs" />
+    <Compile Include="IQuestionDAL.cs" />
+    <Compile Include="IUserPushDAL.cs" />
+    <Compile Include="IUserSocialCircleDAL.cs" />
+    <Compile Include="IUserSocialCircleMassTextingDAL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Property.Common\Property.Common.csproj">
+      <Project>{b0c11b9f-32a9-44e3-a3d0-77d4c4fc414d}</Project>
+      <Name>Property.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.Entity\Property.Entity.csproj">
+      <Project>{c07a9f18-0858-4e01-8ac4-7bc920fcc8ea}</Project>
+      <Name>Property.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,48 @@
+﻿@model Property.Entity.T_PropertyPlace
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="ibox product-detail">
+                <div class="ibox-content">
+                    <h2 class="font-bold m-b-xs">
+                        <span><img src="@Model.Img" class="img-circle" alt="" width="40" height="40" /></span>
+                        @Model.Name
+                        @if (Model.PlaceType == Property.Common.ConstantParam.PLACE_TYPE_HOUSE)
+                        {
+                            <span>（住宅小区）</span>
+                        }
+                        else if (Model.PlaceType == Property.Common.ConstantParam.PLACE_TYPE_COMPANY)
+                        {
+                            <span>（办公楼小区）</span>
+                        }
+                    </h2>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>@Html.Raw(Model.Content)</p>
+                        </div>
+                    </div>
+                    <h4 class="pull-right">@Model.Company.Name</h4>
+                </div>
+                <div class="ibox-footer">
+                    <span class="pull-right">
+                        联系电话 - <i class="fa fa-phone"></i> @Model.Tel
+                    </span>
+                    详细地址 - <i class="fa fa-map-marker"></i>
+                    @Model.Province.ProvinceName @Model.City.CityName
+                    @if (Model.County != null)
+                    {
+                        @Model.County.CountyName
+                    }
+                    @Model.Address
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,208 @@
+﻿@{
+    ViewBag.Title = "上报问题";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@section Styles{
+    <!-- Add jQuery Style direct - used for jQGrid plugin -->
+    <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <!-- Primary Inspinia style -->
+    <link href="~/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        /*.main_visual {
+            height: 27%;
+            overflow: hidden;
+            position: relative;
+        }*/
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            margin-top: 6px;
+        }
+
+            #wrapper ul li {
+                padding: 0px;
+                min-height: 50px;
+            }
+
+        #WeixinQuestionReport {
+            -webkit-border-radius: 100px;
+            background-image: url(/Images/WeiXin/WeixinQuestionReport.png);
+            background-repeat: no-repeat;
+            background-size: 100%;
+            z-index: 9999;
+            position: absolute;
+            height: 50px;
+            width: 50px;
+            right: 1.5rem;
+            bottom: 2.3rem;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script src="~/Scripts/jquery-2.1.1.js"></script>
+    <script src="~/Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+
+    <script type="text/javascript">
+
+    var pageIndex = 1;
+    var Total = 0;
+
+    $(document).ready(function () {
+        if(@ViewBag.QuestionTotal>0){
+                refresher.init({
+                    id: "wrapper",
+                    pullDownAction: Refresh,
+                    pullUpAction: Load
+                });
+                Refresh();
+            }
+            else{
+                var height = $("#no_data_div").height();
+                var h = (height - 194) / 2;
+                $("#no_data_div").css("padding-top", h);
+                $("#WeixinQuestionReport").show();
+            }
+        });
+
+        //刷新
+        function Refresh() {
+            Total = 0;
+            pageIndex = 1;
+            $("#list").empty();
+            Load();
+        }
+
+        //加载
+        function Load() {
+
+            var icon = "/Images/WeiXin/position.png";
+            var timeIcon = "/Images/WeiXin/time.png";
+
+            $.ajax({
+                type: "get",
+                url: "/WeixinQuestion/QuestionJsonList",
+                data: { pageIndex: pageIndex },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $("#WeixinQuestionReport").show();
+                    //如果总个数有变化
+                    if (pageIndex > 1 && data.Total != Total) {
+                        Refresh();
+                    } else {
+                        $.each(data.Result, function (index, entry) {
+
+                            var itemHtmlStr = '';
+                            itemHtmlStr += '<li>';
+                            itemHtmlStr += '<a href="/WeixinQuestion/QuestionDetail/' + entry["Id"] + '" style="text-decoration:none">';
+                            itemHtmlStr += '<div class="feed-element border-bottom white-bg" style="border-top:1px solid #E7EAEC;padding:8px;margin:0;">';
+
+                            itemHtmlStr += '<p style="margin:0px 8px 0 0">';
+                            itemHtmlStr += '<img class="pull-left" alt="image" src="' + icon + '"style="width:13px;height:16px;">';
+                            itemHtmlStr += '<h4 style="color:#0172ff;margin:0 0 8px 20px">' + entry["PropertyName"] +" "+ entry["Title"] + '</h4>';
+                            itemHtmlStr += '</p>';
+
+                            //itemHtmlStr += '<div class="media-body">';
+                            //itemHtmlStr += '<h4 style="color:#000;">' + entry["Desc"] + '</h4>';
+                            //itemHtmlStr += '</div>';
+
+                            itemHtmlStr += '<div style="width:100%;color:#000;">';
+                            //itemHtmlStr += '<tr><td style="color:#000;">';
+                            itemHtmlStr += '<h4 style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">' + entry["Desc"] + '</h4>';
+                            //itemHtmlStr += '</td></tr>';
+                            itemHtmlStr += '</div>';
+
+                            if (entry["ImgCount"] > 0) {
+
+                                itemHtmlStr += '<table style="width:100%;">';
+                                itemHtmlStr += '<tr><td width="100%">'
+                                for (var i = 0; i < entry["ImgCount"]; i++) {
+                                    if(i==1){
+                                        //itemHtmlStr += '<img alt="image" src="' + entry["Imgs"][i] + '"style="width:30%;height:68px;margin:0 10px 0 0">';
+                                        itemHtmlStr += '<div style="width: 32%; float: left;margin:0 2%"><img src="' + entry["Imgs"][i] + '" style="width:100%;height:68px;margin:0"></div>';
+                                    }
+                                    else{
+                                        //itemHtmlStr += '<img alt="image" src="' + entry["Imgs"][i] + '" style="width:30%;height:68px;margin:0 10px 0 0">';
+                                        itemHtmlStr +='<div style="width: 32%; float: left"><img src="' + entry["Imgs"][i] + '" style="width:100%;height:68px;margin:0"></div>'
+                                    }
+                                }
+                                itemHtmlStr += '</td></tr>';
+                                itemHtmlStr += '</table>';
+                            }
+
+                            //itemHtmlStr += '<div class="media-body" style="margin:10px 8px 0 0">';
+                            //itemHtmlStr += '<img class="pull-left" alt="image" src="' + entry["StatusImage"] + '"style="width:68px;height:29px;;border-radius: 10%">';
+                            //itemHtmlStr += '<h5 style="color:#000;margin:6px 0 8px 170px">' + entry["strUploadTime"] + '</h5>';
+                            //itemHtmlStr += '</div>';
+
+                            itemHtmlStr += '<table style="width:100%;margin:10px 8px 0 0">';
+                            itemHtmlStr += '<tr><td width="50%">';
+                            itemHtmlStr += '<img alt="image" src="' + entry["StatusImage"] + '"style="width:68px;height:29px;border-radius: 10%">';
+                            itemHtmlStr += '</td>';
+                            itemHtmlStr += '<td width="50%" style="text-align:right">';
+                            itemHtmlStr += '<img alt="image" src="' + timeIcon + '"style="width:12px;height:12px;margin:-2px 3px 0 0">';
+                            itemHtmlStr += '<span style="color:#000;font-size:12px;font-weight:600;">' + entry["strUploadTime"] + '</span>';
+                            //itemHtmlStr += '</td>';
+                            //itemHtmlStr += '<td width="42%" style="text-align:left">';
+                            //itemHtmlStr += '<h5 style="color:#000;margin:0 0px 0 10px">' + entry["strUploadTime"] + '</h5>';
+                            itemHtmlStr += '</td></tr>';
+                            //itemHtmlStr += '<tr><td width="100%" colspan="3">';
+                            ////itemHtmlStr += '<a href="/WeixinQuestionReport/Index" style="text-decoration:none">';
+                            ////itemHtmlStr += '<h3 style="color:#000;margin:15px 10px 0 0">上报问题</h3>';
+                            ////itemHtmlStr += '</a>';
+                            //itemHtmlStr += '</td></tr>';
+                            itemHtmlStr += '</table>';
+                            itemHtmlStr += '</div>';
+                            itemHtmlStr += '</a>';
+                            itemHtmlStr += '</li>';
+                            $("#list").append(itemHtmlStr);
+                        });
+                        wrapper.refresh();
+                        if (pageIndex * 10 >= data.Total) {
+                            $(".pullUp").text("已全部加载");
+                            wrapper.stop();
+                        } else {
+                            pageIndex = pageIndex + 1;
+                            $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                            wrapper.refresh();
+                        }
+                    }
+                    Total = data.Total;
+
+                }, error: function (error) {
+
+                    //加载失败
+                    wrapper.refresh();
+                }
+            });
+        }
+    </script>
+}
+
+
+@if (ViewBag.QuestionTotal > 0)
+{
+    <div id="wrapper">
+        <ul id="list"></ul>
+    </div>
+}
+else
+{
+    <div id="no_data_div" style="width:100%;height:100%;text-align:center">
+        <img src="~/Images/Weixin/null.png" style="width:210px" />
+    </div>
+}
+
+<a id="WeixinQuestionReport" href="/WeixinQuestion/QuestionReport" style="display:none"></a>
+
+

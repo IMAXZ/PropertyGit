@@ -1,0 +1,140 @@
+﻿@model Property.UI.Models.PropertyCompanyModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "新增物业公司";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增物业公司</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("AddCompany", "PropertyCompany", "", new AjaxOptions { HttpMethod = "Post" }, new { id = "form", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            <input type="hidden" id="Id" name="Id" value="0" />
+                            <div class="form-group">
+                                <label class="control-label col-md-2">物业公司名称<span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "物业公司名称", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">联系方式</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Tel, new { @class = "form-control", @placeholder = "联系方式" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">地址</label>
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.Address, new { @class = "form-control", @placeholder = "地址" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">介绍</label>
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.Content, new { @style = "width:100%;height:400px" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-8">
+                                    <input type="button" value="确定" class="btn btn-primary" onclick="sub()" />
+                                    <a class="btn btn-white" href="/PropertyCompany/CompanyList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/validate/AddPropertyCompanyValidate.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" src="~/Ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script type="text/javascript">
+
+        //编辑器源码文件
+        $().ready(function ()
+        {
+            UE.getEditor('Content');
+            var validator = $("#form").submit(function ()
+            {
+                UE.getEditor('Content').sync("form");
+            })
+        });
+
+        $(function ()
+        {
+            $("#UploadImg").change(function (e)
+            {
+                var file = e.target.files || e.dataTransfer.files;
+                if (file)
+                {
+                    var reader = new FileReader();
+                    reader.onload = function ()
+                    {
+                        $("#Company").attr("src", this.result);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            })
+        })
+
+
+        function sub()
+        {
+            if ($("#form").valid())
+            {
+                $('form').ajaxSubmit({
+                    success: OnSuccess,
+                    error: OnFailure
+                });
+            }
+
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                window.location.href = "/PropertyCompany/CompanyList";
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                })
+            }
+        }
+
+        function OnFailure(err)
+        {
+            swal({
+                title: "请求出现异常,图片上传失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

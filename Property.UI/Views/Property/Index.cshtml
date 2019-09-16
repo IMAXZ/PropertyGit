@@ -1,0 +1,219 @@
+﻿@{
+    ViewBag.Title = "物业平台首页";
+}
+@model Property.UI.Models.PropertyIndexModel
+<div class="wrapper wrapper-content">
+    <div class="ibox-content">
+        <div class="row" style="background-image:url(/Images/index_line.png)">
+            <div class="col-md-6">
+                <h2 style="color:#ffffff;padding-bottom:5px"><span style="font-size:20px">累计APP注册用户数：</span><b>@(Model.AppUserCount)</b></h2>
+            </div>
+            <div class="col-md-6">
+                <h2 style="color:#ffffff;"><span style="font-size:20px">累计物业用户数：</span><b>@(Model.PropertyUserCount)</b></h2>
+            </div>
+        </div>
+    </div>
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <img src="~/Images/index_bar.png" style="height:25px" /><b><span style="font-size:20px;vertical-align:bottom"> 数据统计</span></b>
+                </div>
+            </div>
+            <br />
+            <div class="row" style="color:white">
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg1.png) no-repeat;padding:8px 15px">
+                        <h3>已发布新闻个数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.NoticeCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_news.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg2.png) no-repeat;padding:8px 15px">
+                        <h3>业主上报问题个数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.QuestionCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_question.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg3.png) no-repeat;padding:8px 15px">
+                        <h3>本月上报问题未处理个数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.NotHandleQuestionCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_question_no.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg4.png) no-repeat;padding:8px 15px">
+                        <h3>本月巡检异常未处理个数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.NotHandleExceptionCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_ins.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div><br /></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <img src="~/Images/index_bar.png" style="height:25px" /><b><span style="font-size:20px;vertical-align:bottom"> 最新总公司新闻公告</span></b>
+                            @if (Html.IsHasButton("/NewsNotice/CompanyNewsList"))
+                            {
+                                <a href="@Url.Action("CompanyNewsList", "NewsNotice")"><span class="pull-right font-bold">更多>></span></a>
+                            }
+                        </div>
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">标题</th>
+                                    <th class="text-nowrap">发布时间</th>
+                                    <th class="text-center text-nowrap">其他</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LatestCompanyPostList)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.Title</td>
+                                        @if (item.PublishedTime != null)
+                                        {
+                                            <td class="text-nowrap">@item.PublishedTime.Value.ToString("yyyy-MM-dd HH:mm")</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-nowrap"></td>
+                                        }
+                                        <td class="text-center text-nowrap">
+
+                                            @if (Html.IsHasButton("/NewsNotice/CompanyNewsDetail"))
+                                            {
+                                                <a href="/NewsNotice/CompanyNewsDetail?id=@item.Id" class="btn btn-outline btn-primary btn-sm">详细查看</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <img src="~/Images/index_bar.png" style="height:25px" /><b><span style="font-size:20px;vertical-align:bottom"> 最新上报问题</span></b>
+                            @if (Html.IsHasButton("/Question/QuestionList"))
+                            {
+                                <a href="@Url.Action("QuestionList", "Question")"><span class="pull-right font-bold">更多>></span></a>
+                            }
+                        </div>
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">问题标题</th>
+                                    <th class="text-nowrap">提报人</th>
+                                    <th class="text-nowrap">提报时间</th>
+                                    <th class="text-nowrap">状态</th>
+                                    <th class="text-nowrap">(指派)处理人</th>
+                                    <th class="text-center text-nowrap">其他</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LatestQuestionList)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.Title</td>
+                                        <td class="text-nowrap">@item.UploadUser.UserName</td>
+                                        <td class="text-nowrap">@item.UploadTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td class="text-nowrap">
+                                            @if (item.Status == Property.Common.ConstantParam.NO_DISPOSE)
+                                            {
+                                                <span class="label label-warning">未处理</span>
+                                            }
+
+                                            @if (item.Status == Property.Common.ConstantParam.DISPOSED)
+                                            {
+                                                <span class="label label-primary">已处理</span>
+                                            }
+                                        </td>
+                                        @if (item.DisposerId == null)
+                                        {
+                                            <td class="text-nowrap"></td>
+                                        }
+                                        else if (!string.IsNullOrEmpty(item.Disposer.TrueName))
+                                        {
+                                            <td class="text-nowrap">@item.Disposer.TrueName</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-nowrap">@item.Disposer.UserName</td>
+                                        }
+
+                                        <td class="text-center text-nowrap">
+
+                                            @if (Html.IsHasButton("/Question/QuestionDetail"))
+                                            {
+                                                <a href="/Question/QuestionDetail?id=@item.Id" class="btn btn-outline btn-primary btn-sm">详细查看</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

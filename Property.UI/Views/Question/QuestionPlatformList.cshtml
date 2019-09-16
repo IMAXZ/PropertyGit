@@ -1,0 +1,157 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "上报问题列表";
+}
+
+@using Webdiyer.WebControls.Mvc
+
+@model Property.UI.Models.QuestionPlatformSearchModel
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox-content m-b-xs border-bottom">
+        <div class="row">
+            <div class="col-lg-12">
+                @using (Html.BeginForm("QuestionPlatformList", "Question", FormMethod.Get, new { @class = "form-horizontal", @role = "form" }))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-1">所属小区</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(model => model.PropertyPlaceId, Model.PropertyPlaceList, "请选择物业小区", new { @class = "form-control" })
+                        </div>
+
+                        <label class="control-label col-md-2">状态</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(model => model.Status, Model.StatusList, "请选择状态", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <label class="control-label col-md-1">问题标题</label>
+                        <div class="col-md-3">
+                            @Html.TextBox("Title", "", new { @class = "form-control", @placeholder = "请输入问题标题" })
+                        </div>
+
+                        <label class="control-label col-md-2">提报时间</label>
+                        <div class="col-md-3">
+                            <div class="input-daterange input-group" id="datepicker">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                @Html.TextBox("StartTime", Model.StartTime.Value.ToString("yyyy-MM-dd"), new { @class = "form-control", @readonly = "readonly" })
+                                <span class="input-group-addon">到</span>
+                                @Html.TextBox("EndTime", Model.EndTime.Value.ToString("yyyy-MM-dd"), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-right">
+                            <button class="btn btn-md btn-primary" type="submit">查询</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">所属小区</th>
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Title" }, { "DisplayName", "问题标题" } })
+                                    <th class="text-nowrap">提报人</th>
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "UploadTime" }, { "DisplayName", "提报时间" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Status" }, { "DisplayName", "状态" } })
+                                    <th class="text-nowrap">(指派)处理人</th>
+                                    <th class="text-center text-nowrap">其他</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DataList)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.PropertyPlace.Name</td>
+                                        <td class="text-nowrap">@item.Title</td>
+                                        <td class="text-nowrap">@item.UploadUser.UserName</td>
+                                        <td class="text-nowrap">@item.UploadTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td class="text-center text-nowrap">
+                                            @if (item.Status == Property.Common.ConstantParam.NO_DISPOSE)
+                                            {
+                                                <span class="label label-warning">未处理</span>
+                                            }
+                                            @if (item.Status == Property.Common.ConstantParam.DISPOSED)
+                                            {
+                                                <span class="label label-primary">已处理</span>
+                                            }
+                                        </td>
+                                        @if (item.DisposerId == null)
+                                        {
+                                            <td class="text-nowrap"></td>
+                                        }
+                                        else if (!string.IsNullOrEmpty(item.Disposer.TrueName))
+                                        {
+                                            <td class="text-nowrap">@item.Disposer.TrueName</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-nowrap">@item.Disposer.UserName</td>
+                                        }
+                                        <td class="text-center text-nowrap">
+
+                                            @if (Html.IsHasButton("/Question/QuestionPlatformDetail"))
+                                            {
+                                                <a href="/Question/QuestionPlatformDetail?id=@item.Id" class="btn btn-outline btn-primary btn-sm">查看详细</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-left">
+                            共 @Model.DataList.TotalPageCount 页 @Model.DataList.TotalItemCount 条记录，当前为第 @Model.DataList.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-7 text-right">
+                            @Html.Pager(Model.DataList, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "PageIndex",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    @Styles.Render("~/plugins/dataPickerStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/dataPicker")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+            $('#datepicker').datepicker({
+                clearBtn: false
+            });
+        });
+    </script>
+}
+
+

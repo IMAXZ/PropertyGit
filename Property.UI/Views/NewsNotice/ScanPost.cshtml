@@ -1,0 +1,64 @@
+﻿@model Property.UI.Models.NewsNoticeModel
+@{
+    ViewBag.Title = "新闻公告查看";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight article">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新闻公告查看</h5>
+                </div>
+                <div class="ibox-content" style="padding:20px 30px">
+                    <div class="article-title" style="margin:0 0 0 10px">
+                        <h2><b>@Model.Title</b></h2>
+                        <div class="text-right">
+                            <span class="text-muted">
+                                <i class="fa fa-clock-o"></i>
+                                @if (@Model.PublishedFlag == true)
+                                {
+                                    @Model.PuslishedTime
+                                }
+                                else
+                                {
+                                    @Model.SubmitTime
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+
+<!-- Primary Inspinia style -->
+@Styles.Render("~/Content/css")
+@Styles.Render("~/font-awesome/css")
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+
+<script>
+    $(function ()
+    {
+        var w = $(".ibox-content").width();//容器宽度
+        $(".ibox-content img").each(function ()
+        {//如果有很多图片，我们可以使用each()遍历
+            var img_w = $(this).width();//图片宽度
+            var img_h = $(this).height();//图片高度
+            if (img_w > w)
+            {//如果图片宽度超出容器宽度--要撑破了
+                var height = (w * img_h) / img_w; //高度等比缩放
+                $(this).css({ "width": w, "height": height });//设置缩放后的宽度和高度
+            }
+        });
+    });
+</script>
+

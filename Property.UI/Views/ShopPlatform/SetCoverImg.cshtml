@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "设置店铺封面";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.UI.Models.CoverImgUploadModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content">
+    @using (Ajax.BeginForm("SetCoverImg", "ShopPlatform", "", new AjaxOptions { HttpMethod = "Post" }, new { id = "form", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.ShopId)
+        <div class="ibox-content border-bottom">
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6">
+
+                    @if (!string.IsNullOrEmpty(Model.ImgPath))
+                    {
+                        <img id="Cover" alt="门店图片" class="img-responsive" src="@Model.ImgPath" style="width:100%;max-height:320px">
+                    }
+                    else
+                    {
+                        <img id="Cover" alt="门店图片" class="img-responsive" src="~/Images/shop_img_default.png" style="width: 100%; max-height: 320px">
+                    }
+                </div>
+            </div>
+            <br />
+            <div class="row" style="text-align:center">
+                <input name="CoverImgFile" id="CoverImgFile" type="file" accept="image/*" style="display:none" />
+                <a class="btn btn-sm btn-primary" onclick="$('#CoverImgFile').click()">选择图片</a>
+                <input id="uploadBtn" class="btn btn-sm btn-primary" type="button" value="上传" onclick="upload()" style="display:none"/>
+            </div>
+        </div>
+    }
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/sweetAlert")
+
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(function () {
+            $("#CoverImgFile").change(function (e) {
+                var file = e.target.files || e.dataTransfer.files;
+                if (file && file.length > 0) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        $("#Cover").attr("src", this.result);
+                        if (this.result != undefined && this.result != "") {
+                            $("#uploadBtn").show();
+                        } else {
+                            $("#uploadBtn").hide();
+                        }
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                } else{
+                    location.reload(true);
+                }
+            });
+        })
+
+        //创建提交
+        function upload() {
+
+            $('form').ajaxSubmit({
+                beforeSend: UploadBegin,
+                success: UploadSuccess,
+                error: UploadFailure
+            });
+        }
+
+        //上传开始
+        function UploadBegin() {
+            var str = "";
+            str += '<div class="sk-spinner sk-spinner-wave">';
+            str += '    <div class="sk-rect1"></div>';
+            str += '    <div class="sk-rect2"></div>';
+            str += '    <div class="sk-rect3"></div>';
+            str += '    <div class="sk-rect4"></div>';
+            str += '    <div class="sk-rect5"></div>';
+            str += '</div>';
+
+            swal({
+                title: "上传中...",
+                text: "",
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            //填充loading
+            $(".sweet-alert p").html(str);
+        }
+
+        function UploadSuccess(data) {
+
+            if (data.Code == "OK") {
+                swal({
+                    title: "上传成功!",
+                    text: "",
+                    type: "success"
+                }, function () {
+                    location.reload(true);
+                });
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+
+        function UploadFailure(err) {
+
+            swal({
+                title: "请求出现异常，上传失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+
+}

@@ -1,0 +1,215 @@
+﻿@model Property.UI.Models.ShopPlatformModel
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "编辑商家信息";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>编辑商家信息</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("EditShop", "ShopPlatform", "", new AjaxOptions { HttpMethod = "post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(model => model.Id)
+                            <div class="form-group">
+                                <label class="control-label col-md-2">商家名称<span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.ShopName, new { @class = "form-control", @placeholder = "商家名称", @required = true, @maxlength = 50 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">所在省市<span class="text-danger">*</span></label>
+                                <div class="col-md-3">
+                                    @Html.DropDownListFor(model => model.ProvinceId, Model.ProvinceList, "请选择省份", new { @class = "form-control", @required = true, @disabled = "disabled" })
+                                </div>
+                                <div class="col-md-3">
+                                    @Html.DropDownListFor(model => model.CityId, Model.CityList, "请选择城市", new { @class = "form-control", @required = true, @disabled = "disabled" })
+                                </div>
+                                <div class="col-md-2">
+                                    @Html.DropDownListFor(model => model.CountyId, Model.CountyList, "请选择区县", new { @class = "form-control", @disabled = "disabled" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">商家地址<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @placeholder = "商家地址", @maxlength = 200 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">联系电话<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Tel, new { @class = "form-control", @placeholder = "联系电话", @maxlength = 20 })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-2">营业时间<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        @Html.DropDownListFor(model => model.StartBusinessTime, Model.TimeList, new { @class = "form-control" })
+                                        <span class="input-group-addon">到</span>
+                                        @Html.DropDownListFor(model => model.EndBusinessTime, Model.TimeList, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">主营内容<span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.MainSale, new { @class = "form-control", @placeholder = "主营内容", @required = true, @maxlength = 300 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">商家介绍<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-sm-8">
+                                    @Html.TextAreaFor(m => m.Content, new { @style = "width:100%;height:400px" })
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                    <label class="col-sm-2 control-label">是否送货上门<span>&nbsp;&nbsp;</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="i-checks">
+                                            @Html.CheckBoxFor(m => m.IsDelivery)
+                                        </div>
+                                    </div>
+                                </div>*@
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/ShopPlatform/Index">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<link href="~/Content/animate.css" rel="stylesheet">
+<link href="~/Content/style.css" rel="stylesheet">
+<script src="~/Scripts/jquery-2.1.1.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/common.js"></script>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    <link href="~/Content/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="~/Content/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/iCheck")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" src="~/Ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <!-- 编辑器源码文件 -->
+    <script type="text/javascript">
+        $().ready(function () {
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green'
+            });
+
+            UE.getEditor('Content');
+            var validator = $("#form").submit(function () {
+                UE.getEditor('Content').sync("form");
+            }).validate({
+                ignore: "",
+                errorPlacement: function (error, element) {
+                    if (element.parent().hasClass("input-group")) {
+                        element.parent().after(error);
+                    }
+                    else
+                        element.after(error)
+                },
+                rules: {
+                    ShopName: {
+                        required: true,
+                        maxlength: 50
+                    },
+                    Tel: {
+                        maxlength: 20,
+                        TelCheck: true
+                    },
+                    Address: {
+                        maxlength: 200
+                    },
+                    EndBusinessTime: {
+                        BusinessTimeCheck: true
+                    },
+                    MainSale: {
+                        required: true,
+                        maxlength: 300
+                    }
+                },
+                messages: {
+                    ShopName: {
+                        required: "请输入商家名称",
+                        maxlength: "长度不能超过50位"
+                    },
+                    Tel: {
+                        maxlength: "长度不能超过20位"
+                    },
+                    Address: {
+                        maxlength: "长度不能超过200位"
+                    },
+                    MainSale: {
+                        required: "请输入主营内容",
+                        maxlength: "长度不能超过300位"
+                    }
+                }
+            });
+        });
+
+        jQuery.validator.addMethod("BusinessTimeCheck", function (value, element) {
+            var flag = true;
+            if (parseInt($("#StartBusinessTime").val()) > parseInt($("#EndBusinessTime").val())) {
+                flag = false;
+            }
+            return flag;
+        }, "营业时间设置不合理");
+
+        //请求成功
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/ShopPlatform/Index";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+
+        //请求失败
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常，编辑失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}
+
+

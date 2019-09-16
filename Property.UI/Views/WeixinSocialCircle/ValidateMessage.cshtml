@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "验证消息";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.MyListSocialCircleModel
+
+<div id="contance">
+    @foreach (var items in Model.MyListSocialCircle)
+    {
+        <div id="bk">
+            <span class="sp">@items.ApplyTime.ToString("MM/dd HH:mm")</span>
+        </div>
+        <div class="weui_cells weui_cells_access" style="margin-top: 0">
+            <div class="weui_cell" style="padding:15px">
+                <div class="weui_cell_hd" style="margin-right:10px">
+                    <img src="@items.HeadPath" style="width:48px;height:48px;margin-top:10px;" class="img-circle" />
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <h3 style="margin: 0;color:#000">@items.UserName</h3>
+                    <h3 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle">
+                        申请加入<span>@items.Name</span>
+                    </h3>
+                </div>
+                @if (items.ApplyStatus == 1 || items.ApplyStatus == 3)
+                {
+                    <p id="spa">已通过</p>
+                }
+                else if (items.ApplyStatus == 2)
+                {
+                    <p id="spa">已拒绝</p>
+                }
+            </div>
+
+        <div style="padding:0px 15px;display:block;" id="b">
+            <div class="form-group" style="padding-left:50%;">
+                @if (items.ApplyStatus == 0)
+                {
+                    <a class="btn btn1" onclick="RejectOwnerMgr(@items.Id)">拒绝</a>
+                    @*<input type="submit" value="同意" class="btn btn-primary" />*@
+                    <a class="btn btn2" onclick="PassOwnerMgr(@items.Id)">同意</a>
+                }
+            </div>
+        </div>
+    </div>
+    }
+</div>
+<div id="buttom">
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    <style type="text/css">
+        #buttom {
+            height: 20px;
+            background-color: #FBF9FE;
+            margin-top: -20px;
+        }
+
+        .container {
+            background-color: #F2F2F2;
+        }
+
+        #contance {
+            background-color: #FBF9FE;
+        }
+
+        .btn1 {
+            color: #0172FE;
+            border: 1px solid #0172FE;
+            width: 40%;
+            text-align:center;
+        }
+
+        .btn2 {
+            background-color: #0172FF;
+            width: 40%;
+            color: #FFFFFF;
+            float: right;
+        }
+
+        #bk {
+            background-color: #F2F2F2;
+            height: 40px;
+            width: 100%;
+            padding: 9px;
+            text-align: center;
+        }
+
+        .h {
+            border: 1px;
+            margin-bottom: 0px;
+            color: #F2F2F2;
+        }
+
+        .p1 {
+            color: inherit;
+            background: white;
+            border: 1px solid #e7eaec;
+            border-radius: 3px;
+            display: inline;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        #spa {
+            color: inherit;
+            background: white;
+            border: 1px solid #e7eaec;
+            border-radius: 1px;
+            display: block;
+            padding: 6px 20px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            opacity: 0.7;
+            margin-top:15px;
+        }
+
+        .sp {
+            font-size: 10px;
+            border-radius: 3px;
+            background-color: #d4d2d2;
+            height: auto;
+            padding: 3px 8px;
+        }
+    </style>
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/dataPicker")
+    <script type="text/javascript">
+        //$(".btn-primary").click(function () {
+        //    $("#b").remove();
+        //    $("#spa").show();
+        //});
+
+        //通过
+        function PassOwnerMgr(id) {
+
+            if(confirm("确定通过吗？"))
+            {
+                $.ajax({
+                    url: "/WeixinSocialCircle/PassMgr",
+                    data: { id: id },
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            window.location.reload(true);
+                            $(".btn-primary").click(function () {
+                                $("#b").remove();
+                            });
+                        } else {
+                            alert(data.Msg);
+                        }
+                    },
+                    error: function (err) {
+                        alert("通过失败")
+                    }
+                });
+            }
+        }
+        //驳回
+        function RejectOwnerMgr(id) {
+            if(confirm("确定拒绝吗？"))
+            {
+                $.ajax({
+                    url: "/WeixinSocialCircle/RejectMgr",
+                    data: { id: id },
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+
+                            location.reload(true);
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("驳回失败");
+                    }
+                });
+            }
+        }
+    </script>
+}

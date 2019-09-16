@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "物业用户列表";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+@using Webdiyer.WebControls.Mvc
+@using Property.Common
+@model Property.UI.Models.PropertyPlaceSearchModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox-content m-b-xs border-bottom">
+        <div class="row">
+            <div class="col-lg-12">
+                @using (Html.BeginForm("PropertyUserList", "Company", FormMethod.Get, new { @class = "form-horizontal", @role = "form" }))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-1">所属小区</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(model => model.PropertyPlaceId, Model.PropertyPlaceList, "请选择物业小区", new { @class = "form-control" })
+                        </div>
+                        <label class="control-label col-md-1">用户姓名</label>
+                        <div class="col-md-3">
+                            @Html.TextBox("Kword", "", new { @class = "form-control", @placeholder = "请输入用户名，姓名" })
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button class="btn btn-md btn-primary" type="submit">查询</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center text-nowrap">头像</th>
+                                    <th class="text-center text-nowrap">所属小区</th>
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "UserName" }, { "DisplayName", "用户名" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "TrueName" }, { "DisplayName", "用户姓名" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Tel" }, { "DisplayName", "联系方式" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Phone" }, { "DisplayName", "手机" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Email" }, { "DisplayName", "电子邮箱" } })
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model.DataUserList)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="dropdown-messages-box text-center">
+                                                @if (string.IsNullOrEmpty(item.HeadPath))
+                                                {
+                                                    <img src="/Images/default.png" class="img-circle" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@item.HeadPath" class="img-circle" />
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>@item.PropertyPlace.Name</td>
+                                        <td>@item.UserName</td>
+                                        <td>@item.TrueName</td>
+                                        <td>@item.Tel</td>
+                                        <td>@item.Phone</td>
+                                        <td>@item.Email</td>
+                                    </tr>
+                                }
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-left">
+                            共 @Model.DataUserList.TotalPageCount 页 @Model.DataUserList.TotalItemCount 条记录，当前为第 @Model.DataUserList.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-7 text-right">
+                            @Html.Pager(Model.DataUserList, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "PageIndex",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}

@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "修改邮箱";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.EmailInfoModel
+
+<div>
+    @using (Ajax.BeginForm("EmailInfo", "WeixinPersonalCenter", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+    {
+        <input type="text" readonly="readonly" style="display:none" />
+        <div class="weui_cells weui_cells_form">
+            @Html.HiddenFor(m => m.Id)
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">邮箱</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "weui_input", @maxlength = 50, @style = "text-align:right", @placeholder = "请输入邮箱" })
+                </div>
+            </div>
+        </div>
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="submitPersonInfo();">保存</button>
+    </div>
+</div>
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .weui_btn_plain_blue {
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+            .weui_btn_plain_blue:active {
+                color: #1a31ea;
+                border-color: #1a31ea;
+            }
+
+            .weui_btn_plain_blue:after {
+                border-width: 0;
+            }
+    </style>
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        //提交
+        function submitPersonInfo()
+        {
+            if ($("#Email").val().trim() == "" || $("#Email").val() == undefined)
+            {
+                alert("请输入邮箱");
+                return;
+            }
+            if ($("#Email").val())
+            {
+                var emailRegular = /[a-zA-Z0-9.]+[a-zA-Z0-9]+(.(com|cn|org|edu|hk|net))/;
+                if (!emailRegular.test($("#Email").val()))
+                {
+                    alert("邮箱格式不正确");
+                    return;
+                }
+            }
+            $("#form").submit();
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                //保存成功
+                window.location.href = "/WeixinPersonalCenter/PersonInfo";
+                //history.go(-1);
+                //location.reload(true);
+            }
+            else
+            {
+                alert(data.Msg);
+            }
+        }
+
+        function OnFailure(err)
+        {
+            alert("请求发生异常");
+        }
+    </script>
+}

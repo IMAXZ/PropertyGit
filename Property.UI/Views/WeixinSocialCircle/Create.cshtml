@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "创建圈子";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.SocialCircleModel
+<div>
+
+    @using (Ajax.BeginForm("Create", "WeixinSocialCircle", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { @id = "form" }))
+    {
+        <input type="text" readonly="readonly" style="display:none" />
+        <div style="padding: 27px 0; height: 199px; background: url(/Images/Weixin/quanz_create_bg.png) no-repeat; background-size: 100% 199px">
+            <div style="text-align: center">
+                @Html.HiddenFor(m => m.HeadImg)
+                <img id="Head" src="~/Images/Weixin/quanz_head.png" style="width: 98px; height: 98px;background: #fff; border:4px solid #5ba0ff; " class="img-circle">
+                <div style="margin-top:15px">
+                    <a href="#" class="weui_btn weui_btn_mini weui_btn_plain_white" style="font-size:13px;color:#fff" onclick="chooseImg()">设置圈子头像</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            <div class="weui_cell weui_cell_select weui_select_after">
+                <div class="weui_cell_hd">
+                    <label class="weui_label" style="margin-bottom:0">所属小区</label>
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.DropDownListFor(model => model.PlaceId, Model.PlaceList, "请选择所属小区", new { @class = "weui_select" })
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">圈子名称</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(model => model.Name, new { @class = "weui_input", @maxlength = 30, @placeholder = "给圈子起个名字吧" })
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <label class="weui_label" style="margin-bottom:10px">圈子介绍</label>
+                    @Html.TextAreaFor(model => model.Content, new { @class = "weui_textarea", @maxlength = 200, @placeholder = "简单介绍下圈子吧，可不填", @rows = "5" })
+                </div>
+            </div>
+        </div>
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="createSubmit();">创建圈子</button>
+    </div>
+</div>
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_btn_plain_white {
+            line-height: 22px;
+            padding: 0 8px;
+            border: 1px solid #fff;
+        }
+
+        button.weui_btn_plain_white,
+        input.weui_btn_plain_white {
+            border-width: 1px;
+            background-color: transparent;
+        }
+
+        .weui_btn_plain_white:active {
+            border-color: #5ba0ff;
+        }
+
+        .weui_btn_plain_white:after {
+            border-width: 0;
+        }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        input {
+            text-align: right;
+        }
+
+        select, select option {
+            direction: rtl;
+        }
+    </style>
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+                'chooseImage',
+                'previewImage',
+                'uploadImage',
+                'downloadImage',
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        });
+
+        var imglocalId = "";
+        //选择图片头像
+        function chooseImg() {
+
+            wx.chooseImage({
+                count: 1,
+                success: function (res) {
+
+                    imglocalId = res.localIds[0];
+                    $("#Head").attr("src", imglocalId);
+                }
+            });
+        }
+
+        //创建提交
+        function createSubmit() {
+
+            if ($("#PlaceId").val() == "" || $("#PlaceId").val() == undefined) {
+                alert("请选择所属小区");
+            } else if ($("#Name").val().trim() == "") {
+                alert("请输入圈子名称");
+            } else {
+
+                if (imglocalId != undefined && imglocalId != "") {
+                    wx.uploadImage({
+                        localId: imglocalId,
+                        success: function (res) {
+
+                            $("#HeadImg").val(res.serverId);
+                            $("#form").submit();
+                        },
+                        fail: function (res) {
+                            alert(JSON.stringify(res));
+                        }
+                    });
+                } else {
+                    alert("请设置圈子头像");
+                }
+            }
+        }
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+
+                alert("创建成功");
+                window.location.href = "/WeixinSocialCircle/Index";
+            }
+            else {
+                alert(data.Msg);
+            }
+        }
+        function OnFailure(err) {
+            alert("请求发生异常");
+        }
+    </script>
+
+}

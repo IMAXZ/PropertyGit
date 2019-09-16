@@ -1,0 +1,221 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "上报问题详细";
+}
+@model Property.Entity.T_Question
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="ibox product-detail">
+                <div class="ibox-content">
+
+                    <div class="row">
+                        @if (!string.IsNullOrEmpty(Model.Imgs))
+                        {
+                            string[] imgs = Model.Imgs.Split(';');
+                            <div class="col-md-5">
+
+                                <div class="carousel slide" id="carousel">
+
+                                    <ol class="carousel-indicators">
+                                        @for (int i = 0; i < imgs.Count(); i++)
+                                        {
+                                            if (i == 0)
+                                            {
+                                                <li data-slide-to="@i" data-target="#carousel" class="active"></li>
+                                            }
+                                            else
+                                            {
+                                                <li data-slide-to="@i" data-target="#carousel"></li>
+                                            }
+                                        }
+                                    </ol>
+
+                                    <div class="carousel-inner">
+                                        @for (int i = 0; i < imgs.Count(); i++)
+                                        {
+                                            if (i == 0)
+                                            {
+                                                <div class="item active">
+                                                    <img alt="image" class="img-container" src="@imgs[i]">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="item">
+                                                    <img alt="image" class="img-container" src="@imgs[i]">
+                                                </div>
+                                            }
+
+                                        }
+
+                                    </div>
+                                    <a data-slide="prev" href="#carousel" class="left carousel-control">
+                                        <span class="icon-prev"></span>
+                                    </a>
+                                    <a data-slide="next" href="#carousel" class="right carousel-control">
+                                        <span class="icon-next"></span>
+                                    </a>
+                                </div>
+
+                            </div>
+                            <div class="col-md-7">
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped table-bordered">
+
+                                        <tbody>
+                                            <tr>
+                                                <th colspan="2" class="text-center"><label>问题详情</label></th>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题标题</label></td>
+                                                <td class="col-md-10">@Model.Title</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题描述</label></td>
+                                                <td class="col-md-10">@Model.Desc</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题语音</label></td>
+                                                <td class="col-md-10">
+                                                    @if (!string.IsNullOrEmpty(Model.AudioPath))
+                                                    {
+                                                        <audio controls="controls">
+                                                            <source src="@Model.AudioPath" />
+                                                        </audio>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br />
+                                @if (Model.Status == Property.Common.ConstantParam.DISPOSED)
+                                {
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-bordered">
+
+                                            <tbody>
+                                                <tr>
+                                                    <th colspan="3" class="text-center"><label>处理结果</label></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-md-8"><label>问题处理描述</label></th>
+                                                    <th class="col-md-2"><label>处理人</label></th>
+                                                    <th class="col-md-2"><label>处理时间</label></th>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Model.QuestionDisposes.FirstOrDefault().DisposeDesc</td>
+                                                    @if (Model.Disposer == null)
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(Model.Disposer.TrueName))
+                                                    {
+                                                        <td>@Model.Disposer.TrueName</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@Model.Disposer.UserName</td>
+                                                    }
+                                                    <td>@Model.QuestionDisposes.FirstOrDefault().DisposeTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div><label class="label label-warning">未处理</label></div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped table-bordered">
+
+                                        <tbody>
+                                            <tr>
+                                                <th colspan="2" class="text-center"><label>问题详情</label></th>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题标题</label></td>
+                                                <td class="col-md-10">@Model.Title</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题描述</label></td>
+                                                <td class="col-md-10">@Model.Desc</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-2"><label>问题语音</label></td>
+                                                <td class="col-md-10">
+                                                    @if (!string.IsNullOrEmpty(Model.AudioPath))
+                                                    {
+                                                        <audio controls="controls">
+                                                            <source src="@Model.AudioPath" />
+                                                        </audio>
+                                                    }
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br />
+                                @if (Model.Status == Property.Common.ConstantParam.DISPOSED)
+                                {
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-bordered">
+
+                                            <tbody>
+                                                <tr>
+                                                    <th colspan="3" class="text-center"><label>处理结果</label></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-md-8"><label>问题处理描述</label></th>
+                                                    <th class="col-md-2"><label>处理人</label></th>
+                                                    <th class="col-md-2"><label>处理时间</label></th>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Model.QuestionDisposes.FirstOrDefault().DisposeDesc</td>
+                                                    @if (Model.Disposer == null)
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(Model.Disposer.TrueName))
+                                                    {
+                                                        <td>@Model.Disposer.TrueName</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@Model.Disposer.UserName</td>
+                                                    }
+                                                    <td>@Model.QuestionDisposes.FirstOrDefault().DisposeTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div><label class="label label-warning">未处理</label></div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

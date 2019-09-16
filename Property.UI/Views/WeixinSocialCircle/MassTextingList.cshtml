@@ -1,0 +1,259 @@
+﻿@{
+    ViewBag.Title = "群发消息";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.SocialCircleChatModel
+
+@{
+    var Name = Model.Name.Length > 10 ? Model.Name.Substring(0, 10) + ".." : Model.Name;
+}
+
+<div style="background: #0172ff; height: 50px; line-height: 50px; text-align: center;color:#fff;position:fixed;top:0;width:100%">
+    <span style="vertical-align:middle;font-size:18px">@Name</span>
+</div>
+
+<div id="wrapper">
+    <ul id="list"></ul>
+</div>
+
+<div style="background: #fff; height: 48px; line-height: 48px; text-align: center;color:#fff;position:fixed;bottom:0;width:100%;padding:6px 0">
+    <div style="text-align:center">
+        <button style="width:40%;font-size:16px;line-height:36px" class="weui_btn weui_btn_blue" onclick="location.href = '/WeixinSocialCircle/CircleUserManage/@Model.Id'"> + 新建群发</button>
+    </div>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .container {
+            background-color: #f2f2f2;
+        }
+
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            top: 50px;
+            bottom: 58px;
+            width: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 0 10px;
+                background-color: #f2f2f2;
+            }
+
+        h3, h4 {
+            font-weight: 500;
+            margin: 8px 0;
+            color: #000;
+            word-break: break-all;
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            word-break: break-all;
+            color: #676a6c;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        hr {
+            margin: 0;
+        }
+
+        .mass_recordbox {
+            padding: 0 10px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            background-color: #fff;
+            height: auto;
+            display: block;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        .time {
+            background: #b7b0b0;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+    </style>
+}
+
+@section Scripts{
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script type="text/javascript">
+
+        var pageIndex = 1;
+        var Total = 0;
+        var IsLoadComplete = false;
+        var circleId = @Html.Raw(Model.Id)
+
+        $(document).ready(function () {
+
+            refresher.init({
+                id: "wrapper",
+                pullUpAction: Load,
+                pullDownAction: Refresh
+            });
+            wrapper.refresh();
+
+            //加载数据
+            Load();
+            $("#loading_page").show();
+        });
+
+        //刷新
+        function Refresh() {
+
+            Total = 0;
+            pageIndex = 1;
+            IsLoadComplete = false;
+            $(".pullUp").children().remove();
+            $("#list").empty();
+            $("#loading_page").show();
+            Load();
+        }
+
+        var timeInterval = @Html.Raw((int)ViewBag.TimeInterval)
+        //加载
+        function Load() {
+
+            //如果未加载完毕
+            if (!IsLoadComplete) {
+
+                $.ajax({
+                    type: "get",
+                    url: "/WeixinSocialCircle/GetSocialCircleMassTextingJsonList",
+                    data: { id: circleId, PageIndex: pageIndex },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+
+                        if (data.Total == 0) {
+                            wrapper.refresh();
+                            $(".pullUp").remove();
+                            IsLoadComplete = true;
+                            wrapper.stop();
+                        }
+                            //如果总个数有变化
+                        else if (pageIndex > 1 && data.Total != Total) {
+                            Refresh();
+                        } else {
+                            $.each(data.Result, function (index, entry) {
+
+                                var ChatTime = new Date(entry["ChatTime"]).getTime();
+                                var LastChatTime = new Date(entry["LastTime"]).getTime();
+                                var href = "/WeixinSocialCircle/SendMsg?id=@Model.Id" + "&ids=" + entry["MemberIds"];
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<li>';
+                                if (entry["LastTime"] == undefined || entry["LastTime"] == ""
+                                    || LastChatTime - ChatTime > parseInt(timeInterval) * 60 * 1000) {
+
+                                    var d = new Date(entry["ChatTime"]);
+                                    itemHtmlStr += '<div style="text-align:center;margin-top:6px"><span class="time">' + getFormatDate(d) + '</span></div>';
+                                }
+                                itemHtmlStr += '<a class="mass_recordbox" href=' + href + '>';
+
+                                itemHtmlStr += '<div style="padding:5px 0">';
+                                itemHtmlStr += '<p>你发消息给<span> ' + entry["MemberCount"] + ' </span>位朋友:</p>';
+                                itemHtmlStr += '<p>' + entry["MemberNames"] + '</p>';
+                                itemHtmlStr += '</div>';
+                                itemHtmlStr += '<hr />';
+
+                                itemHtmlStr += '<div>';
+                                if (entry["Content"] != undefined && entry["Content"] != "") {
+                                    itemHtmlStr += '<h3>' + entry["Content"] + '</h3>';
+                                }
+                                if (entry["Img"] != undefined && entry["Img"] != "") {
+                                    itemHtmlStr += '<img src="' + entry["Img"] + '" style="width:100%;height:200px" />';
+                                }
+                                itemHtmlStr += '</div>';
+                                itemHtmlStr += '<hr />';
+
+                                itemHtmlStr += '<div style="text-align:center;padding:5px 0"><span style="font-size: 16px; color: #0172ff">再发一条</span></div>';
+
+                                itemHtmlStr += '</a>';
+                                itemHtmlStr += '</li>';
+                                $("#list").append(itemHtmlStr);
+                            });
+                            //如果已经加载完毕
+                            if (pageIndex * 5 >= data.Total) {
+
+                                $(".pullUp").children().remove();
+                                IsLoadComplete = true;
+                                wrapper.stop();
+                            } else {
+                                pageIndex = pageIndex + 1;
+                                $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                                wrapper.refresh();
+                            }
+                            wrapper.refresh();
+                        }
+                        Total = data.Total;
+                        $("#loading_page").hide();
+
+                    }, error: function (error) {
+
+                        //加载失败
+                        wrapper.refresh();
+                        $("#loading_page").hide();
+                    }
+                });
+            }
+        }
+
+        var currentYear = @Html.Raw(DateTime.Now.Year)
+
+        function getFormatDate(date) {
+
+            var seperator1 = '/';
+            var seperator2 = ':';
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+
+            if (month >= 1 && month <= 9) {
+                month = '0' + month;
+            }
+            if (day >= 0 && day <= 9) {
+                day = '0' + day;
+            }
+            if (hour >= 0 && hour <= 9) {
+                hour = '0' + hour;
+            }
+            if (minute >= 0 && minute <= 9) {
+                minute = '0' + minute;
+            }
+
+            if (date.getYear() == currentYear) {
+                return month + seperator1 + day + ' ' + hour + seperator2 + minute;
+            } else {
+                return date.getFullYear() + seperator1 + month + seperator1 + day;
+            }
+        }
+    </script>
+}

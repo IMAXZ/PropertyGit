@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "设置支付宝账户";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+@model Property.UI.Models.ShopAccountModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设置支付宝账户</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("SetAlipayAccount", "ShopAccount", "", new AjaxOptions { HttpMethod = "Post" }, new { id = "form", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.AlipayId)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">支付宝账户<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.AlipayNumber, new { @class = "form-control", @placeholder = "支付宝账户" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商户号<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.AlipayMerchantNo, new { @class = "form-control", @placeholder = "商户号" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">秘钥<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.PrivatePath, new { @class = "form-control", @type = "file" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">公钥<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.PublicPath, new { @class = "form-control", @type = "file" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="button" value="确定" class="btn btn-primary" onclick="sub()"/>
+                                    <a class="btn btn-white" href="/ShopAccount/AccountList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script src="~/Scripts/validate/AddAlipayAccount.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        function sub()
+        {
+            if ($("#form").valid())
+            {
+                $('form').ajaxSubmit({
+                    beforeSend: ImportBegin,
+                    success: OnSuccess,
+                    error: OnFailure
+                });
+            }
+        }
+
+        function ImportBegin()
+        {
+
+            var str = "";
+            str += '<div class="sk-spinner sk-spinner-wave">';
+            str += '    <div class="sk-rect1"></div>';
+            str += '    <div class="sk-rect2"></div>';
+            str += '    <div class="sk-rect3"></div>';
+            str += '    <div class="sk-rect4"></div>';
+            str += '    <div class="sk-rect5"></div>';
+            str += '</div>';
+
+            swal({
+                title: "导入中...",
+                text: "",
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            //填充loading
+            $(".sweet-alert p").html(str);
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                window.location.href = "/ShopAccount/AccountList";
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err)
+        {
+            swal({
+                title: "请求出现异常,设置失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

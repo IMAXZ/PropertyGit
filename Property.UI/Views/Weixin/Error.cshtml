@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "错误页";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+<div id="error_div" style="width:100%;height:100%;text-align:center;background:#fff">
+    <img src="~/Images/Weixin/error.png" style="width:321px" />
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var height = $("#error_div").height();
+            var h = (height - 371) / 2;
+            $("#error_div").css("padding-top", h);
+        });
+    </script>
+}

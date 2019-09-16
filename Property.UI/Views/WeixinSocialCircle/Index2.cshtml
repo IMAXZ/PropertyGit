@@ -1,0 +1,261 @@
+﻿@{
+    ViewBag.Title = "业主圈子";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+<div class="weui_search_bar" id="search_bar" style="background-color: #fff; position: fixed; top: 0; width: 100%">
+    <div class="weui_search_outer" style="background-color:#fff">
+        <div class="weui_search_inner" style="padding:0 36px 0 10px">
+            <input type="text" class="weui_search_input" id="Kwords" name="Kwords" placeholder="搜索感兴趣的圈子..." style="padding:6px 0" oninput="Load()">
+            <i class="search_icon"></i>
+            <i class="search_cancel_icon" onclick="emptyKwords()" style="display:none"></i>
+        </div>
+    </div>
+</div>
+
+<div style="position: fixed; top: 48px; width: 100%">
+
+    <div style="text-align: center; padding: 6px 0; border-bottom: 1px solid #d9d9d9">
+        <span style="font-size: 13px">您所在业主小区共有<span id="TotalCount" style="color:#0172ff;font-weight:600">&nbsp;@ViewBag.Count </span>个圈子在热聊</span>
+    </div>
+
+    <div class="weui_tab" style="margin-bottom:10px">
+        <div class="weui_navbar" style="color:#000;background:#fff;font-weight:600">
+            <div style="width: 50%; text-align: center; padding: 8px 0" onclick="location.href = '/WeixinSocialCircle/Index'">
+                <span style="font-size:16px">业主圈子</span>
+            </div>
+            <div style="width: 50%;text-align:center; padding: 8px 0" class="now">
+                <span style="font-size: 16px">我的圈子</span>
+            </div>
+        </div>
+        <div class="weui_tab_bd" style="padding-top:43px">
+
+            <div id="page_content">
+            </div>
+        </div>
+    </div>
+</div>
+
+<a id="CreateSocialCircleBtn" href="/WeixinSocialCircle/Create"></a>
+<a id="refreshBtn" onclick="refresh2()"></a>
+
+@section Styles{
+
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .now {
+            color: #0172ff;
+            border-bottom: 2px solid #0172ff;
+        }
+
+        .search_icon {
+            background: url(/Images/Weixin/search_icon.png) no-repeat;
+            background-size: 25px 25px;
+            position: absolute;
+            right: 6px;
+            top: 3.5px;
+            line-height: 25px;
+            width: 25px;
+            height: 25px;
+            vertical-align: middle;
+        }
+        .search_cancel_icon {
+            background: url(/Images/Weixin/search_cancel.png) no-repeat;
+            background-size: 25px 25px;
+            position: absolute;
+            right: 6px;
+            top: 3.5px;
+            line-height: 25px;
+            width: 25px;
+            height: 25px;
+            vertical-align: middle;
+        }
+        .weui_btn_plain_blue {
+            line-height: 22px;
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 0 8px;
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+        button.weui_btn_plain_blue,
+        input.weui_btn_plain_blue {
+            border-width: 1px;
+            background-color: transparent;
+        }
+
+        .weui_btn_plain_blue:active {
+            color: #1a31ea;
+            border-color: #1a31ea;
+        }
+
+        .weui_btn_plain_blue:after {
+            border-width: 0;
+        }
+
+        .marker_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 11px;
+            height: 13px;
+            background: url(/Images/Weixin/quanz_marker.png) no-repeat;
+            background-size: 11px 13px;
+            margin-right: 2px;
+        }
+
+        #CreateSocialCircleBtn {
+            -webkit-border-radius: 100px;
+            background: url(/Images/WeiXin/create_circle_btn.png) no-repeat;
+            background-size: 54px 54px;
+            z-index: 2;
+            position: absolute;
+            height: 54px;
+            width: 54px;
+            right: 15px;
+            bottom: 15px;
+        }
+
+        #refreshBtn {
+            -webkit-border-radius: 100px;
+            background: url(/Images/WeiXin/refresh_btn.png) no-repeat;
+            background-size: 54px 54px;
+            z-index: 2;
+            position: absolute;
+            height: 54px;
+            width: 54px;
+            right: 15px;
+            bottom: 84px;
+        }
+    </style>
+}
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var h = $(".container").height();
+            $(".weui_tab").css("height", h - 91);
+            $(".weui_tab_bd").css("height", h - 91);
+
+            Load();
+        });
+
+        //清空搜索关键字
+        function emptyKwords() {
+            $("#Kwords").val("");
+            Load();
+        }
+
+        //页面刷新
+        function refresh2() {
+            location.replace(location.href);
+        }
+
+        //跳转到详细
+        function gotoChat(id) {
+            location.href = '/WeixinSocialCircle/Chat/' + id;
+        }
+
+        //搜索
+        function Load() {
+
+            $("#page_content").empty();
+            $("#loading_page").show();
+            var kwords = $("#Kwords").val();
+
+            if (kwords == undefined || kwords == "") {
+
+                $(".search_cancel_icon").hide();
+                $(".search_icon").show();
+            } else {
+                $(".search_icon").hide();
+                $(".search_cancel_icon").show();
+            }
+
+            $.ajax({
+                type: "get",
+                url: "/WeixinSocialCircle/GetSearchMySocialCircle",
+                data: { kwords: kwords },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+
+                    if (data.CreateCount > 0 || data.JoinCount > 0) {
+
+                        //如果有创建的圈子
+                        if (data.CreateCount > 0) {
+
+                            var createStr = '';
+                            createStr += '<div style="margin:10px 8px;font-size:13px;font-weight:500">我创建的圈子</div>';
+                            createStr += '<div class="weui_cells weui_cells_access" style="margin-top: 0">';
+
+                            $.each(data.CreateList, function (index, entry) {
+
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<div class="weui_cell" style="padding:15px" onclick="gotoChat(' + entry["Id"] + ')">';
+
+                                itemHtmlStr += '<div class="weui_cell_hd" style="margin-right:10px">';
+                                itemHtmlStr += '<img src="' + entry["HeadPath"] + '" style="width:40px;height:40px" class="img-circle"/>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '<div class="weui_cell_bd weui_cell_primary">';
+                                itemHtmlStr += '<h3 style="margin: 0;color:#000">' + entry["Name"] + '</h3>';
+                                itemHtmlStr += '<h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">' + entry["PlaceName"] + '</span></h5>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '</div>';
+                                createStr += itemHtmlStr;
+
+                            });
+                            createStr += '</div>';
+                            $("#page_content").append(createStr);
+
+                        }
+                        //如果有加入的圈子
+                        if (data.JoinCount > 0) {
+
+                            var joinStr = '';
+                            joinStr += '<div style="margin:10px 8px;font-size:13px;font-weight:500">我加入的圈子</div>';
+                            joinStr += '<div class="weui_cells weui_cells_access" style="margin-top: 0">';
+
+                            $.each(data.JoinList, function (index, entry) {
+
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<div class="weui_cell" style="padding:15px" onclick="gotoChat(' + entry["Id"] + ')">';
+
+                                itemHtmlStr += '<div class="weui_cell_hd" style="margin-right:10px">';
+                                itemHtmlStr += '<img src="' + entry["HeadPath"] + '" style="width:40px;height:40px" class="img-circle"/>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '<div class="weui_cell_bd weui_cell_primary">';
+                                itemHtmlStr += '<h3 style="margin: 0;color:#000">' + entry["Name"] + '</h3>';
+                                itemHtmlStr += '<h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">' + entry["PlaceName"] + '</span></h5>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '</div>';
+                                joinStr += itemHtmlStr;
+
+                            });
+                            joinStr += '</div>';
+                            $("#page_content").append(joinStr);
+                        }
+                    } else {
+
+                        var nodataStr = '<div style="width:100%;text-align:center;padding:20px 0"><img src="/Images/Weixin/null.png" style="width:210px" /></div>';
+                        $("#page_content").append(nodataStr);
+                    }
+                    $("#loading_page").hide();
+
+                }, error: function (error) {
+
+                    alert("请求发生异常");
+                    $("#loading_page").hide();
+                }
+            });
+        }
+    </script>
+}
+

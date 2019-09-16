@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "业主信息导入";
+}
+
+@using Webdiyer.WebControls.Mvc
+@model Property.UI.Models.ImportUsersModel
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        @using (Ajax.BeginForm("ImportHouseUsers", "HouseUser", "", new AjaxOptions { HttpMethod = "Post" }, new { id = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div>
+                @if (Model.HasImportTemplate)
+                {
+                    <a target="_blank" href="/HouseUser/ImportTemplateDownload">导入模板下载</a>
+                }
+            </div>
+            <br />
+            <div>
+                @Html.TextBoxFor(model => model.file, new { @class = "form-control", @type = "file" })
+            </div>
+            <br />
+            <div>
+                <input name="Upload" value="批量导入住宅业主信息" class="btn btn-primary" onclick="sub()" />
+            </div>
+            <br />
+            <div>
+                <a target="_blank" href="#" class="hidden" id="failFilePath">下载导入失败文件</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#form").validate({
+                rules: {
+                    file: {
+                        required: true
+                    }
+                },
+                messages: {
+                    file: {
+                        required: "请选择要导入Excel文件"
+                    }
+                }
+            });
+        });
+
+        function sub() {
+            if ($("#form").valid()) {
+                $('form').ajaxSubmit({
+                    beforeSend: ImportBegin,
+                    success: OnSuccess,
+                    error: OnFailure
+                });
+            }
+
+        }
+
+        function ImportBegin() {
+
+            var str = "";
+            str += '<div class="sk-spinner sk-spinner-wave">';
+            str += '    <div class="sk-rect1"></div>';
+            str += '    <div class="sk-rect2"></div>';
+            str += '    <div class="sk-rect3"></div>';
+            str += '    <div class="sk-rect4"></div>';
+            str += '    <div class="sk-rect5"></div>';
+            str += '</div>';
+
+            swal({
+                title: "导入中...",
+                text: "",
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            //填充loading
+            $(".sweet-alert p").html(str);
+        }
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                swal({
+                    title: data.Content,
+                    type: "success",
+                    text: ""
+                });
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+                var path = data.Content;
+                if (path != "" && path != undefined) {
+                    $("#failFilePath").attr("href", path);
+                    $("#failFilePath").removeClass("hidden");
+                }
+            }
+        }
+
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,导入失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

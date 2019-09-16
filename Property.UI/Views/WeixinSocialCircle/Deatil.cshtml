@@ -1,0 +1,420 @@
+﻿@{
+    ViewBag.Title = "圈子详情";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.Entity.T_SocialCircle
+@{
+    var users = Model.UserSocialCircles.Where(us => us.ApplyStatus == Property.Common.ConstantParam.IsVerified_YES).OrderByDescending(us => us.ApplyTime).Select(us => new
+    {
+        UserId = us.ApplyUser.Id,
+        HeadPath = us.ApplyUser.HeadPath
+    }).Distinct();
+}
+@if ((int)ViewBag.CurrentUserId == Model.CreaterId)
+{
+    <!--如果创建人是当前用户-->
+    <div>
+        <div style="padding: 27px 0; height: 199px; background: url(/Images/Weixin/quanz_create_bg.png) no-repeat;background-size:100% 199px">
+
+            <div style="text-align: center">
+                @if (string.IsNullOrEmpty(Model.HeadImgPath))
+                {
+                    <img id="Head" src="~/Images/Weixin/quanz_head.png" style="width: 98px; height: 98px;background: #fff; border:4px solid #5ba0ff; " class="img-circle">
+                }
+                else
+                {
+                    <img id="Head" src="@Model.HeadImgPath" style="width: 98px; height: 98px;background: #fff; border:4px solid #5ba0ff; " class="img-circle">
+                }
+                <div style="margin-top:15px">
+                    <input id="imgFile" type="image" accept="image/*" style="display:none" />
+                    <button class="weui_btn weui_btn_mini weui_btn_plain_white" style="font-size:13px" onclick="chooseUploadImg()">设置圈子头像</button>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd">
+                    <label class="weui_label" style="margin-bottom:0">所属小区</label>
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p><nobr>@Model.PropertyPlace.Name</nobr></p>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_access" style="font-size:16px" onclick="location.href = '/WeixinSocialCircle/UpdateName/@Model.Id'">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">圈子名称</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p><nobr>@Model.Name</nobr></p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_access" style="font-size:16px" onclick="location.href = '/WeixinSocialCircle/UpdateContent/@Model.Id'">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <label class="weui_label" style="margin-bottom:10px;width:100%">圈子介绍<span class="weui_cell_ft" style="float:right;vertical-align:middle"></span></label>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @if (string.IsNullOrEmpty(Model.Content))
+                        {
+                            <p class="text-left">无</p>
+                        }
+                        else
+                        {
+                            <p class="text-left">@Model.Content</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_access" style="font-size:16px" onclick="location.href = '/WeixinSocialCircle/CircleUserManage/@Model.Id'">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <label class="weui_label" style="width:100%;margin-bottom:0">圈子成员<span class="weui_cell_ft" style="float:right;vertical-align:middle">@(users.Count() + 1)人</span></label>
+                    <div class="weui_cell_bd weui_cell_primary" style="margin-top:10px">
+                        @if (!string.IsNullOrEmpty(Model.Creater.HeadPath))
+                        {
+                            <div style="width: 20%; float: left;padding:0 8px"><img src="@Model.Creater.HeadPath" style="width: 100%" class="img-circle cyImg"></div>
+                        }
+                        else
+                        {
+                            <div style="width: 20%; float: left;padding:0 8px"><img src="/Images/WeiXin/header_default.png" style="width: 100%" class="img-circle cyImg"></div>
+                        }
+                        @foreach (var user in users.Take(4))
+                        {
+                            if (!string.IsNullOrEmpty(user.HeadPath))
+                            {
+                                <div style="width: 20%; float: left;padding:0 8px"><img src="@user.HeadPath" style="width: 100%" class="img-circle cyImg"></div>
+                            }
+                            else
+                            {
+                                <div style="width: 20%; float: left;padding:0 8px"><img src="/Images/WeiXin/header_default.png" style="width: 100%" class="img-circle cyImg"></div>
+                            }
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_access" style="font-size: 16px; border-bottom: 1px solid #d9d9d9" onclick="location.href = '/WeixinSocialCircle/MassTextingList/@Model.Id'">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">群发消息</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p><span style="font-size: 12px; color: #fff; background: #d9d9d9; padding: 3px 8px; border-radius: 3px; ">@Model.SocialCircleMassTextings.Count<span>条群发记录</span></span></p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </div>
+        </div>
+        <div style="margin:20px 10px">
+            <button class="weui_btn weui_btn_blue" onclick="dissolve(@Model.Id)">解散该圈子</button>
+        </div>
+    </div>
+}
+else
+{
+    <!--如果当前用户不是创建人-->
+    <div>
+        <div style="padding: 50.5px 0; height: 199px; background: url(/Images/Weixin/quanz_create_bg.png) no-repeat;background-size:100% 199px">
+
+            <div style="text-align: center">
+                @if (string.IsNullOrEmpty(Model.HeadImgPath))
+                {
+                    <img id="Head" src="~/Images/Weixin/quanz_head.png" style="width: 98px; height: 98px;background: #fff; border:4px solid #5ba0ff; " class="img-circle">
+                }
+                else
+                {
+                    <img id="Head" src="@Model.HeadImgPath" style="width: 98px; height: 98px;background: #fff; border:4px solid #5ba0ff; " class="img-circle">
+                }
+            </div>
+        </div>
+
+        <div class="weui_cells" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd">
+                    <label class="weui_label" style="margin-bottom:0">所属小区</label>
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p><nobr>@Model.PropertyPlace.Name</nobr></p>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">圈子名称</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p><nobr>@Model.Name</nobr></p>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <label class="weui_label" style="margin-bottom:10px;width:100%">圈子介绍</label>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @if (string.IsNullOrEmpty(Model.Content))
+                        {
+                            <p class="text-left">无</p>
+                        }
+                        else
+                        {
+                            <p class="text-left">@Model.Content</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui_cells weui_cells_access" style="font-size:16px" onclick="location.href = '/WeixinSocialCircle/CircleUserManage/@Model.Id'">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <label class="weui_label" style="width: 100%;margin-bottom:0">圈子成员<span class="weui_cell_ft" style="float:right;vertical-align:middle">@(users.Count() + 1)人</span></label>
+                    <div class="weui_cell_bd weui_cell_primary" style="margin-top:10px">
+
+                        @if (!string.IsNullOrEmpty(Model.Creater.HeadPath))
+                        {
+                            <div style="width: 20%; float: left;padding:0 8px"><img src="@Model.Creater.HeadPath" style="width: 100%" class="img-circle cyImg"></div>
+                        }
+                        else
+                        {
+                            <div style="width: 20%; float: left;padding:0 8px"><img src="/Images/WeiXin/header_default.png" style="width: 100%" class="img-circle cyImg"></div>
+                        }
+                        @foreach (var user in users.Take(4))
+                        {
+                            if (!string.IsNullOrEmpty(user.HeadPath))
+                            {
+                                <div style="width: 20%; float: left;padding:0 8px"><img src="@user.HeadPath" style="width: 100%" class="img-circle cyImg"></div>
+                            }
+                            else
+                            {
+                                <div style="width: 20%; float: left;padding:0 8px"><img src="/Images/WeiXin/header_default.png" style="width: 100%" class="img-circle cyImg"></div>
+                            }
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        @{
+            int ownerId = (int)ViewBag.CurrentUserId;
+            
+            if (users.Select(u => u.UserId).Contains(ownerId))
+            {
+                <div style="margin:20px 10px">
+                    <button class="weui_btn weui_btn_blue" onclick="exit(@Model.Id)">退出圈子</button>
+                </div>
+            }
+            else
+            {
+                //如果已经申请过
+                if (Model.UserSocialCircles.Count(us => us.UserId == ownerId && us.ApplyStatus == 0) > 0)
+                {
+                    <div style="margin:20px 10px">
+                        <button class="weui_btn weui_btn_blue" onclick="applyJoin(@Model.Id)">再次申请</button>
+                    </div>
+                }
+                else
+                {
+                    <div style="margin:20px 10px">
+                        <button class="weui_btn weui_btn_blue" onclick="applyJoin(@Model.Id)">申请加入</button>
+                    </div>
+                }
+            }
+        }
+    </div>
+}
+
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_btn_plain_white {
+            line-height: 22px;
+            padding: 0 8px;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        button.weui_btn_plain_white,
+        input.weui_btn_plain_white {
+            border-width: 1px;
+            background-color: transparent;
+        }
+
+        .weui_btn_plain_white:active {
+            color: #fff;
+            border-color: #5ba0ff;
+        }
+
+        .weui_btn_plain_white:after {
+            border-width: 0;
+        }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        p {
+            text-align: right;
+            margin-bottom: 0;
+        }
+    </style>
+}
+@section Scripts{
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+
+        var circleId = @Html.Raw(Model.Id)
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+              'chooseImage',
+              'previewImage',
+              'uploadImage',
+              'downloadImage'
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        });
+
+        $(function () {
+            var width = $(".cyImg").width();
+            $(".cyImg").css({ "height": width });
+        });
+
+        var imglocalId = "";
+        //选择上传头像
+        function chooseUploadImg() {
+
+            wx.chooseImage({
+                count: 1,
+                success: function (res) {
+
+                    imglocalId = res.localIds[0];
+                    $("#Head").attr("src", imglocalId);
+
+                    wx.uploadImage({
+                        localId: imglocalId,
+                        success: function (res) {
+
+                            //上传图片
+                            $.ajax({
+                                type: "POST",
+                                url: "/WeixinSocialCircle/UpdateImg",
+                                data: { Id: circleId, Img: res.serverId },
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.Code == "OK") {
+                                        location.reload(true);
+                                    } else {
+                                        alert(data.Msg);
+                                    }
+                                }, error: function (error) {
+                                    alert("头像上传失败");
+                                }
+                            });
+                        },
+                        fail: function (res) {
+                            alert(JSON.stringify(res));
+                        }
+                    });
+                }
+            });
+        }
+
+        //解散圈子
+        function dissolve(id) {
+            var res = confirm("确定要解散该圈子吗？");
+            if (res) {
+                //解散
+                $.ajax({
+                    type: "post",
+                    url: "/WeixinSocialCircle/Dissolve/" + id,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            alert("解散成功");
+                            window.location.href = "/WeixinSocialCircle/MyCircle";
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("解散失败");
+                    }
+                });
+            }
+        }
+
+        //退出圈子
+        function exit(id) {
+
+            var res = confirm("确定要退出该圈子吗？");
+            if (res) {
+                $.ajax({
+                    type: "post",
+                    url: "/WeixinSocialCircle/Exit/" + id,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            alert("退出成功");
+                            window.location.href = "/WeixinSocialCircle/MyCircle";
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("退出失败");
+                    }
+                });
+            }
+        }
+
+        //加入圈子
+        function applyJoin(Id) {
+
+            var result = confirm("确定要申请加入该圈子吗？");
+            if (result == true) {
+                //提交申请
+                $.ajax({
+                    type: "post",
+                    url: "/WeixinSocialCircle/ApplyJoin/" + Id,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            alert("申请成功");
+                            location.reload(true);
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("申请失败");
+                    }
+                });
+            }
+        }
+    </script>
+}

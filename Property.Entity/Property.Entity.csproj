@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C07A9F18-0858-4E01-8AC4-7BC920FCC8EA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Property.Entity</RootNamespace>
+    <AssemblyName>Property.Entity</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="M_Action.cs" />
+    <Compile Include="M_ActionItem.cs" />
+    <Compile Include="M_City.cs" />
+    <Compile Include="M_County.cs" />
+    <Compile Include="M_Menu.cs" />
+    <Compile Include="M_Province.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="R_CompanyRoleAction.cs" />
+    <Compile Include="R_CompanyUserRole.cs" />
+    <Compile Include="R_PlanPoint.cs" />
+    <Compile Include="R_PropertyIdentityVerification.cs" />
+    <Compile Include="R_PropertyRoleAction.cs" />
+    <Compile Include="R_PropertyUserRole.cs" />
+    <Compile Include="R_PlatformRoleAction.cs" />
+    <Compile Include="R_PlatformUserRole.cs" />
+    <Compile Include="R_ShopPlace.cs" />
+    <Compile Include="R_UserPlace.cs" />
+    <Compile Include="R_UserPostBarTopic.cs" />
+    <Compile Include="R_UserSocialCircle.cs" />
+    <Compile Include="R_UserSocialCircleMassTexting.cs" />
+    <Compile Include="T_ApplyInfo.cs" />
+    <Compile Include="T_AppUserShippingAddress.cs" />
+    <Compile Include="T_Build.cs" />
+    <Compile Include="T_BuildCompany.cs" />
+    <Compile Include="T_BuildDoor.cs" />
+    <Compile Include="T_BuildUnit.cs" />
+    <Compile Include="T_Company.cs" />
+    <Compile Include="T_CompanyOpreateLog.cs" />
+    <Compile Include="T_CompanyPost.cs" />
+    <Compile Include="T_CompanyRole.cs" />
+    <Compile Include="T_CompanyUser.cs" />
+    <Compile Include="T_ExpressCompany.cs" />
+    <Compile Include="T_Feedback.cs" />
+    <Compile Include="T_GoodsCategory.cs" />
+    <Compile Include="T_HouseUser.cs" />
+    <Compile Include="T_HouseUserExpenseDetails.cs" />
+    <Compile Include="T_HouseUserExpenseTemplate.cs" />
+    <Compile Include="T_InspectionCategory.cs" />
+    <Compile Include="T_InspectionExceptionDispose.cs" />
+    <Compile Include="T_InspectionPlan.cs" />
+    <Compile Include="T_InspectionPoint.cs" />
+    <Compile Include="T_InspectionResult.cs" />
+    <Compile Include="T_InspectionTimePlan.cs" />
+    <Compile Include="T_LifeBill.cs" />
+    <Compile Include="T_LifePayType.cs" />
+    <Compile Include="T_LifeBillType.cs" />
+    <Compile Include="T_MobileVersion.cs" />
+    <Compile Include="T_PhoneValidate.cs" />
+    <Compile Include="T_PropertyAccount.cs" />
+    <Compile Include="T_PropertyExpenseNo.cs" />
+    <Compile Include="T_Order.cs" />
+    <Compile Include="T_OrderDetails.cs" />
+    <Compile Include="T_PostBarTopic.cs" />
+    <Compile Include="T_PostBarTopicDiscuss.cs" />
+    <Compile Include="T_PostBarTopicType.cs" />
+    <Compile Include="T_PropertyExpenseType.cs" />
+    <Compile Include="T_PropertyOpreateLog.cs" />
+    <Compile Include="T_PlatformOpreateLog.cs" />
+    <Compile Include="T_PlatformRole.cs" />
+    <Compile Include="T_PlatformUser.cs" />
+    <Compile Include="T_Post.cs" />
+    <Compile Include="T_PropertyPlace.cs" />
+    <Compile Include="T_PropertyRole.cs" />
+    <Compile Include="T_PropertyUser.cs" />
+    <Compile Include="T_PropertyUserPush.cs" />
+    <Compile Include="T_Question.cs" />
+    <Compile Include="T_QuestionDispose.cs" />
+    <Compile Include="T_Shop.cs" />
+    <Compile Include="T_ShopPaymentManagement.cs" />
+    <Compile Include="T_ShopAccounts.cs" />
+    <Compile Include="T_ShopSale.cs" />
+    <Compile Include="T_ShopShippingCost.cs" />
+    <Compile Include="T_ShopUser.cs" />
+    <Compile Include="T_ShopUserPush.cs" />
+    <Compile Include="T_SocialCircle.cs" />
+    <Compile Include="T_SocialCircleMassTexting.cs" />
+    <Compile Include="T_SocialCircleChat.cs" />
+    <Compile Include="T_SystemMessage.cs" />
+    <Compile Include="T_User.cs" />
+    <Compile Include="T_UserPush.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

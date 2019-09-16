@@ -1,0 +1,103 @@
+﻿.head-set {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.pad-bottom {
+    padding-bottom: 60px;
+}
+/*================================
+    NAVBAR STYLES
+==================================*/
+.navbar-default {
+    background-color: rgb(35, 133, 161);
+    border-color: transparent;
+    color: #000;
+}
+
+    .navbar-default .navbar-nav > li > a {
+        color: #000;
+        font-size:16px
+    }
+
+        .navbar-default .navbar-nav > li > a:hover {
+            color: #0172ff;
+            font-weight: 500;
+        }
+
+.navbar-brand {
+    padding: 0px;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+/*================================
+    HOME SECTION STYLES
+==================================*/
+
+/*STYLE OF BACKGROUND IMAGE*/
+#home {
+    padding: 0;
+    -webkit-background-size: cover;
+    background-size: cover;
+    -moz-background-size: cover;
+    min-height: 600px;
+}
+    /*STYLE FOR OVERLAY CLASS - WHICH IS ABOVE IMAGE WITH OPACITY/TRANSPARENCY 0.75*/
+    #home .overlay {
+        min-height: 600px;
+        color: #fff;
+        padding-top: 70px;
+    }
+
+/*CLASS TO FORMAT TEXT*/
+.p-cls {
+    padding-top: 30px;
+    padding-bottom: 40px;
+}
+/*================================
+    FOOTER SECTION STYLES
+==================================*/
+footer {
+    padding: 15px;
+    font-size: 15px;
+    text-align: center;
+    font-weight: 800;
+    background-color: #000;
+    color: #fff;
+}
+
+    footer a, footer a:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+
+.btn-primary {
+    color: #0172ff;
+    background-color: #fff;
+    border-color: #0172ff;
+    padding:3px 12px;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        color: #fff;
+        background-color: #0172ff;
+        border-color: #0172ff;
+    }
+
+.btn-success {
+    background-color: #8AC007;
+    border-color: #8AC007;
+    color: #FFFFFF;
+}
+
+
+    .btn-success:hover,
+    .btn-success:focus,
+    .btn-success:active {
+        background-color: #51C332;
+        border-color: #51C332;
+    }

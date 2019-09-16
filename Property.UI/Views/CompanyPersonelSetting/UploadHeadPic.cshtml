@@ -1,0 +1,160 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "设置个人头像";
+}
+@model Property.UI.Models.LoggedInAccountModel
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                @Html.HiddenFor(model => model.UserId, new { id = "userId" })
+                <div class="ibox-title">
+                    <h5>设置个人头像</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="image-crop">
+                                @if (string.IsNullOrEmpty(Model.HeadPath))
+                                {
+                                    <img src="~/Images/default.png" alt="" class="cropper-hidden" />
+                                }
+                                else
+                                {
+                                    <img src="@Model.HeadPath" alt="" class="cropper-hidden" />
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>头像预览</h4>
+                            <div class="img-preview fa-border img-preview-sm"><img src="" style="min-width: 0px !important; min-height: 0px !important; max-width: none !important; max-height: none !important; width: 722px; height: 483px; margin-left: -72px; margin-top: -63px;"></div>
+                            <div class="btn-group">
+                                <label title="Upload image file" for="inputImage" class="btn btn-primary">
+                                    <input type="file" accept="image/*" name="file" id="inputImage" class="hide">
+                                    选择图片
+                                </label>
+                                <button class="btn btn-white" id="zoomIn" type="button"><i class="fa fa-search-plus"></i>放大</button>
+                                <button class="btn btn-white" id="zoomOut" type="button"><i class="fa fa-search-minus"></i>缩小</button>
+
+                                <a class="btn btn-primary" onclick="sub()" id="download">上传</a>
+                                <a class="btn btn-white" href="/CompanyPlatform/Index">取消</a>
+                            </div>
+                            <div class="col-md-12">
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/inspinia")
+    @Scripts.Render("~/plugins/imagecropper")
+}
+
+
+<script src="~/Scripts/jquery-2.1.1.js"></script>
+<script src="~/Scripts/jquery-2.1.1.intellisense.js"></script>
+<script src="~/Scripts/common.js"></script>
+<script src="~/Scripts/plugins/cropper/cropper.min.js"></script>
+<script src="~/Scripts/plugins/metisMenu/metisMenu.min.js"></script>
+<script src="~/Scripts/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+<link href="~/Content/plugins/cropper/cropper.min.css" rel="stylesheet">
+<link href="~/Content/animate.css" rel="stylesheet">
+<link href="~/Content/style.css" rel="stylesheet">
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var $image = $(".image-crop > img")
+        $($image).cropper({
+            aspectRatio: 1.618,
+            preview: ".img-preview",
+            done: function (data) {
+
+            },
+            crop: function (e) {
+
+            }
+        });
+
+        var $inputImage = $("#inputImage");
+
+        if (window.FileReader) {
+            $inputImage.change(function () {
+                var fileReader = new FileReader(),
+                        files = this.files,
+                        file;
+
+                if (!files.length) {
+                    return;
+                }
+
+                file = files[0];
+
+                if (/^image\/\w+$/.test(file.type)) {
+                    fileReader.readAsDataURL(file);
+                    fileReader.onload = function () {
+                        $inputImage.val("");
+                        $image.cropper("reset", true).cropper("replace", this.result);
+                    };
+                } else {
+                    showMessage("请选择图片文件.");
+                }
+            });
+        } else {
+            $inputImage.addClass("hide");
+        }
+
+        $("#zoomIn").click(function () {
+            $image.cropper("zoom", 0.1);
+        });
+
+        $("#zoomOut").click(function () {
+            $image.cropper("zoom", -0.1);
+        });
+    });
+
+    function sub() {
+        var $image = $(".image-crop > img")
+        var te = $image.cropper("getDataURL")
+        if (te == "" || te == undefined || te.length == 0) {
+            swal("请选择图片!", "", "warning");
+            return;
+        }
+        te = te.replace(/^data:image\/(png|jpg);base64,/, "")
+        $.ajax({
+            url: "/CompanyPersonelSetting/UploadHeadPic",
+            data: { data: te, userId: $("#userId").val() },
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                if (data.Code == "OK") {
+                    window.location.href = "/CompanyPlatform/Index";
+                }
+                else {
+                    swal("请求失败!", data.Msg, "warning");
+                }
+            },
+            error: function (err) {
+                swal({
+                    title: err.responseJSON.Msg,
+                    type: "warning",
+                    text: ""
+                });
+            }
+        })
+    }
+</script>

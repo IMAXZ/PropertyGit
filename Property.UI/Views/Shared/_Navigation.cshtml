@@ -1,0 +1,91 @@
+﻿<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element text-center">
+                    <span>
+                        @if (string.IsNullOrEmpty(Html.GetLoginUserHeadImgPath()))
+                        {
+                            <img alt="image" class="img-circle" src="/Images/default.png" width="60" height="60" />
+                        }
+                        else
+                        {
+                            <img alt="image" class="img-circle" src="@Html.GetLoginUserHeadImgPath()" width="60" height="60" />
+                        }
+                    </span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            <span class="block m-t-xs">
+                            </span>
+                            <span class="text-xs block"><strong class="font-b old">@Html.GetLoginUserName()</strong><b class="caret"></b></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="@Url.Action("SetPlatUserInfo", "PlatformLoggedAccount")"><i class="fa fa-cog"></i>&nbsp;&nbsp;个人信息</a></li>
+                        <li><a href="@Url.Action("EditPlatUserPwd", "PlatformLoggedAccount")"><i class="fa fa-lock"></i>&nbsp;&nbsp;密码修改</a></li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    Sarnath
+                </div>
+            </li>
+            @{
+                var menuList = Html.GetSessionModel().MenuList.Where(
+                    m => m.IsPlatform == Property.Common.ConstantParam.USER_TYPE_PLATFORM).OrderBy(m => m.Order);
+            }
+
+            @foreach (var item in menuList)
+            {
+                if (item.ParentId == null)
+                {
+                    <li id="L1@(item.MenuCode)">
+                        @if (string.IsNullOrEmpty(item.MenuUrl))
+                        {
+                            <a href="#">
+                                <i class="@item.MenuCss"></i><span class="nav-label">@item.MenuName</span>
+                                <span class="fa arrow"></span>
+                            </a>
+
+                            var secondMenus = menuList.Where(m => m.ParentId == item.MenuId);
+                            if (secondMenus.Count() > 0)
+                            {
+                                <ul class="nav nav-second-level collapse">
+                                    @foreach (var secodItem in secondMenus)
+                                    {
+                                        <li id="L2@(secodItem.MenuCode)">
+                                            @if (string.IsNullOrEmpty(secodItem.MenuUrl))
+                                            {
+                                                <a href="#"><span class="nav-label">@secodItem.MenuName</span><span class="fa arrow"></span></a>
+
+                                                var threeMenus = menuList.Where(m => m.ParentId == secodItem.MenuId);
+                                                if (threeMenus.Count() > 0)
+                                                {
+                                                    <ul class="nav nav-third-level collapse">
+                                                        @foreach (var threeItem in threeMenus)
+                                                        {
+                                                            <li id="L3@(threeItem.MenuCode)"><a href="@threeItem.MenuUrl">@threeItem.MenuName</a></li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <a href="@secodItem.MenuUrl">@secodItem.MenuName</a>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        }
+                        else
+                        {
+                            <a href="@item.MenuUrl">
+                                <i class="@item.MenuCss"></i><span class="nav-label">@item.MenuName</span>
+                            </a>
+                        }
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</nav>

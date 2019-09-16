@@ -1,0 +1,657 @@
+﻿@model Property.UI.Models.InspectionPlanModel
+@{
+    ViewBag.Title = "编辑巡检任务";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>编辑巡检任务</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("EditPlan", "Inspection", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(model => model.PlanId)
+                            <div class="form-group">
+                                <label class="control-label col-md-3">巡检任务名称<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.PlanName, new { @class = "form-control", @placeholder = "巡检任务名称", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">巡检任务描述<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Memo, new { @class = "form-control", @placeholder = "巡检任务描述" })
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">巡检类型<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(model => model.Type, Model.TypeList, new { @class = "form-control", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">巡检开始日期<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="input-group date">
+                                        @Html.TextBoxFor(model => model.BeginDate, Model.BeginDate.ToString("yyyy-MM-dd"), new { @class = "form-control", @placeholder = "开始日期", @readonly = "readonly" })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">巡检结束日期<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="input-group date">
+                                        @Html.TextBoxFor(model => model.EndDate, Model.EndDate.ToString("yyyy-MM-dd"), new { @class = "form-control", @placeholder = "结束日期", @readonly = "readonly" })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">是否随机巡检<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(model => model.IsRandom, Model.IsRandomList, new { @class = "form-control", @required = true })
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="RandomNumDiv" style="display:none">
+                                <label class="control-label col-md-3">随机巡检次数<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.RandomNum, new { @class = "form-control", @placeholder = "随机巡检次数",@maxlength = 2 })
+                                </div>
+                            </div>
+
+                            <div id="DayPlans" style="display:none">
+                                <div class="form-group" id="DayPlan1">
+                                    <label class="control-label col-md-3">日巡检安排<span class="text-danger">*</span></label>
+                                    <div class="col-md-5">
+                                        @if (Model.StartHourNums[0] != null && Model.EndHourNums[0] != null)
+                                        {
+                                            <div class="input-group">
+
+                                                <select class="form-control" data-val="true" id="StartHourNums" name="StartHourNums">
+                                                    <option value="">请选择开始时间</option>
+                                                    @foreach (var item in Model.StartHourNumLists[0])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+
+                                                <span class="input-group-addon">到</span>
+                                                <select class="form-control" data-val="true" id="EndHourNums" name="EndHourNums">
+                                                    <option value="">请选择结束时间</option>
+                                                    @foreach (var item in Model.EndHourNumLists[0])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="input-group">
+                                                @Html.DropDownListFor(model => model.StartHourNums, Model.HourNumList, "请选择开始时间", new { @class = "form-control" })
+                                                <span class="input-group-addon">到</span>
+                                                @Html.DropDownListFor(model => model.EndHourNums, Model.HourNumList, "请选择结束时间", new { @class = "form-control" })
+                                            </div>
+                                        }
+                                    </div>
+                                    <a href="#" class="btn btn-primary btn-sm" onclick="addDayPlan(this)"><i class="fa fa-plus"></i></a>&nbsp;&nbsp;
+                                    <a class="btn btn-danger btn-sm" onclick="delPlan(this)"><i class="fa fa-minus"></i></a>
+                                </div>
+                                @for (int i = 2; i <= 10; i++)
+                                {
+                                    string Id = "DayPlan" + i;
+                                    if (Model.StartHourNums[i - 1] != null && Model.EndHourNums[i - 1] != null)
+                                    {
+                                        <div class="form-group" id="@Id">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                <div class="input-group">
+
+                                                    <select class="form-control" data-val="true" id="StartHourNums" name="StartHourNums">
+                                                        <option value="">请选择开始时间</option>
+                                                        @foreach (var item in Model.StartHourNumLists[i - 1])
+                                                        {
+                                                            if (item.Selected)
+                                                            {
+                                                                <option value="@item.Value" selected="selected">@item.Text</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.Value">@item.Text</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                    <span class="input-group-addon">到</span>
+                                                    <select class="form-control" data-val="true" id="EndHourNums" name="EndHourNums">
+                                                        <option value="">请选择结束时间</option>
+                                                        @foreach (var item in Model.EndHourNumLists[i - 1])
+                                                        {
+                                                            if (item.Selected)
+                                                            {
+                                                                <option value="@item.Value" selected="selected">@item.Text</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.Value">@item.Text</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group" id="@Id" style="display:none">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                <div class="input-group">
+                                                    @Html.DropDownListFor(model => model.StartHourNums, Model.HourNumList, "请选择开始时间", new { @class = "form-control" })
+                                                    <span class="input-group-addon">到</span>
+                                                    @Html.DropDownListFor(model => model.EndHourNums, Model.HourNumList, "请选择结束时间", new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <div id="WeekPlans" style="display:none">
+                                <div class="form-group" id="WeekPlan1">
+                                    <label class="control-label col-md-3">周巡检安排<span class="text-danger">*</span></label>
+                                    <div class="col-md-5">
+                                        @if (Model.StartWeekNums[0] != null && Model.EndWeekNums[0] != null)
+                                        {
+                                            <select class="form-control" data-val="true" id="StartWeekNums" name="StartWeekNums">
+                                                <option value="">请选择周几巡检</option>
+                                                @foreach (var item in Model.StartWeekNumLists[0])
+                                                {
+                                                    if (item.Selected)
+                                                    {
+                                                        <option value="@item.Value" selected="selected">@item.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <select class="form-control" data-val="true" id="EndWeekNums" name="EndWeekNums" style="display:none">
+                                                <option value="">请选择周几结束</option>
+                                                @foreach (var item in Model.EndWeekNumLists[0])
+                                                {
+                                                    if (item.Selected)
+                                                    {
+                                                        <option value="@item.Value" selected="selected">@item.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(model => model.StartWeekNums, Model.WeekNumList, "请选择周几巡检", new { @class = "form-control" })
+                                            @Html.DropDownListFor(model => model.EndWeekNums, Model.WeekNumList, "请选择周几结束", new { @class = "form-control", @style = "display:none" })
+                                        }
+
+                                    </div>
+                                    <a href="#" class="btn btn-primary btn-sm" onclick="addWeekPlan(this)"><i class="fa fa-plus"></i></a>&nbsp;&nbsp;
+                                    <a class="btn btn-danger btn-sm" onclick="delPlan(this)"><i class="fa fa-minus"></i></a>
+                                </div>
+                                @for (int i = 2; i <= 7; i++)
+                                {
+                                    string Id = "WeekPlan" + i;
+                                    if (Model.StartWeekNums[i - 1] != null && Model.EndWeekNums[i - 1] != null)
+                                    {
+                                        <div class="form-group" id="@Id">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                <select class="form-control" data-val="true" id="StartWeekNums" name="StartWeekNums">
+                                                    <option value="">请选择周几巡检</option>
+                                                    @foreach (var item in Model.StartWeekNumLists[i - 1])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                @*<select class="form-control" data-val="true" id="EndWeekNums" name="EndWeekNums" style="display:none">
+                                                    <option value="">请选择周几结束</option>
+                                                    @foreach (var item in Model.EndWeekNumLists[i - 1])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>*@
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group" id="@Id" style="display:none">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                @Html.DropDownListFor(model => model.StartWeekNums, Model.WeekNumList, "请选择周几巡检", new { @class = "form-control" })
+                                                @*@Html.DropDownListFor(model => model.EndWeekNums, Model.WeekNumList, "请选择周几结束", new { @class = "form-control", @style = "display:none" })*@
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <div id="MonthPlans" style="display:none">
+                                <div class="form-group" id="MonthPlan1">
+                                    <label class="control-label col-md-3">月巡检安排<span class="text-danger">*</span></label>
+                                    <div class="col-md-5">
+                                        @if (Model.StartDayNums[0] != null && Model.EndDayNums[0] != null)
+                                        {
+                                            <select class="form-control" data-val="true" id="StartDayNums" name="StartDayNums">
+                                                <option value="">请选择每月第几日巡检</option>
+                                                @foreach (var item in Model.StartDayNumLists[0])
+                                                {
+                                                    if (item.Selected)
+                                                    {
+                                                        <option value="@item.Value" selected="selected">@item.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <select class="form-control" data-val="true" id="EndDayNums" name="EndDayNums" style="display:none">
+                                                <option value="">请选择第几日结束</option>
+                                                @foreach (var item in Model.EndDayNumLists[0])
+                                                {
+                                                    if (item.Selected)
+                                                    {
+                                                        <option value="@item.Value" selected="selected">@item.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(model => model.StartDayNums, Model.DayNumList, "请选择每月第几日巡检", new { @class = "form-control" })
+                                            @Html.DropDownListFor(model => model.EndDayNums, Model.DayNumList, "请选择第几日结束", new { @class = "form-control", @style = "display:none" })
+                                        }
+                                    </div>
+                                    <a href="#" class="btn btn-primary btn-sm" onclick="addMonthPlan(this)"><i class="fa fa-plus"></i></a>&nbsp;&nbsp;
+                                    <a class="btn btn-danger btn-sm" onclick="delPlan(this)"><i class="fa fa-minus"></i></a>
+                                </div>
+                                @for (int i = 2; i <= 10; i++)
+                                {
+                                    string Id = "MonthPlan" + i;
+                                    if (Model.StartDayNums[i - 1] != null && Model.EndDayNums[i - 1] != null)
+                                    {
+                                        <div class="form-group" id="@Id">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                <select class="form-control" data-val="true" id="StartDayNums" name="StartDayNums">
+                                                    <option value="">请选择每月第几日巡检</option>
+                                                    @foreach (var item in Model.StartDayNumLists[i - 1])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                @*<select class="form-control" data-val="true" id="EndDayNums" name="EndDayNums" style="display:none">
+                                                    <option value="">请选择第几日结束</option>
+                                                    @foreach (var item in Model.EndDayNumLists[i - 1])
+                                                    {
+                                                        if (item.Selected)
+                                                        {
+                                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>*@
+
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group" id="@Id" style="display:none">
+                                            <label class="control-label col-md-3"></label>
+                                            <div class="col-md-5">
+                                                @Html.DropDownListFor(model => model.StartDayNums, Model.DayNumList, "请选择每月第几日巡检", new { @class = "form-control" })
+                                                @*@Html.DropDownListFor(model => model.EndDayNums, Model.DayNumList, "请选择第几日结束", new { @class = "form-control", @style = "display:none" })*@
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-3">选择巡检点<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @foreach (var item in Model.PointList)
+                                    {
+                                        <div class="i-checks">
+                                            @if (item.Selected)
+                                            {
+                                                <label><input type="checkbox" value="@item.Value" int="PointIds" name="PointIds" checked="checked">&nbsp;&nbsp;@item.Text</label>
+                                            }
+                                            else
+                                            {
+                                                <label><input type="checkbox" value="@item.Value" int="PointIds" name="PointIds">&nbsp;&nbsp;@item.Text</label>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">是否发布<span class="text-danger">&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    <div class="i-checks">
+                                        @Html.CheckBoxFor(model => model.IsPublished)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3"></label>
+                                <div class="col-md-6">
+                                    <p style="font-size:10px">任务发布后，巡检人员将开始进行巡检，任务不可再编辑</p>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/Inspection/PlanList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    @Styles.Render("~/plugins/dataPickerStyles")
+    <link href="~/Content/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="~/Content/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <style>
+        .plan-validation-error {
+            color: #D26C77;
+            font-weight: bold;
+            font-size: 1.0em;
+        }
+    </style>
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/iCheck")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    @Scripts.Render("~/plugins/dataPicker")
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/validate/InspectionPlanValidate.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('.date').datepicker({
+                clearBtn: false
+            });
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green'
+            });
+
+            //巡检类型变化监听
+            $('#Type').change(function () {
+
+                var currentDate = new Date();
+                var year = currentDate.getFullYear();
+                var month = currentDate.getMonth() + 1;
+                var date = currentDate.getDate();
+                var day = currentDate.getDay();
+                if (day == 0) {
+                    day = 7;
+                }
+
+                //如果选择日巡检
+                if ($(this).val() == 0) {
+
+                    $("#BeginDate").val(year + '-' + month + '-' + date);
+                    $("#EndDate").val(year + '-' + month + '-' + date);
+
+                    $("#DayPlans").show();
+                    $("#WeekPlans").find("select").val("");
+                    $("#WeekPlans").hide();
+                    $("#MonthPlans").find("select").val("");
+                    $("#MonthPlans").hide();
+                    for (var i = 2; i < 10; i++) {
+                        $("#WeekPlan" + i).hide();
+                        $("#MonthPlan" + i).hide();
+                    }
+                    //如果选择周巡检
+                } else if ($(this).val() == 1) {
+
+                    currentDate.setDate(date - day + 1);
+                    year = currentDate.getFullYear();
+                    month = currentDate.getMonth() + 1;
+                    date = currentDate.getDate();
+                    $("#BeginDate").val(year + '-' + month + '-' + date);
+                    currentDate.setDate(date + 6);
+                    var lastdate = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+                    $("#EndDate").val(lastdate);
+
+                    $("#DayPlans").find("select").val("");
+                    $("#DayPlans").hide();
+                    $("#WeekPlans").show();
+                    $("#MonthPlans").find("select").val("");
+                    $("#MonthPlans").hide();
+                    for (var i = 2; i < 10; i++) {
+                        $("#DayPlan" + i).hide();
+                        $("#MonthPlan" + i).hide();
+                    }
+                    //如果选择月巡检
+                } else {
+                    $("#BeginDate").val(year + '-' + month + '-01');
+                    var day = new Date(year, month, 0);
+                    var lastdate = year + '-' + month + '-' + day.getDate();
+                    $("#EndDate").val(lastdate);
+
+                    $("#DayPlans").find("select").val("");
+                    $("#DayPlans").hide();
+                    $("#WeekPlans").find("select").val("");
+                    $("#WeekPlans").hide();
+                    $("#MonthPlans").show();
+                    for (var i = 2; i < 10; i++) {
+                        $("#WeekPlan" + i).hide();
+                        $("#WeekPlan" + i).hide();
+                    }
+                }
+                //更改开始结束时间
+                $('.date').datepicker('update');
+
+                $("#IsRandom").val(0);
+                $("#RandomNum").val("");
+                $("#RandomNumDiv").hide();
+            });
+
+            //是否随机变化监听
+            $('#IsRandom').change(function () {
+
+                //如果是不随机巡检
+                if ($(this).val() == 0) {
+                    $("#RandomNumDiv").hide();
+                    //如果选择日巡检
+                    if ($("#Type").val() == 0) {
+                        $("#DayPlans").show();
+                    } else if ($("#Type").val() == 1) {
+                        $("#WeekPlans").show();
+                    } else {
+                        $("#MonthPlans").show();
+                    }
+                    for (var i = 2; i < 10; i++) {
+                        $("#DayPlan" + i).hide();
+                        $("#WeekPlan" + i).hide();
+                        $("#MonthPlan" + i).hide();
+                    }
+                } else {
+                    //如果是随机巡检
+                    $("#RandomNumDiv").show();
+                    $("#DayPlans").hide();
+                    $("#WeekPlans").hide();
+                    $("#MonthPlans").hide();
+                }
+                $("#RandomNum").val("");
+            });
+        });
+
+        $(window).load(function (){
+
+            //巡检安排初始化
+            var type = @Html.Raw(Model.Type);
+            var IsRamdom = @Html.Raw(Model.IsRandom);
+            //如果不随机
+            if(IsRamdom == 0){
+                if(type == 0)
+                {
+                    $("#DayPlans").show();
+
+                }else if(type == 1)
+                {
+                    $("#WeekPlans").show();
+                }else
+                {
+                    $("#MonthPlans").show();
+                }
+            }else{
+                $("#RandomNumDiv").show();
+            }
+        });
+
+        //添加日巡检安排
+        function addDayPlan(obj) {
+
+            var num = $("#DayPlans").children("div:visible").length;
+            if (num < 10) {
+                var Id = "#DayPlan" + (num + 1);
+                $(Id).show();
+                $(obj).attr("href", Id);
+            } else {
+                $(obj).addClass("btn-default");
+            }
+        }
+
+        //添加周巡检安排
+        function addWeekPlan(obj) {
+
+            var num = $("#WeekPlans").children("div:visible").length;
+            if (num < 7) {
+                var Id = "#WeekPlan" + (num + 1);
+                $(Id).show();
+                $(obj).attr("href", Id);
+            } else {
+                $(obj).addClass("btn-default");
+            }
+        }
+
+        //添加月巡检安排
+        function addMonthPlan(obj) {
+
+            var num = $("#MonthPlans").children("div:visible").length;
+            if (num < 10) {
+                var Id = "#MonthPlan" + (num + 1);
+                $(Id).show();
+                $(obj).attr("href", Id);
+            } else {
+                $(obj).addClass("btn-default");
+            }
+        }
+
+        //删除巡检安排
+        function delPlan(obj) {
+            var num = $(obj).parent().parent().children("div:visible").length;
+            if (num > 1) {
+                $(obj).parent().parent().children("div:visible").last().find("select").val("");
+                $(obj).parent().parent().children("div:visible").last().hide();
+            }
+        }
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/Inspection/PlanList";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,编辑失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

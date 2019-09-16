@@ -1,0 +1,403 @@
+﻿@{
+    ViewBag.Title = "我的话题圈";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+<div class="weui_tab">
+    <div id="tab_div_now_" class="weui_navbar" style="color:#000;background:#fff;font-weight:600">
+        <div style="width: 50%; text-align: center; padding: 8px 0" class="now">
+            <span style="font-size:16px">我的话题</span>
+        </div>
+        <div style="width: 50%;text-align:center; padding: 8px 0">
+            <span style="font-size: 16px">我的回复</span>
+        </div>
+    </div>
+    <div class="weui_tab_bd" style="padding-top:43px">
+        <div id="tab_1" style="display:block">            
+        </div>
+        <div id="tab_2" style="display:none">            
+        </div>
+        <div id="wrapper">
+            <ul id="list"></ul>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        #tab_1.weui_cells:before {
+            border-top: none;
+        }
+        #tab_2.weui_cells:before {
+            border-top: none;
+        }
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+            #wrapper ul li {
+                padding: 15px;
+                background: #FFF;
+            }
+        #wrapperReply {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+            #wrapperReply ul li {
+                padding: 15px;
+                background: #FFF;
+            }
+        .user_icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+        .now {
+            color: #0172ff;
+            border-bottom: 2px solid #0172ff;
+        }
+        .weui_article {           
+            padding-top:10px;
+            padding-bottom:5px;           
+        }
+        .NullImg {
+         text-align:center;
+         padding:50px 0;
+        }
+            .NullImg img {
+            width:120px;
+            }
+            .NullImg div {
+                margin-top:10px;
+            }
+        .weui_article section {
+            margin-bottom: 5px;
+        }
+        .topicType {
+            color: #afafaf;
+        }
+            .topicType img {
+                float: right;
+                width: 16px;
+                margin-top: 4px;
+            }
+            .topicType span {
+                float: right;
+                margin-left:5px;
+                color: #0371fe;
+                font-size:14px;
+                font-weight:normal;
+            }
+        .weui_article h2 {
+            margin-bottom: 10px;
+        }
+        .weui_article p {
+            margin: 6px 0;
+        }
+        .Wsection:before {
+            top: 0;
+            border-top: 0.5px solid #d9d9d9;
+            -webkit-transform-origin: 0 0;
+            transform-origin: 0 0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+        .Wsection:after {
+            bottom: 0;
+            border-bottom: 0.5px solid #d9d9d9;
+            -webkit-transform-origin: 0 100%;
+            transform-origin: 0 100%;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+        .username_color {
+        font-weight:700;
+        }
+        .weui_cells {
+            margin-top: 10px;
+        }
+    </style>
+}
+
+@section Scripts{
+
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript">
+
+    //跳转到详细
+    function gotoDetail(id) {
+        location.href = '/WeixinTopic/TopicDetailList?topicId=' + id + "&floorId=0";
+    }
+    function gotoDetailReply(topicId, floorId, parentId, PostUserId,replyId) {
+        //一级回复
+        if (parentId == null) {
+            location.href = '/WeixinTopic/TopicDetailList?topicId=' + topicId + "&floorId=" + floorId;
+        }
+        else {
+            var curentUserId =@ViewBag.CurrentUserId;
+            if (PostUserId == curentUserId) {
+                location.href = '/WeixinTopic/FloorDetailList?floorId= ' + floorId + '&replyId=' + replyId;
+            }
+            else {
+                location.href = '/WeixinTopic/FloorDetailList?floorId=' + floorId + "&replyId=" + PostUserId;
+            }
+        }        
+    }
+    window.onload = function () {
+        new tab('tab_div_now_');
+    }
+
+    //tab切换方法
+    function tab(o, s, cb, ev) {
+        var $ = function (o) { return document.getElementById(o) };
+        var css = o.split((s || '_'));
+        if (css.length != 4) return;
+        this.event = ev || 'onclick';
+        o = $(o);
+        if (o) {
+            this.ITEM = [];
+            o.id = css[0];
+            var item = o.getElementsByTagName(css[1]);
+            var j = 1;
+            for (var i = 0; i < item.length; i++) {
+                if (item[i].className.indexOf(css[2]) >= 0 || item[i].className.indexOf(css[3]) >= 0) {
+                    if (item[i].className == css[2]) o['cur'] = item[i];
+                    item[i].callBack = cb || function () { };
+                    item[i]['css'] = css;
+                    item[i]['link'] = o;
+                    this.ITEM[j] = item[i];
+                    item[i]['Index'] = j++;
+                    item[i][this.event] = this.ACTIVE;
+                }
+            }
+            return o;
+        }
+    }
+    tab.prototype = {        
+        ACTIVE: function () {
+            var $ = function (o) { return document.getElementById(o) };
+            this['link']['cur'].className = this['css'][3];
+            this.className = this['css'][2];
+            try {
+                $(this['link']['id'] + '_' + this['link']['cur']['Index']).style.display = 'none';
+                $(this['link']['id'] + '_' + this['Index']).style.display = 'block';
+            } catch (e) { }
+            this.callBack.call(this);
+            this['link']['cur'] = this;
+            Refresh();
+        }
+    }
+
+    var pageIndex = 1;
+    var Total = 0;
+    var pageIndexReply = 1;
+    var TotalReply = 0;
+
+    $(document).ready(function () {
+
+        refresher.init({
+            id: "wrapper",
+            pullDownAction: Refresh,
+            pullUpAction: Load
+        });
+        Load();
+
+        //refresher.init({
+        //    id: "wrapperReply",
+        //    pullDownAction: RefreshReply,
+        //    pullUpAction: LoadReply
+        //});
+        //LoadReply();
+
+
+        //$("#wrapperReply .pullDown").hide();
+    });
+
+    //刷新
+    function Refresh() {
+        Total = 0;
+        pageIndex = 1;
+        TotalReply = 0;
+        pageIndexReply = 1;
+        $("#list").empty();
+        if ($("#tab_1").css("display")=="none") {
+            LoadReply();
+        }
+        else {
+            Load();
+        }
+        
+    }
+
+    //加载 tab1 我的话题
+    function Load() {
+        $.ajax({
+            type: "get",
+            url: "/WeixinTopic/MyTopicJsonList",
+            data: { PageIndex: pageIndex },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                //如果总个数有变化
+                if (pageIndex > 1 && data.Total != Total) {
+                    Refresh();
+                } else {
+                    $.each(data.Result, function (index, entry) {
+                        var html = "";
+                        html += '<div class="weui_cells" onclick="gotoDetail(' + entry["Id"] + ')">';
+                        html += '<article class="weui_article">';
+                        html += '<section>';
+                        html += '<p class="pull-left" style="margin:0 8px 0 0">';
+                        html += '<img alt="image" src="';
+                        if (entry["UserImage"] == null || entry["UserImage"] == "") {
+                            html += '../Images/news_item_default.png';
+                        }
+                        else {
+                            html += entry["UserImage"];
+                        }
+                        html += '" class="user_icon">';
+                        html += '</p>';
+                        html += '<div>';
+                        html += ' <p style="margin:2px 8px 0 0" class="username_color">' + entry["UserName"] + '</p>';
+                        html += '<p style="color:#afafaf;margin:2px 8px 0 0;font-size:14px;">' + entry["PostDate"] + '</p>';
+                        html += '</div>';
+                        html += '<h4 style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;color:#000000;margin-bottom: 5px;margin-top:10px;font-size:15px; font-weigth:700;">' + entry["Title"] + '</h4>';
+                        html += '<p class="reply_content_color" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;font-size:14px;color: #000000;">' + entry["Content"] + '</p>';
+                        var piclist = entry["PicList"] + '';
+                        if (piclist.length > 0) {
+                            var imgs = piclist.split(';');
+                            if (imgs.length > 0) {
+                                html += '<p style="width:100%;">';
+                                for (var i = 0; i < imgs.length; i++) {                                    
+                                    html += '<img src="' + imgs[i] + '" style="height:68px; width:30%;margin:0 8px 10px 0;"/>';                                    
+                                }
+                                html += '</p>';
+                            }
+                        }
+                        html += '</section>';
+                        html += '<section style="margin:0 0;">';
+                        html += ' <p style="margin: 0 0; margin-left:-5px;" class="topicType">【' + entry["PropertyName"] + '】【' + entry["TopicType"] + '】<span>' + entry["CommentCount"] + '</span><img src="/Images/WeiXin/speek_blue.png"/></p>';
+                        html += '</section>';
+                        html += '</article>';
+                        html += '</div>';
+                        $("#list").append(html);
+                    });
+                    
+                    wrapper.refresh();
+                    if (data.Total == 0) {
+                        var itemHtmlStr = '<div class="NullImg"><img src="/Images/WeiXin/topic.png"/><div>还没有发表话题</div></div>';
+                        $("#list").append(itemHtmlStr);
+                        $(".pullUp").text("");
+                        wrapper.stop();
+                    }
+                    else {
+                        if (pageIndex * 10 >= data.Total) {
+                            $(".pullUp").text("已全部加载");
+                            wrapper.stop();
+                        } else {
+                            pageIndex = pageIndex + 1;
+                            $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                            wrapper.refresh();
+                        }
+                    }
+                }
+                Total = data.Total;
+
+            }, error: function (error) {
+                //加载失败
+                wrapper.refresh();
+            }
+        });
+    }
+
+    //加载 tab2 我的回复
+    function LoadReply() {
+        $.ajax({
+            type: "get",
+            url: "/WeixinTopic/MyReplyJsonList",
+            data: { PageIndex: pageIndexReply },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {                
+                //如果总个数有变化
+                if (pageIndexReply > 1 && data.Total != TotalReply) {
+                    Refresh();
+                } else {                    
+                    $.each(data.Result, function (index, entry) {
+                        var html = "";
+                        html += '<div class="weui_cells" onclick="gotoDetailReply(' + entry["TopicId"] + ',' + entry["FloorId"] + ',' + entry["ParentId"] + ',' + entry["PostUserId"] + ',' + entry["ReplyId"] + ')">';
+                        html += '<article class="weui_article">';
+                        html += '<div>';
+                        html += '<p class="pull-left" style="margin:0 8px 0 0">';
+                        html += '<img alt="image" src="';
+                        if (entry["UserImage"] == null || entry["UserImage"] == "") {
+                            html += '../Images/news_item_default.png';
+                        }
+                        else {
+                            html += entry["UserImage"];
+                        }
+                        html += '" class="user_icon"/>';
+                        html += '</p>';
+                        html += '<div>';
+                        html += ' <p style="margin:2px 8px 0 0" class="username_color">' + entry["UserName"] + '</p>';
+                        html += '<p style="color:#afafaf;margin:2px 8px 0 0;font-size:14px;">' + entry["PostDate"] + '</p>';
+                        html += '</div>';                        
+                        html += '<div style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;color:black;font-size:14px;margin: 10px 0;"><span style="color:#0371fe;">回复：</span>' + entry["Content"] + '</div>';
+                        html += '<div class="weui_cells" style="margin-top:5px;"><h2 style="color:#000;margin-top:10px;">话题：' + entry["Title"] + '</h2>';
+                        var piclist = entry["PicList"];
+                        if (piclist != null) {                            
+                            var imgs = piclist.split(';');
+                            if (imgs.length > 0) {
+                                for (var i = 0; i < imgs.length; i++) {
+                                    html += '<p>';
+                                    html += '<img src="' + imgs[i] + '" style="width:30%;height:68px;margin:0 3% 10px 0;float:left;"/>';
+                                    html += '</p>';
+                                }
+                            }
+                        }
+                        html += '</div></div>';
+                        html += '<div>';
+                        html += ' <p style="margin: 6px 0 4px 0; margin-left:-5px;" class="topicType">【' + entry["PropertyName"] + '】【' + entry["TopicType"] + '】<span>' + entry["CommentCount"] + '</span><img src="/Images/WeiXin/speek_blue.png"/></p>';
+                        html += '</div>';
+                        html += '</article>';
+                        html += '</div>';
+                        $("#list").append(html);
+                    });
+
+                    wrapper.refresh();
+                    if (data.Total == 0) {
+                        var itemHtmlStr = '<div class="NullImg"><img src="/Images/WeiXin/topic.png"/><div>还没有回复话题</div></div>';
+                        $("#list").html("");
+                        $("#list").append(itemHtmlStr);
+                        $(".pullUp").text("");
+                        wrapper.stop();
+                    }
+                    else {
+                        if (pageIndexReply * 10 >= data.Total) {
+                            $(".pullUp").text("已全部加载");
+                            wrapper.stop();
+                        } else {
+                            pageIndexReply = pageIndexReply + 1;
+                            $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                            wrapper.refresh();
+                        }
+                    }
+                }
+                TotalReply = data.Total;
+
+            }, error: function (error) {
+                //加载失败
+                wrapper.refresh();
+            }
+        });
+    }
+</script>
+}
+

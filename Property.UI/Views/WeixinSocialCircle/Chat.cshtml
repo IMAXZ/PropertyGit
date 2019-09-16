@@ -1,0 +1,473 @@
+﻿@{
+    ViewBag.Title = "我的圈子";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.SocialCircleChatModel
+
+@{
+    var Name = Model.Name.Length > 10 ? Model.Name.Substring(0, 10) + ".." : Model.Name;
+}          
+
+<div style="background: #0172ff; height: 50px; line-height: 50px; text-align: center;color:#fff;position:fixed;top:0;width:100%">
+    <span style="float:left;padding-left:10px;padding-right:15px" onclick="history.go(-1)"><i class="return_icon"></i></span>
+    <span style="vertical-align:middle;font-size:18px"><span>@Name</span>(@Model.MemberCount)</span>
+    <span style="float: right; padding: 0 10px" onclick="location.href = '/WeixinSocialCircle/Deatil/@Model.Id'"><i class="right_icon"></i></span>
+</div>
+
+<div id="wrapper">
+    <ul id="list"></ul>
+</div>
+
+<div class="weui_search_bar" id="search_bar" style="background-color: #f6f7fb; position: fixed; bottom: 0; width: 100%">
+    <input type="image" accept="image/*" name="input_img" id="input_img" style="display:none" onclick="sendImg()" />
+    <span style="margin-right: 10px; margin-top: 2.5px" onclick="$('#input_img').click()"><i class="takephoto_icon"></i></span>
+    <div class="weui_search_outer" style="background-color:#fff">
+        <div class="weui_search_inner" style="padding:0 10px">
+            <input type="text" class="weui_search_input" id="message" name="message" style="padding:6px 0">
+        </div>
+    </div>
+    <button id="send_btn" class="weui_btn weui_btn_mini weui_btn_default" style="width:55px;text-align:center;margin-left:10px;background-color:#fff;display:none" onclick="send()">发送</button>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .container {
+            background-color: #f2f2f2;
+        }
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            top: 50px;
+            bottom: 48px;
+            width: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 15px;
+                background-color: #f2f2f2;
+            }
+
+        h3, h4 {
+            font-weight: 500;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        p {
+            margin:0
+        }
+        .weui_search_outer:after {
+            border: #808080 solid 1px;
+        }
+
+        .return_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 25px;
+            height: 25px;
+            background: url(/Images/Weixin/return_icon.png) no-repeat;
+            background-size: 25px 25px;
+        }
+
+        .right_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 30px;
+            height: 30px;
+            background: url(/Images/Weixin/quanz_right_btn.png) no-repeat;
+            background-size: 30px 30px;
+        }
+
+        .takephoto_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 27px;
+            height: 27px;
+            background: url(/Images/Weixin/take_photo_btn.png) no-repeat;
+            background-size: 27px 27px;
+        }
+
+            .takephoto_icon:active {
+                background: url(/Images/Weixin/take_photo_btn_press.png) no-repeat;
+                background-size: 27px 27px;
+            }
+
+        .talk_recordbox {
+            padding: 5px 10px 10px 10px;
+        }
+
+            .talk_recordbox .talk_recordtextbg {
+                float: left;
+                width: 10px;
+                height: 30px;
+                display: block;
+                background: url(/Images/Weixin/talk_recordtextme.png) no-repeat;
+                background-position: left top;
+            }
+
+            .talk_recordbox .talk_recordtext {
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #fff;
+                height: auto;
+                min-height: 39px;
+                display: block;
+                padding: 2px;
+                margin-left: 60px;
+                margin-right: 20px;
+                color: #000;
+                word-break: break-all;
+            }
+
+            .talk_recordbox .user {
+                float: left;
+                display: inline;
+                height: 45px;
+                width: 45px;
+                margin-top: 0px;
+                margin-right: 5px;
+                margin-bottom: 0px;
+                margin-left: 0px;
+                font-size: 12px;
+                line-height: 20px;
+                text-align: center;
+            }
+
+        /*自己发言样式*/
+        .talk_recordboxme {
+            padding: 5px 10px 10px 10px;
+        }
+
+            .talk_recordboxme .talk_recordtextbg {
+                float: right;
+                width: 10px;
+                height: 30px;
+                display: block;
+                background-image: url(/Images/Weixin/talk_recordtext.png);
+                background-repeat: no-repeat;
+                background-position: left top;
+            }
+
+            .talk_recordboxme .talk_recordtext {
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #b8d45c;
+                min-height: 39px;
+                margin-left: 20px;
+                margin-right: 60px;
+                height: auto;
+                padding: 2px;
+                color: #000;
+                word-break: break-all;
+            }
+
+            .talk_recordboxme .user {
+                float: right;
+                height: 45px;
+                width: 45px;
+                margin-top: 0px;
+                margin-right: 0px;
+                margin-bottom: 0px;
+                margin-left: 5px;
+                font-size: 12px;
+                line-height: 20px;
+                text-align: center;
+                display: inline;
+            }
+
+        .time {
+            background: #b7b0b0;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+    </style>
+}
+
+@section Scripts{
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+
+    <script type="text/javascript">
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+                'chooseImage',
+                'previewImage',
+                'uploadImage',
+                'downloadImage',
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        });
+
+        var pageIndex = 1;
+        var Total = 0;
+        var IsLoadComplete = false;
+        var circleId = @Html.Raw(Model.Id)
+
+        $(document).ready(function () {
+
+            $('#message').bind('input', function () {
+
+                if ($("#message").val() == undefined || $("#message").val() == "") {
+                    $("#send_btn").hide();
+                } else {
+                    $("#send_btn").show();
+                }
+            });
+
+            refresher.info = {
+                "pullDownLable": "下拉加载更多...",
+                "pullingDownLable": "松开加载...",
+                "pullUpLable": "上拉加载更多...",
+                "pullingUpLable": "松开加载更多...",
+                "loadingLable": "加载中..."
+            };
+            refresher.init({
+                id: "wrapper",
+                pullDownAction: Load
+            });
+            $(".pullUp").remove();
+            wrapper.refresh();
+
+            //加载数据
+            Load();
+
+        });
+
+        //发送
+        function send() {
+
+            var msg = $("#message").val();
+            if (msg != undefined && msg != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "/WeixinSocialCircle/SendChatMessage",
+                    data: { id: circleId, content: msg },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            location.reload(true);
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("发送失败");
+                    }
+                });
+            }
+        }
+
+        var imglocalIds = [];
+        var imgserverIds = "";
+
+        //发送图片
+        function sendImg() {
+
+            wx.chooseImage({
+                success: function (res) {
+
+                    imglocalIds = res.localIds;
+                    var i = 0, length = imglocalIds.length;
+
+                    function upload() {
+                        wx.uploadImage({
+                            localId: imglocalIds[i],
+                            success: function (res) {
+                                i++;
+                                if (i < length) {
+
+                                    imgserverIds += res.serverId + ",";
+                                    upload();
+                                }
+                                if (i == length) {
+
+                                    imgserverIds += res.serverId;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/WeixinSocialCircle/SendChatImgMessage",
+                                        data: { id: circleId, imgs: imgserverIds },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            if (data.Code == "OK") {
+                                                location.reload(true);
+                                            } else {
+                                                alert(data.Msg);
+                                            }
+                                        }, error: function (error) {
+                                            alert("发送失败");
+                                        }
+                                    });
+                                }
+                            },
+                            fail: function (res) {
+                                alert(JSON.stringify(res));
+                            }
+                        });
+                    }
+                    upload();
+                }
+            });
+        }
+
+        //图片放大
+        $(document).on('click', '.talk_recordtext img', function (event) {
+            var imgArray = [];
+            var curImageSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+            if (curImageSrc) {
+                $('.talk_recordtext img').each(function (index, el) {
+                    var itemSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+
+        var timeInterval = @Html.Raw((int)ViewBag.TimeInterval)
+        //加载
+        function Load() {
+
+            //如果加载完毕
+            if (IsLoadComplete) {
+                $(".pullDown").children().hide();
+                $(".pullDown").css("height", "40px");
+                wrapper.refresh();
+            } else {
+
+                $.ajax({
+                    type: "get",
+                    url: "/WeixinSocialCircle/GetSocialCircleChatJsonList",
+                    data: { id: circleId, PageIndex: pageIndex },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+
+                        //如果总个数有变化
+                        if (pageIndex > 1 && data.Total != Total) {
+                            location.reload(true);
+                        } else {
+                            $.each(data.Result, function (index, entry) {
+
+                                var ChatTime = new Date(entry["ChatTime"]).getTime();
+                                var LastChatTime = new Date(entry["LastChatTime"]).getTime();
+                                if (entry["IsMySelf"]) {
+                                    var itemHtmlStr = '';
+                                    itemHtmlStr += '<li class="talk_recordboxme">';
+                                    if (entry["LastChatTime"] == undefined || entry["LastChatTime"] == ""
+                                        || ChatTime - LastChatTime > parseInt(timeInterval) * 60 * 1000) {
+
+                                        var d = new Date(entry["ChatTime"]);
+                                        itemHtmlStr += '<div style="text-align:center"><span class="time">' + getFormatDate(d) + '</apan></div>';
+                                    }
+                                    itemHtmlStr += '<div class="user"><img class="img-circle" src="' + entry["ChatUserHeadImg"] + '" style="width:45px;height:45px" /></div>';
+                                    itemHtmlStr += '<h4 style="text-align:right">' + entry["ChatUser"] + '&nbsp;</h4>';
+                                    itemHtmlStr += '<div class="talk_recordtextbg">&nbsp;</div>';
+
+                                    itemHtmlStr += '<div class="talk_recordtext">';
+                                    if (entry["ChatContent"] != undefined && entry["ChatContent"] != "") {
+                                        itemHtmlStr += '<p style="padding:8px 5px;word-break: break-all">' + entry["ChatContent"] + '</p>';
+                                    }
+                                    if (entry["ChatImg"] != undefined && entry["ChatImg"] != "") {
+                                        itemHtmlStr += '<img src="' + entry["ChatImg"] + '" style="width:100%;height:200px;border-radius:5px" />';
+                                    }
+                                    itemHtmlStr += '</div>';
+                                    itemHtmlStr += '</li>';
+                                    $("#list").prepend(itemHtmlStr);
+                                } else {
+                                    var itemHtmlStr = '';
+                                    itemHtmlStr += '<li class="talk_recordbox">';
+                                    if (entry["LastChatTime"] == undefined || entry["LastChatTime"] == ""
+                                        || ChatTime - LastChatTime > parseInt(timeInterval) * 60 * 1000) {
+
+                                        var d = new Date(entry["ChatTime"]);
+                                        itemHtmlStr += '<div style="text-align:center"><span class="time">' + getFormatDate(d) + '</apan></div>';
+                                    }
+                                    itemHtmlStr += '<div class="user"><img class="img-circle" src="' + entry["ChatUserHeadImg"] + '" style="width:45px;height:45px" /></div>';
+                                    itemHtmlStr += '<h4 style="text-align:left">' + entry["ChatUser"] + '&nbsp;</h4>';
+                                    itemHtmlStr += '<div class="talk_recordtextbg">&nbsp;</div>';
+
+                                    itemHtmlStr += '<div class="talk_recordtext">';
+                                    if (entry["ChatContent"] != undefined && entry["ChatContent"] != "") {
+                                        itemHtmlStr += '<p style="padding:8px 5px;word-break: break-all">' + entry["ChatContent"] + '</p>';
+                                    }
+                                    if (entry["ChatImg"] != undefined && entry["ChatImg"] != "") {
+                                        itemHtmlStr += '<img src="' + entry["ChatImg"] + '" style="width:100%;height:200px;border-radius:5px" />';
+                                    }
+                                    itemHtmlStr += '</div>';
+                                    itemHtmlStr += '</li>';
+                                    $("#list").prepend(itemHtmlStr);
+                                }
+
+                            });
+                            //如果已经加载完毕
+                            if (pageIndex * 5 >= data.Total) {
+
+                                IsLoadComplete = true;
+                            } else {
+                                pageIndex = pageIndex + 1;
+                            }
+                            wrapper.refresh();
+                        }
+                        Total = data.Total;
+
+                    }, error: function (error) {
+
+                        //加载失败
+                        wrapper.refresh();
+                    }
+                });
+            }
+        }
+
+        var currentYear = @Html.Raw(DateTime.Now.Year)
+
+        function getFormatDate(date) {
+
+            var seperator1 = '/';
+            var seperator2 = ':';
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+
+            if (month >= 1 && month <= 9) {
+                month = '0' + month;
+            }
+            if (day >= 0 && day <= 9) {
+                day = '0' + day;
+            }
+            if (hour >= 0 && hour <= 9) {
+                hour = '0' + hour;
+            }
+            if (minute >= 0 && minute <= 9) {
+                minute = '0' + minute;
+            }
+
+            if (date.getYear() == currentYear) {
+                return month + seperator1 + day + ' ' + hour + seperator2 + minute;
+            } else {
+                return date.getFullYear() + seperator1 + month + seperator1 + day;
+            }
+        }
+    </script>
+}

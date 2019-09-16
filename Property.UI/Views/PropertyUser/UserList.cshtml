@@ -1,0 +1,250 @@
+﻿@{
+    ViewBag.Title = "物业用户列表";
+}
+@using Webdiyer.WebControls.Mvc
+@using Property.Common
+@model PagedList<Property.Entity.T_PropertyUser>
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox-content m-b-xs border-bottom">
+        <div class="row">
+            <div class="col-lg-12">
+                @using (Html.BeginForm("UserList", "PropertyUser", FormMethod.Get, new { @class = "form-horizontal", @role = "form" }))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-1">用户姓名</label>
+                        <div class="col-md-3">
+                            @Html.TextBox("Kword", "", new { @class = "form-control", @placeholder = "请输入用户名，姓名" })
+                        </div>
+                        <div class="col-md-8 text-right">
+                            <button class="btn btn-md btn-primary" type="submit">查询</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    @if (Html.IsHasButton("/PropertyUser/AddUser"))
+                    {
+                        @Html.ActionLink("新增物业用户", "AddUser", null, new { @class = "btn btn-primary" })
+                    }
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center text-nowrap">头像</th>
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "UserName" }, { "DisplayName", "用户名" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "TrueName" }, { "DisplayName", "用户姓名" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Tel" }, { "DisplayName", "联系方式" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Phone" }, { "DisplayName", "手机" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "Email" }, { "DisplayName", "电子邮箱" } })
+                                    <th class="text-center text-nowrap">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="dropdown-messages-box text-center">
+                                                @if (string.IsNullOrEmpty(item.HeadPath))
+                                                {
+                                                    <img src="/Images/default.png" class="img-circle" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@item.HeadPath" class="img-circle" />
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>@item.UserName</td>
+                                        <td>@item.TrueName</td>
+                                        <td>@item.Tel</td>
+                                        <td>@item.Phone</td>
+                                        <td>@item.Email</td>
+                                        <td class="text-center text-nowrap">
+
+                                            @if (item.IsMgr == ConstantParam.USER_ROLE_DEFAULT)
+                                            {
+                                                if (Html.IsHasButton("/PropertyUser/ConfigRole"))
+                                                {
+                                                    <a href="/PropertyUser/ConfigRole?id=@item.Id" class="btn btn-outline btn-primary btn-sm">分配角色</a>
+                                                }
+                                            }
+                                            @if (Html.IsHasButton("/PropertyUser/ScanRole"))
+                                            {
+                                                <a href="/PropertyUser/ScanRole?id=@item.Id" class="btn btn-outline btn-primary btn-sm">查看角色</a>
+                                            }
+                                            @if (item.IsMgr == ConstantParam.USER_ROLE_DEFAULT)
+                                            {
+                                                if (Html.IsHasButton("/PropertyUser/UploadPic"))
+                                                {
+                                                    <a href="/PropertyUser/UploadPic?id=@item.Id" class=" btn btn-outline btn-primary btn-sm">设置头像</a>
+                                                }
+                                                if (Html.IsHasButton("/PropertyUser/ResetPassword"))
+                                                {
+                                                    <a href="#" class=" btn btn-outline btn-primary btn-sm" onclick="restorePasswordToDefaults(@item.Id);">重置密码</a>
+                                                }
+                                                if (Html.IsHasButton("/PropertyUser/EditUser"))
+                                                {
+                                                    <a href="/PropertyUser/EditUser?id=@item.Id" class="btn btn-outline btn-default btn-sm">编辑</a>
+                                                }
+                                                if (Html.IsHasButton("/PropertyUser/DeleteUser"))
+                                                {
+                                                    <a href="#" class="btn btn-outline btn-default btn-sm" onclick="confirmDel(@item.Id);">删除</a>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-left">
+                            共 @Model.TotalPageCount 页 @Model.TotalItemCount 条记录，当前为第 @Model.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-7 text-right">
+                            @Html.Pager(Model, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "PageIndex",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    <script type="text/javascript">
+
+        function confirmDel(id) {
+            swal({
+                title: "确定要删除该物业用户吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "/PropertyUser/DeleteUser",
+                        data: { id: id },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.Code == "OK") {
+
+                                swal({
+                                    title: "删除成功!",
+                                    text: "",
+                                    type: "success"
+                                }, function () {
+                                    window.location.reload();
+                                });
+                            } else {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        },
+                        error: function (err) {
+
+                            swal({
+                                title: "请求出现异常，删除失败",
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    });
+                }
+            })
+        }
+
+
+        function restorePasswordToDefaults(id) {
+            swal({
+                title: "确定要重置用户密码吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm) {
+
+                $("button.confirm").attr('disabled',true);
+                if (isConfirm) {
+                    $.ajax({
+                        url: "/PropertyUser/ResetPassword",
+                        data: { id: id },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+
+                            $("button.confirm").attr('disabled',false);
+                            if (data.Code == "OK") {
+                                swal({
+                                    title: "重置成功!",
+                                    text: "新密码已发送至您的邮箱，请及时查看并修改",
+                                    type: "success"
+                                }, function () {
+                                    window.location.reload();
+                                });
+                            } else {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        },
+                        error: function (err) {
+
+                            $("button.confirm").attr('disabled',false);
+                            swal({
+                                title: "请求出现异常，重置失败",
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}
+
+
+

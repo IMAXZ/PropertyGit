@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "个人中心";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+
+        <div style="padding: 35px 0; height: 177px; background: url(/Images/Weixin/my_bg.png) no-repeat; background-size: 100% 177px; ">
+            <div style="text-align: center">
+                <img alt="image" class="img-circle" src="@ViewBag.HeadPath" style="width: 80px; height: 80px; border-radius: 50%">
+                <h3 style="color:#fff;margin-top:10px">@ViewBag.UserName</h3>
+            </div>
+        </div>
+
+        <div style="background:#fff">
+            <div class="weui_grids">
+                <a href="/WeixinPersonalCenter/PersonInfo" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_1.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        个人信息
+                    </p>
+                </a>
+                <a href="/WeixinIdentityBind/Index" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_2.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        绑定小区
+                    </p>
+                </a>
+                <a href="/WeixinExpenseNotice/ExpenseNoticeList" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_3.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        缴费通知
+                    </p>
+                </a>
+                <a href="/WeixinTopic/MyTopicList" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_4.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        我的话题
+                    </p>
+                </a>
+                <a href="/WeixinSocialCircle/MyCircle" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_5.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        我的圈子
+                    </p>
+                </a>
+                <a href="/WeixinPersonalCenter/PasswordMgr" class="weui_grid">
+                    <div class="weui_grid_icon" style="width:40px;height:40px">
+                        <i class="icon" style="background: url(/Images/Weixin/menu_6.png) no-repeat; background-size: 40px 40px; "></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        密码管理
+                    </p>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="weui_tabbar" style="background:#fff">
+        <a href="/WeixinHome/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab1.png">
+            </div>
+            <p class="weui_tabbar_label">首页</p>
+        </a>
+        <a href="/WeixinTopic/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab2.png">
+            </div>
+            <p class="weui_tabbar_label">社区话题</p>
+        </a>
+        <a href="/WeixinBanshi/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab3.png">
+            </div>
+            <p class="weui_tabbar_label">生活办事</p>
+        </a>
+        <a href="javascript:;" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab4_press.png">
+            </div>
+            <p class="weui_tabbar_label" style="color: #0172ff">个人中心</p>
+        </a>
+    </div>
+</div>
+
+@section Styles{
+
+    <style type="text/css">
+        .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .weui_tabbar_icon {
+            width: 21px;
+            height: 21px;
+        }
+    </style>
+}

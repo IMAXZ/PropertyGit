@@ -1,0 +1,341 @@
+﻿@{
+    ViewBag.Title = "成员管理";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.circleuserModel
+
+@*<div class="bd">*@
+    @if (Model.Count > 1)
+    {
+        <div class="weui_cells_title"><h3>创建者</h3></div>
+        <div class="weui_cells">
+            <div class="weui_cell">
+                <div class="weui_cell_hd">
+                    <img src="@Model.HeadImg" style="width:45px;height:45px;display:block" class="img-circle" />
+                </div>&nbsp;
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p style="height:15px">@Model.CreateName</p>
+                </div>
+            </div>
+        </div>
+        <div id="manage_div">
+            @*如果创建人是当前用户*@
+            @if (Model.UserId == Model.CreateId)
+            {
+                <div class="weui_cells_title"><h3>其他成员</h3></div>
+                <div id="wrapper">
+                    <ul id="list" class="weui_cells weui_cells_checkbox"></ul>
+                </div>
+                <div class="weui_search_bar" style="background-color: #f6f7fb; position: fixed; bottom: 0; width: 100%">
+                    <div style="margin:-6px 0 0 auto">
+                        <button onclick="Msg()" class="weui_btn weui_btn_mini weui_btn_primary" style="top:-4px">
+                            <img src="/Images/WeiXin/usermanage1.png" style="width:21px;height:21px" />
+                            <span>群发</span>
+                        </button>
+                        <button id="a" onclick="Submit()" class="weui_btn weui_btn_mini weui_btn_primarys" style="top:-4px">
+                            <img src="/Images/WeiXin/usermanage2.png" style="width:21px;height:21px" id="m" />
+                            <span id="s">删除</span>
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="weui_cells_title"><h3>其他成员</h3></div>
+                <div id="wrapper">
+                    <ul id="list" class="weui_cells weui_cells_checkbox"></ul>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="weui_cells_title"><h3>创建者</h3></div>
+        <div class="weui_cells">
+            <div class="weui_cell">
+                <div class="weui_cell_hd">
+                    <img src="@Model.HeadImg" style="width:45px;height:45px;display:block" class="img-circle" />
+                </div>&nbsp;
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p style="height:15px">@Model.CreateName</p>
+                </div>
+            </div>
+        </div>
+    }
+@*</div>*@
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .weui_btn_primary {
+            background-color: #0172ff;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .weui_btn_primarys {
+            background-color: #ff6300;
+        }
+        
+        .weui_cells_title {
+            color: #000;
+        }
+
+        h3, h4, h5 {
+            margin-top: 5px;
+            font-weight: 100;
+        }
+
+        .weui_cell_bd weui_cell_primary {
+            font-weight: 100;
+        }
+
+        .weui_cells_checkbox .weui_check:checked + .weui_icon_checked:before {
+            color: #0172ff;
+        }
+
+        .weui_btn.weui_btn_mini {
+            font-size: 16px;
+        }
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 15px;
+                background: #FFF;
+            }
+
+        .weui_btn_primary:not(.weui_btn_disabled):active {
+            color: rgba(255, 255, 255, 0.8);
+            background-color: #1a31ea;
+        }
+
+        .weui_btn_primarys:not(.weui_btn_disabled):active {
+            color: rgba(255, 255, 255, 0.8);
+            background-color: #e05700;
+        }
+
+        label {
+            max-width: 100%;
+            font-weight: 700;
+            margin-bottom: 0px;
+        }
+    </style>
+}
+
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script>
+
+        var pageIndex = 1;
+        var Total = 0;
+        var IsLoadComplete = false;
+        //圈子Id
+        var circleId = @Html.Raw(Model.Id)
+
+        $(document).ready(function ()
+        {
+            refresher.init({
+                id: "wrapper",
+                pullDownAction: Refresh,
+                pullUpAction: Load
+            });
+
+            //设置#wrapper的高度
+            var a = $(".container").height();
+            var b = $(".weui_cells_title").height();
+            var c = $(".weui_cells").height();
+            var d = $(".weui_search_bar").height();
+            $("#wrapper").height(a - 3 * b - c - 2 * d);
+
+            Load();
+        });
+        //刷新
+        function Refresh()
+        {
+            $("#s").html("删除");
+            Total = 0;
+            IsLoadComplete = false;
+            pageIndex = 1;
+            $("#list").empty();
+            Load();
+        }
+
+        //加载成员列表
+        function Load()
+        {
+            if (!IsLoadComplete)
+            {
+                $.ajax({
+                    type: "get",
+                    url: "/WeixinSocialCircle/CircleUserList",
+                    data: { id: circleId, PageIndex: pageIndex },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        if (data.Total > 0)
+                        {
+                            //如果总个数有变化
+                            if (pageIndex > 1 && data.Total != Total)
+                            {
+                                location.reload(true);
+                            }
+                            else
+                            {
+                                $.each(data.Result, function (index, entry)
+                                {
+                                    var html = "";
+                                    html += '<label class="weui_cell weui_check_label">';
+                                    html += '<div class="weui_cell_hd">';
+                                    if (entry["UserImg"] != undefined && entry["UserImg"] != "")
+                                    {
+                                        html += '<img src="' + entry["UserImg"] + '" style="width:45px;height:45px;display:block" class="img-circle" />';
+                                    }
+                                    html += '</div>';
+                                    html += '<div class="weui_cell_bd weui_cell_primary">';
+                                    html += '<p style="height:15px;font-weight:500;">' + entry["UserName"] + '</p>';
+                                    html += '</div>';
+                                    html += '<div class="weui_cell_hd">';
+                                    html += '<input type="checkbox" class="weui_check" name="ids" value="' + entry["UserId"] + '" onclick="count()">';
+                                    if (entry["userid"] == entry["CreateId"])
+                                    {
+                                        html += '<i class="weui_icon_checked"></i>';
+                                    }
+                                    html += '</div>';
+                                    html += '</label>';
+                                    $("#list").append(html);
+                                });
+                                wrapper.refresh();
+                                if (pageIndex * 10 >= data.Total)
+                                {
+                                    $(".pullUp").remove();
+                                    IsLoadComplete = true;
+                                    wrapper.stop();
+                                } else
+                                {
+                                    pageIndex = pageIndex + 1;
+                                    $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                                    wrapper.refresh();
+                                }
+
+                            }
+                        } else
+                        {
+                            $("#manage_div").hide();
+                        }
+                        Total = data.Total;
+                    }, error: function (error)
+                    {
+                        //加载失败
+                        wrapper.refresh();
+                    }
+                });
+            }
+        }
+
+        //显示个数
+        function count()
+        {
+            var box = $("input[type=checkbox]:checked").length;
+            if (box == 0)
+            {
+                document.getElementById("s").innerHTML = "删除";
+            }
+            else
+            {
+                document.getElementById("s").innerHTML = "删除(" + box + ")";
+            }
+        }
+        
+        //群发
+        function Msg()
+        {
+            var check = $("input[type=checkbox]:checked");
+            var count = check.length;
+            var ids = "";
+            for (var i = 0; i < count; i++)
+            {
+                ids += check[i].value + ",";
+            }
+            if (count > 0)
+            {
+                location.href = "/WeixinSocialCircle/SendMsg?id=" + circleId + "&ids=" + ids;
+
+                //$.ajax({
+                //    type: "get",
+                //    url: "/WeixinSocialCircle/SendMsg",
+                //    data: { id: id, ids: ids },
+                //    //dataType: "json",
+                //    success: function (data)
+                //    {
+                //        if (ids != null)
+                //        {
+                //            location.reload(true);
+                //        } else
+                //        {
+                //            alert(data.Msg);
+                //        }
+                //    }, error: function (error)
+                //    {
+                //        alert("发送失败");
+                //    }
+                //});
+            }
+            else
+            {
+                alert("请选择要群发的成员")
+            }
+        }
+
+        //删除
+        function Submit()
+        {
+            var check = $("input[type=checkbox]:checked");
+            var len = check.length;
+            var userId = "";
+            for (var i = 0; i < len; i++)
+            {
+                userId += check[i].value + ",";
+            }
+
+            if (len > 0)
+            {
+                if (confirm("确定要删除么?"))
+                {
+                    $.ajax({
+                        type: "POST",
+                        url: "/WeixinSocialCircle/DeleUserManage",
+                        data: { id: circleId, userId: userId },
+                        dataType: "json",
+                        success: function (data)
+                        {
+                            if (data.Code == "OK")
+                            {
+                                location.reload(true);
+                            } else
+                            {
+                                alert(data.Msg);
+                            }
+                        }, error: function (error)
+                        {
+                            alert("删除失败");
+                        }
+                    });
+                }
+            }
+            else
+            {
+                alert("请选择要删除的成员");
+            }
+        }
+
+    </script>
+}

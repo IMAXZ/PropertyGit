@@ -1,0 +1,35 @@
+﻿@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Error</title>
+    <link href="/Content/bootstrap.min.css" rel="stylesheet">
+    <link href="/fonts/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="/Content/animate.css" rel="stylesheet">
+    <link href="/Content/style.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <div class="middle-box text-center animated fadeInDown">
+        <h1>500</h1>
+        <h3 class="font-bold">Internal Server Error</h3>
+        <div class="error-desc">
+            您好,服务器处理过程中发生执行异常，请点击“返回”按钮后进行重试。
+            <form class="form-inline m-t" role="form">
+                <input type="button" class="btn btn-primary" value="返回" onclick="javascript:history.go(-1)" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Mainly scripts -->
+    <script src="/Scripts/jquery-2.1.1.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+
+</body>
+
+</html>
+

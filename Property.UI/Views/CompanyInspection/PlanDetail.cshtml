@@ -1,0 +1,214 @@
+﻿@model Property.Entity.T_InspectionPlan
+@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "查看任务详细";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>查看任务详细</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTable">
+                            <tbody>
+                                <tr>
+                                    <td class="col-md-2"><label>巡检任务名称</label></td>
+                                    <td class="col-md-4">@Model.PlanName</td>
+                                    <td class="col-md-2"><label>所属小区</label></td>
+                                    <td class="col-md-4">@Model.PropertyPlace.Name</td>
+                                </tr>
+                                <tr>
+                                    <td><label>巡检开始日期</label></td>
+                                    <td>@Model.BeginDate.ToString("yyyy-MM-dd")</td>
+                                    <td><label>巡检结束日期</label></td>
+                                    <td>@Model.EndDate.ToString("yyyy-MM-dd")</td>
+                                </tr>
+                                <tr>
+                                    <td><label>巡检类型</label></td>
+
+                                    @if (Model.Type == Property.Common.ConstantParam.INSPECTION_TYPE_DAY)
+                                    {
+                                        <td>日巡检</td>
+                                    }
+                                    else if (Model.Type == Property.Common.ConstantParam.INSPECTION_TYPE_WEEK)
+                                    {
+                                        <td>周巡检</td>
+                                    }
+                                    else
+                                    {
+                                        <td>月巡检</td>
+                                    }
+                                    <td><label>巡检次数</label></td>
+                                    <td>@Model.Number 次</td>
+                                </tr>
+
+                                <tr>
+                                    @if (Model.Type == Property.Common.ConstantParam.INSPECTION_TYPE_DAY)
+                                    {
+                                        <td style="vertical-align:middle;"><label>日巡检时间安排</label></td>
+                                        <td colspan="3">
+                                            @if (Model.IsRandom == Property.Common.ConstantParam.DELIVERY_FLAG_FALSE)
+                                            {
+                                                <table class="table table-hover table-bordered" style="width:100%;border:none;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:20%">第几次</th>
+                                                            <th style="width:40%">开始时间</th>
+                                                            <th style="width:40%">结束时间</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var DayPlan in Model.TimePlans)
+                                                        {
+                                                            <tr>
+                                                                <td>@DayPlan.Number</td>
+                                                                <td>@DayPlan.BeginNum :00</td>
+                                                                <td>@DayPlan.EndNum :00</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <span class="label">随机巡检</span>
+                                            }
+                                        </td>
+                                    }
+                                    else if (Model.Type == Property.Common.ConstantParam.INSPECTION_TYPE_WEEK)
+                                    {
+                                        <td style="vertical-align:middle;"><label>周巡检时间安排</label></td>
+                                        <td colspan="3">
+                                            @if (Model.IsRandom == Property.Common.ConstantParam.DELIVERY_FLAG_FALSE)
+                                            {
+                                                <table class="table table-hover table-bordered" style="width:100%;border:none;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:20%">第几次</th>
+                                                            <th style="width:80%">周几巡检</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var WeekPlan in Model.TimePlans)
+                                                        {
+                                                            <tr>
+                                                                <td>@WeekPlan.Number</td>
+                                                                @switch (WeekPlan.BeginNum)
+                                                                {
+                                                                    case 1:
+                                                                        <td>星期一</td> break;
+                                                                    case 2:
+                                                                    <td>星期二</td> break;
+                                                                    case 3:
+                                                                    <td>星期三</td> break;
+                                                                    case 4:
+                                                                    <td>星期四</td> break;
+                                                                    case 5:
+                                                                    <td>星期五</td> break;
+                                                                    case 6:
+                                                                    <td>星期六</td> break;
+                                                                    case 7:
+                                                                    <td>星期日</td> break;
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <span class="label">随机巡检</span>
+                                            }
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="vertical-align:middle;"><label>月巡检时间安排</label></td>
+                                        <td colspan="3">
+                                            @if (Model.IsRandom == Property.Common.ConstantParam.DELIVERY_FLAG_FALSE)
+                                            {
+                                                <table class="table table-hover table-bordered" style="width:100%;border:none;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:20%">第几次</th>
+                                                            <th style="width:80%">第几日巡检</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var MonthPlan in Model.TimePlans)
+                                                        {
+                                                            <tr>
+                                                                <td>@MonthPlan.Number</td>
+                                                                <td>@MonthPlan.BeginNum 日</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <span class="label">随机巡检</span>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+
+                                <tr>
+                                    <td style="vertical-align:middle;"><label>巡检点</label></td>
+                                    <td colspan="3">
+                                        <table class="table table-hover table-bordered" style="width:100%;border:none;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:20%">巡检类别</th>
+                                                    <th style="width:20%">巡检点名称</th>
+                                                    <th style="width:60%">巡检点内容</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var CategoryName in (List<string>)ViewBag.CategoryList)
+                                                {
+                                                    var PointCategorys = ((List<Property.UI.Models.PointCategoryModel>)ViewBag.PointCategorys).Where(pc => pc.CategoryName == CategoryName).ToList();
+                                                    int i = 0;
+                                                    foreach (var Point in PointCategorys)
+                                                    {
+                                                        <tr>
+                                                            @if (i == 0)
+                                                            {
+                                                                <td rowspan="@PointCategorys.Count" style="vertical-align:middle;">@CategoryName</td>
+                                                            }
+                                                            <td>@Point.PointName</td>
+                                                            <td>@Point.PointMemo</td>
+                                                        </tr>
+                                                            i++;
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label>备注</label></td>
+                                    <td colspan="3">@Model.Memo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="col-md-offset-5 col-md-4">
+                            <a href="/CompanyInspection/PlanList" class="btn btn-white">返回</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryui")
+}

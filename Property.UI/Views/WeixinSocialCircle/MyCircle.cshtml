@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "我的圈子";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.MySocialCircleListModel
+
+@if (Model.NoDealCount > 0 || Model.CreateList.Count > 0 || Model.JoinList.Count > 0 || Model.NewsetMass != null)
+{
+    if (Model.NoDealCount > 0)
+    {
+        <div style="margin:10px 8px;font-size:13px;font-weight:500">验证消息</div>
+        <div class="weui_cells weui_cells_access" style="margin-top: 0">
+            <div class="weui_cell" style="padding:15px" onclick="location.href = '/WeixinSocialCircle/ValidateMessage'">
+                <div class="weui_cell_hd" style="margin-right:10px">
+                    <img src="~/Images/Weixin/apply_join_notice.png" style="width:40px;height:40px" class="img-circle" />
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <h3 style="margin: 0;color:#000">圈子验证消息<span style="float: right; font-weight: 500; color: #c4bdc0; font-size: 13px">@Model.ApplyInfo.ApplyTime</span></h3>
+                    <h5 style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle">
+                        @if (Model.ApplyInfo.ApplyUserName.Length > 5)
+                        {
+                            <span>@Model.ApplyInfo.ApplyUserName.Substring(0, 5)..</span>
+                        }
+                        else
+                        {
+                            <span>@Model.ApplyInfo.ApplyUserName</span>
+                        }
+                        <span>申请加入</span>
+                        @if (Model.ApplyInfo.CircleName.Length > 10)
+                        {
+                            <span>@Model.ApplyInfo.CircleName.Substring(0, 10)<span>..</span></span>
+                        }
+                        else
+                        {
+                            <span>@Model.ApplyInfo.CircleName</span>
+                        }
+                        <span style="width: 13px; height: 13px; background: #ff6300; border-radius: 50%; float: right;text-align:center;font-size:10px;color:#fff">@Model.NoDealCount</span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    }
+    if (Model.NewsetMass != null)
+    {
+        <div style="margin:10px 8px;font-size:13px;font-weight:500">群发消息</div>
+        <div class="weui_cells weui_cells_access" style="margin-top: 0">
+            <div class="weui_cell" style="padding:15px" onclick="location.href = '/WeixinSocialCircle/ReceiveMassTexting'">
+                <div class="weui_cell_hd" style="margin-right:10px">
+                    <img src="~/Images/Weixin/mass_text.png" style="width:40px;height:40px" class="img-circle" />
+                </div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <h3 style="margin: 0;color:#000">群发消息通知<span style="float: right; font-weight: 500; color: #c4bdc0; font-size: 13px">@Model.NewsetMass.MassSendTime</span></h3>
+                    <h5 style="margin: 10px 0 0 0; font-weight: 500; color: #c4bdc0; font-size: 13px; vertical-align: middle">
+                        @if (Model.NewsetMass.CircleName.Length > 10)
+                        {
+                            <span>@Model.NewsetMass.CircleName.Substring(0, 10)<span>..发送来一条新消息</span></span>
+                        }
+                        else
+                        {
+                            <span>@Model.NewsetMass.CircleName<span>发送来一条新消息</span></span>
+                        }
+
+                        @if (Model.NoReadCount > 0)
+                        {
+                            <span style="width: 13px; height: 13px; background: #ff6300; border-radius: 50%; float: right;text-align:center;font-size:10px;color:#fff">@Model.NoReadCount</span>
+                        }
+                    </h5>
+                </div>
+            </div>
+        </div>
+    }
+
+    if (Model.CreateList.Count > 0)
+    {
+        <div style="margin:10px 8px;font-size:13px;font-weight:500">我创建的圈子</div>
+        <div class="weui_cells weui_cells_access" style="margin-top: 0">
+            @foreach (var item in Model.CreateList)
+            {
+                <div class="weui_cell" style="padding:15px" onclick="location.href = '/WeixinSocialCircle/Chat/@item.Id'">
+                    <div class="weui_cell_hd" style="margin-right:10px">
+                        <img src="@item.HeadPath" style="width:40px;height:40px" class="img-circle" />
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @{
+                var Name = item.Name.Length > 10 ? item.Name.Substring(0, 10) + ".." : item.Name;
+                        }
+                        <h3 style="margin: 0;color:#000">@Name<span style="float: right; font-weight: 500; color: #c4bdc0; font-size: 13px">@item.NewestChatTime</span></h3>
+                        <h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">@item.PlaceName</span></h5>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    if (Model.JoinList.Count > 0)
+    {
+        <div style="margin:10px 8px;font-size:13px;font-weight:500">我加入的圈子</div>
+        <div class="weui_cells weui_cells_access" style="margin-top:0">
+            @foreach (var item in Model.JoinList)
+            {
+                <div class="weui_cell" style="padding:15px" onclick="location.href = '/WeixinSocialCircle/Chat/@item.Id'">
+                    <div class="weui_cell_hd" style="margin-right:10px">
+                        <img src="@item.HeadPath" style="width:40px;height:40px" class="img-circle" />
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @{
+                var Name = item.Name.Length > 10 ? item.Name.Substring(0, 10) + ".." : item.Name;
+                        }
+                        <h3 style="margin: 0;color:#000">@Name<span style="float: right; font-weight: 500; color: #c4bdc0; font-size: 13px">@item.NewestChatTime</span></h3>
+                        <h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">@item.PlaceName</span></h5>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    <div id="no_data_div" style="width:100%;height:100%;text-align:center">
+        <img src="~/Images/Weixin/null.png" style="width:210px" />
+    </div>
+}
+
+<a id="refreshBtn" onclick="refresh()"></a>
+
+@section Styles{
+    <style type="text/css">
+        .marker_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 11px;
+            height: 13px;
+            background: url(/Images/Weixin/quanz_marker.png) no-repeat;
+            background-size: 11px 13px;
+            margin-right: 2px;
+        }
+
+        #refreshBtn {
+            -webkit-border-radius: 100px;
+            background: url(/Images/WeiXin/refresh_btn.png) no-repeat;
+            background-size: 54px 54px;
+            z-index: 2;
+            position: absolute;
+            height: 54px;
+            width: 54px;
+            right: 15px;
+            bottom: 15px;
+        }
+    </style>
+}
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var height = $("#no_data_div").height();
+            var h = (height - 194) / 2;
+            $("#no_data_div").css("padding-top", h);
+        });
+
+        //页面刷新
+        function refresh() {
+            location.replace(location.href);
+        }
+    </script>
+}

@@ -1,0 +1,570 @@
+﻿@{
+    ViewBag.Title = "话题详细";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.TopicDetailModel
+
+<div class="article">
+    <div class="bd">
+        <div id="wrapper">
+            <ul id="replyList"></ul>
+        </div>
+        <div id="submitForm" style="z-index: 2; position: fixed; bottom: 0; width: 100%;">
+            @using (Ajax.BeginForm("ReplyTopic", "WeixinTopic", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+            {
+
+                <div id="replyTopic">
+                    <div id="addPhoto"><img src="/Images/WeiXin/take_photo_btn.png" width="30" /></div>
+                    <div style="padding-left: 10px;padding-right:5px; width:75%;float:left;">
+                        <input id="ReplyTopicContent" name="ReplyTopicContent" type="text" placeholder="已有@{@Model.LevelOneReplyCount}条回复 " value="" maxlength="500" />
+                    </div>
+                    <a class="Send" onclick="FormSubmit()">发送</a>
+                </div>
+
+                <input id="ReplyTopicImgList" name="ReplyTopicImgList" value="" type="hidden" />
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.PostUserId)
+                @Html.HiddenFor(m => m.CurrentUserId)
+            }
+
+            <div id="photo">
+                <div class="weui_cell">
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <div id="previewCon"></div>
+                        <div class="weui_uploader_input_wrp">
+                            <input id="chooseImage" class="weui_uploader_input" type="image" accept="image/jpg,image/jpeg,image/png,image/gif">
+                        </div>
+                    </div>
+                </div>
+                <div style="color:#e9e9e9">添加图片（最多可添加三张）</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp:@ViewBag.timestamp,
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+              'chooseImage',
+              'previewImage',
+              'uploadImage',
+              'downloadImage'
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        })
+    </script>
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript">
+        $("#addPhoto").on("click", function () {
+            $("#photo").show();
+        });
+        $("#replyList").on("click", function () {
+            $("#photo").hide();
+        });
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                //alert("提交成功！");
+                window.location.href = "/WeixinTopic/TopicDetailList?topicId=@Model.Id&floorId=0";
+            }
+        }
+
+        function OnFailure() {
+            alert("回复发生异常！");
+        }
+
+        // 5 图片接口
+        // 5.1 拍照、本地选图
+        var images = {
+            localId: [],
+            serverId: []
+        };
+
+        document.querySelector('#chooseImage').onclick = function () {
+            var imgCount=3;
+            var length=0;
+            if (images.localId.length>0) {
+                var arr = images.localId.toString().split(',');
+                length=arr.length;
+            }
+            if (length == 3) {
+                alert("最多上传3张图片！");
+                return;
+            }
+            if (length > 0) {
+                imgCount=3-length;
+            }
+            wx.chooseImage({
+                count: imgCount, // 默认9
+                success: function (res) {
+                    if (images.localId.length>0) {
+                        images.localId +="," + res.localIds;
+                    }
+                    else
+                    {
+                        images.localId = res.localIds;
+                    }
+                    for (var i in res.localIds) {
+                        var src = res.localIds[i];
+                        $("#previewCon").append('<div class="divClose"><a onclick="DeleteImg(this,\''+src+'\')" class="imgClose">&nbsp;</a><img class="upImg" src="'+src+'" width="77" height="77" /></div>');
+                    }
+
+                    var arr = images.localId.toString().split(',');
+                    if (arr.length==3) {
+                        $(".weui_uploader_input_wrp").hide();
+                    }
+                }
+            });
+        };
+
+        //上传图片到服务器
+        function UploadImages() {
+            if (images.localId.length == 0) {
+                $("#form").submit();
+                return;
+            }
+            var arr = images.localId.toString().split(',');
+            var i = 0, length = arr.length;
+            images.serverId = [];
+            function upload() {
+                wx.uploadImage({
+                    localId: arr[i],
+                    success: function (res) {
+                        i++;
+                        images.serverId.push(res.serverId);
+                        if (i < length) {
+                            upload();
+                        }
+                        if (i == length) {
+                            $("#ReplyTopicImgList").val(images.serverId);
+                            $("#form").submit();
+                        }
+                    },
+                    fail: function (res) {
+                        alert(JSON.stringify(res));
+                    }
+                });
+            }
+            upload();
+
+        }
+
+        //发送
+        function FormSubmit() {
+            if ($("#ReplyTopicContent").val().trim() == "") {
+                alert("请输入回复内容！");
+                return false;
+            }
+
+            UploadImages();
+        }
+
+        //删除图片
+        function DeleteImg(imga,localId){
+            var str = localId+",";
+            var strPre = ","+localId;
+            images.localId = images.localId.toString().replace(str,"").replace(strPre,"").replace(localId,"");
+            $(imga).parent().remove();
+            var arr = images.localId.toString().split(',');
+            if (arr.length<3) {
+                $(".weui_uploader_input_wrp").show();
+            }
+        }
+
+        //删除话题
+        function DeleteTopic(Id){
+            var result = confirm("确定要删除主题吗？");
+            if(result==true){
+                $.ajax({
+                    type:"post",
+                    url:"/WeixinTopic/DelTopic/"+Id,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code=="OK") {
+                            alert("删除成功！");
+                            //location.href="/WeixinTopic/MyTopicList";
+                            //window.location.href=document.referrer;
+                            //location.href=top.window.location.href;
+                            location.href="/WeixinTopic/PlaceTopicList?placeId=@Model.PropertyPlaceId";
+                        }
+                        else{
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("删除失败");
+                    }
+                })
+            }
+        }
+
+        var pageIndex = 1;//页码
+        var Total = 0;//一级回答总数
+        var topicId = 0;
+        var pageIndex = 1;
+        var floorId =0;
+
+        $(document).ready(function () {
+            topicId = '@Model.Id';
+            floorId = '@Model.FloorId';
+
+            var height = $("#wrapper").height() - $("#submitForm").height();
+            $("#wrapper").height(height + "px");
+            refresher.init({
+                id: "wrapper",
+                pullDownAction: Refresh,
+                pullUpAction: Load
+            });
+            Load();
+        });
+
+        //刷新
+        function Refresh() {
+            Total = 0;
+            pageIndex = 1;
+            $("#replyList").empty();
+            Load();
+        }
+
+        //二级回复
+        function Level2Reply(id,replayId){
+            if (replayId == $("#CurrentUserId").val()) {
+                return;
+            }
+            else
+            {
+                location.href='/WeixinTopic/FloorDetailList?floorId='+id+'&replyId='+replayId;
+            }
+        }
+        //图片放大
+        $(document).on('click', '#previewCon img',function(event) {
+            var imgArray = [];
+            var curImageSrc = $(this).attr('src');
+            var oParent = $(this).parent();
+            if (curImageSrc && !oParent.attr('href')) {
+                $('#previewCon img').each(function(index, el) {
+                    var itemSrc = $(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+        //图片放大
+        $(document).on('click', '#BigPic img',function(event) {
+            var imgArray = [];
+            var curImageSrc = "http://v.homekeeper.com.cn"+$(this).attr('src');
+            var oParent = $(this).parent();
+            if (curImageSrc && !oParent.attr('href')) {
+                $('#BigPic img').each(function(index, el) {
+                    var itemSrc = "http://v.homekeeper.com.cn"+$(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+        //加载数据列表
+        function Load() {
+            if (pageIndex == 1) {
+                var html = "";
+                html += '<div class="weui_cells" style="width:100%;background-color:#fff;margin-top:0px;">';
+                html += '<article class="weui_article">';
+                html += '<section>';
+                html += '<p class="pull-left" style="margin:0 8px 0 0">';
+                html += '<img alt="image" src="';
+                if ('@Model.PostUserHeadPath'==null||'@Model.PostUserHeadPath'=="") {
+                    html += '../Images/news_item_default.png';
+                }
+                else{
+                    html += '@Model.PostUserHeadPath' ;
+                }
+                html += '" class="user_icon">';
+                html += '</p>';
+                html += '<div>';
+                html += ' <p style="margin:2px 8px 0 0" class="username_color">@Model.PostUserName';
+                if (@Model.IsTop == 1) {
+                    html += '<span style="background-color:#0172ff;color:white;margin-left: 10px; padding: 1px 8px;font-size: 12px;border-radius: 2px;">置顶</span>';
+                }
+                html += '</p>';
+                html += '<p style="color:#afafaf;margin:0 8px 0 0;font-size:14px;">@Model.PostDate</p>';
+                html += '</div>';
+                html += '<p>';
+                //用户自己发布的话题：显示删除
+                var postuserId='@Model.PostUserId';
+                var currentuserid='@Model.CurrentUserId';
+                if (postuserId==currentuserid) {
+                    html += '<a style="color:#0172ff;font-size:13px;margin-top:5px;font-weight:normal;" onclick="DeleteTopic(@Model.Id)">删除该话题</a>';
+                }
+                html += '<h4 style="color:#000;margin-bottom:5px;font-size:15px;">@Model.Title</h4>';
+                html += '</p>';
+                html += '<p class="reply_content_color font-size:14px;" id="abcd">';
+                html += '@Html.Raw(Model.Content.Replace("\n","<br/>").Replace("\r",""))';
+                html += '</p>';
+                @*html += '<p class="reply_content_color font-size:14px;">@Html.Raw(HttpUtility.HtmlDecode(Model.Content.Replace("\n","")))</p>';*@
+                if ('@Model.TopicImgPath'!='') {
+                    var imgs = '@Model.TopicImgPath'.split(';');
+                    if (imgs.length > 0) {
+                        for (var i = 0; i < imgs.length; i++) {
+                            html += '<p style="margin-top:10px;">';
+                            html += '<img src="' + imgs[i] + '">';
+                            html += '</p>';
+                        }
+                    }
+                }
+                html += '</section>';
+                html += '</article>';
+                html += '</div>';
+                $("#replyList").append(html);
+            }
+
+            $.ajax({
+                type: "get",
+                url: "/WeixinTopic/TopicDetailJsonList",
+                data: {
+                    topicId: topicId,
+                    floorId: floorId,
+                    pageIndex: pageIndex
+                },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //如果总个数有变化
+                    if (pageIndex > 1 && data.Total != Total) {
+                        Refresh();
+                    } else {
+                        $.each(data.Result, function (index, entry) {
+
+                            var itemHtmlStr = '';
+
+                            itemHtmlStr += '<section style="width:100%;background-color:#f6f7fb;">';
+                            itemHtmlStr += '<article class="weui_article" style="padding:5px 15px 0 15px">';
+                            itemHtmlStr += '<section  style="border-bottom:1px solid #e2e2e2">';
+                            itemHtmlStr += '<p class="pull-left" style="margin:0 8px 0 0"><img alt="image" src="' ;
+                            if (entry["UserImage"]==null||entry["UserImage"]=="") {
+                                itemHtmlStr += '../Images/news_item_default.png';
+                            }
+                            else{
+                                itemHtmlStr += entry["UserImage"] ;
+                            }
+                            itemHtmlStr += '" class="user_icon"></p>';
+                            itemHtmlStr += '<div>';
+                            itemHtmlStr += '<div style="margin:4px 8px 0 0">';
+                            itemHtmlStr += '<p style="font-size: 15px; margin: 2px -10px 0 10px" class="username_color">' + entry["UserName"] ;
+                            itemHtmlStr += '<a class="topicImg" href="/WeixinTopic/FloorDetailList?floorId= '+entry["Id"]+'&replyId='+entry["UserId"]+'"><img src="../Images/WeiXin/topicCount.png" width="20"></a></p>';
+                            itemHtmlStr += '<p style="color:#afafaf;margin:0 8px 0 0;font-size:13px;">第'+entry["FloorNo"] +'楼  ' + entry["PostDate"] + '</p>';
+                            itemHtmlStr += '</div>';
+                            itemHtmlStr += '<div style="margin-left:53px;">';
+                            itemHtmlStr += '<p class="reply_content_color" style="font-size:13px;">' + entry["Content"] + '</p>';
+
+                            var imgsPath = entry["PicList"] == "" || entry["PicList"] == null ? new Array() : entry["PicList"].split(';');
+                            if (imgsPath.length > 0) {
+                                itemHtmlStr += '<p id="BigPic">';
+                                for (var i = 0; i < imgsPath.length; i++) {
+                                    itemHtmlStr += '<img alt="image" src="' + imgsPath[i] + '" style="width:30%;height:68px;margin:0 8px 10px 0;"/>';
+                                }
+                                itemHtmlStr += '</p>';
+                            }
+
+                            itemHtmlStr += '</div>';
+                            if (entry["Level2DiscussList"].length > 0) {
+                                itemHtmlStr += '<div style="margin-bottom:10px;margin-left:53px;">';
+
+                                $.each(entry["Level2DiscussList"], function (indexLevel2, entry2) {
+                                    if (indexLevel2 >= 2) { return; }
+                                    itemHtmlStr += '<p class="pull-left" style="line-height:22px;color:#0172ff;font-size:12px;" onclick="Level2Reply('+entry["Id"]+','+entry2["Level2UserId"]+')">' + entry2["Level2UserName"] + '：</p>';
+                                    itemHtmlStr += '<p style="color:#343434;font-size:12px;line-height:22px;">' + entry2["Level2Content"] + '</p>';
+                                });
+
+                                if (parseInt(entry["Level2DiscussListCount"].toString()) - 2 > 0) {
+                                    itemHtmlStr += ' <p style="text-align:center;font-size:12px;"><a style="color: #0172ff;" href="/WeixinTopic/FloorDetailList?floorId= '+entry["Id"]+'&replyId='+entry["UserId"]+'">查看更多' + (parseInt(entry["Level2DiscussListCount"].toString()) - 2) + '条回复</a></p>';
+                                }
+                                itemHtmlStr += '</div>';
+                            }
+                            itemHtmlStr += '</div>';
+                            itemHtmlStr += '</section>';
+                            itemHtmlStr += '</article>';
+                            itemHtmlStr += '</section>';
+
+                            $("#replyList").append(itemHtmlStr);
+                        });
+                        wrapper.refresh();
+                        if (pageIndex * 10 >= data.Total) {
+                            $(".pullUp").text("已全部加载");
+                            wrapper.stop();
+                        } else {
+                            pageIndex = pageIndex + 1;
+                            $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                            wrapper.refresh();
+                        }
+                    }
+                    Total = data.Total;
+                }, error: function (error) {
+                    //加载失败
+                    wrapper.refresh();
+                }
+            });
+        }
+
+    </script>
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        ::-webkit-input-placeholder {
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .article p {
+            font-size: 14px;
+        }
+
+        .reply_content_color {
+            color: #343434;
+        }
+
+        .user_icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+
+        .username_color {
+            color: #8b8b8b;
+            font-weight: 700;
+        }
+
+        .reply_img {
+            width: 30%;
+            height: 68px;
+            margin: 0 5px 0 0;
+        }
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            margin-top: 0px;
+        }
+
+            #wrapper li {
+                background: #fff;
+            }
+
+        #photo {
+            height: 30%;
+            background-color: #fafafa;
+            padding: 10px;
+            text-align: center;
+            display: none;
+            border-top: 1px solid #e2e2e2;
+        }
+
+        #replyTopic {
+            border-top: 1px solid #e2e2e2;
+            background-color: white;
+            width: 100%;
+            height: 45px;
+            padding: 7px;
+        }
+
+        #addPhoto {
+            height: 100%;
+            width: 10%;
+            float: left;
+            padding-left: 5px;
+        }
+
+        #ReplyTopicContent {
+            width: 100%;
+            -webkit-border-radius: 6px;
+            /*color: #e2e2e2;*/
+            color: #000000;
+            border: 1px solid #e2e2e2;
+            height: 30px;
+            line-height: 30px;
+            vertical-align: middle;
+        }
+
+        .Send {
+            border: 1px solid #e2e2e2;
+            -webkit-border-radius: 6px;
+            float: left;
+            height: 30px;
+            width: 12%;
+            text-align: center;
+            color: black;
+            line-height: 30px;
+        }
+
+        #previewCon {
+            float: left;
+        }
+
+        .divClose {
+            margin-right: 9px;
+            margin-bottom: 9px;
+            display: block;
+            position: relative;
+            float: left;
+        }
+
+        .imgClose {
+            background: url(/Images/WeiXin/topicClose.png) no-repeat top right;
+            width: 20px;
+            height: 20px;
+            top: 0px;
+            right: 0px;
+            z-index: 101;
+            position: absolute;
+            cursor: pointer;
+            display: block;
+        }
+
+        .upImg {
+            position: relative;
+            z-index: 100;
+        }
+
+        .topicImg {
+            float: right;
+        }
+
+        .weui_article {
+            padding: 10px 15px;
+        }
+
+            .weui_article section {
+                margin-bottom: 0px;
+            }
+
+            .weui_article p {
+                margin: 0;
+            }
+    </style>
+}

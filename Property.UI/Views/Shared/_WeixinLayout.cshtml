@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>@ViewBag.Title</title>
+
+    <!-- Primary Inspinia style -->
+    @Styles.Render("~/Content/css")
+    <link href="@Url.Content("~/Content/weui.min.css")" rel="stylesheet" type="text/css" />
+    @if (IsSectionDefined("Styles"))
+    {
+        @RenderSection("Styles", required: false)
+    }
+    <style>
+        body, html {
+            height: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: #fbf9fe;
+        }
+
+        .container {
+            height: 100%;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        * {
+            font-family: 黑体;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading_page" style="width:100%;height:100%;display:none;z-index:999">
+        <img src="~/Images/Weixin/loading.gif" style="width: 100%;height:100%" />
+    </div>
+    <div class="container">
+        @RenderBody()
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <!-- Handler for local scripts -->
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

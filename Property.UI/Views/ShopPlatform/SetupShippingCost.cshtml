@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "设置订单运费";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.UI.Models.ShopShippingCostModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设置订单运费</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("SetupShippingCost", "ShopPlatform", "", new AjaxOptions { HttpMethod = "post", OnFailure = "OnFailure", OnBegin = "onBegin", OnSuccess = "OnSuccess" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.ShopId)
+                        @Html.HiddenFor(model => model.Id)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">免运费<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-sm-5">
+                                    <div class="i-checks">
+                                        @Html.CheckBoxFor(m => m.IsFree)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">运费<span class="text-danger">*</span></label>
+                                <div class="col-md-3">
+                                    @Html.TextBoxFor(model => model.Price, new { @class = "form-control", @placeholder = "运费", maxlength = "12" })
+                                </div>
+                                <div class="text-left col-md-3">
+                                    <label class="control-label">元</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">订单消费金额满</label>
+                                <div class="col-md-3">
+                                    @Html.TextBoxFor(model => model.OrderExpense, new { @class = "form-control", @placeholder = "订单消费金额", maxlength = "12" })
+                                </div>
+                                <div class="text-left col-md-3">
+                                    <label class="control-label">免运费</label>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                    <label class="control-label col-md-2">否则应收取运费<span class="text-danger">*</span></label>
+                                    <div class="col-md-2">
+                                        @Html.TextBoxFor(model => model.Price, new { @class = "form-control", @placeholder = "运费", maxlength = "10" })
+                                    </div>
+                                    <div class="text-left col-md-3">
+                                        <label class="control-label">元</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">订单金额大于等于<span class="text-danger">*</span></label>
+                                    <div class="col-md-2">
+                                        @Html.TextBoxFor(model => model.OrderExpense, new { @class = "form-control", @placeholder = "订单消费金额", maxlength = "10" })
+                                    </div>
+                                    <div class="text-left col-md-3">
+                                        <label class="control-label">免运费</label>
+                                    </div>
+                                </div>*@
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    <link href="~/Content/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="~/Content/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/iCheck")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script type="text/javascript">
+        function onBegin() {
+            $("#form").valid()
+        }
+
+        //失败返回
+        function OnFailure(message) {
+            swal({
+                title: '请求发生异常，上架失败',
+                type: "error",
+                text: ""
+            });
+        }
+
+        //成功返回
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                swal({
+                    title: "设置订单运费成功",
+                    type: "success",
+                    text: ""
+                });
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+
+        $(document).ready(function () {
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green'
+            });
+
+            checkIsFree();
+        })
+
+        function checkIsFree() {
+            var isfreecheck = $("input[name='IsFree']:checked").length;
+
+            if (isfreecheck == 1) {
+                $("#OrderExpense").attr("readonly", "true");
+                $("#Price").attr("readonly", "true");
+                removeInputValidate();
+            }
+            else {
+                addInputValidate();
+            }
+        }
+
+        $('input[name="IsFree"]').on('ifChecked', function (event) {
+            $("#OrderExpense").val('');
+            $("#Price").val('');
+            $("#OrderExpense").attr("readonly", "true");
+            $("#Price").attr("readonly", "true");
+            removeInputValidate();
+        });
+
+        $('input[name="IsFree"]').on('ifUnchecked', function (event) {
+            $("#OrderExpense").removeAttr("readonly");
+            $("#Price").removeAttr("readonly");
+            addInputValidate();
+        });
+
+        //加验证
+        function addInputValidate() {
+            $("#form").validate();
+            //$("#OrderExpense").rules("add", { required: true, number: true, messages: { required: '请输入订单消费金额', number: '请输入数字' } });
+            //$("#OrderExpense").rules("add", { isFloatEqZero: true, messages: { isFloatEqZero: '订单消费金额必须大于0' } });
+            $("#OrderExpense").rules("add", { number: true, isOneOrTwoDecimal: true, max: 999999999.99, messages: { number: '请输入数字', isOneOrTwoDecimal: '小数点后最多保留两位', max: '最大不能超过999999999.99' } });
+            $("#Price").rules("add", { required: true, number: true, isOneOrTwoDecimal: true, max: 999999999.99, messages: { required: '请输入运费', number: '请输入数字', isOneOrTwoDecimal: '小数点后最多保留两位', max: '最大不能超过999999999.99' } });
+            //$("#Price").rules("add", { isFloatEqZero: true, messages: { isFloatEqZero: '应收运费必须大于0' } });
+        };
+
+        //移除验证
+        function removeInputValidate() {
+            $("#OrderExpense").rules("remove");
+            $("#Price").rules("remove");
+        }
+    </script>
+}
+
+
+
+

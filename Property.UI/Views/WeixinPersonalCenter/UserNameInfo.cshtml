@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "修改用户名";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.UserNameInfoModel
+
+<div>
+    @using (Ajax.BeginForm("UserNameInfo", "WeixinPersonalCenter", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+    {
+        <input type="text" readonly="readonly" style="display:none" />
+        <div class="weui_cells weui_cells_form">
+            @Html.HiddenFor(m => m.Id)
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">用户名</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "weui_input", @style = "text-align:right",@maxLength=50, @placeholder = "请输入用户名" })
+                </div>
+            </div>
+        </div>
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="submitPersonInfo();">保存</button>
+    </div>
+</div>
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .weui_btn_plain_blue {
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+            .weui_btn_plain_blue:active {
+                color: #1a31ea;
+                border-color: #1a31ea;
+            }
+
+            .weui_btn_plain_blue:after {
+                border-width: 0;
+            }
+    </style>
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        //提交
+        function submitPersonInfo()
+        {
+            if ($("#UserName").val().trim() == "" || $("#UserName").val() == undefined)
+            {
+                alert("请输入用户名");
+                return;
+            }
+            //if ($("#UserName").val)
+            //{
+            //    var value = $("#UserName").val;
+            //    var length = value.length;
+            //    if (length > 50)
+            //    {
+            //        alert("长度不能超过50位");
+            //        return;
+            //    }
+            //}
+            $("#form").submit();
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                //保存成功
+                window.location.href = "/WeixinPersonalCenter/PersonInfo";
+                //history.go(-1);
+                //location.reload(true);
+            }
+            else
+            {
+                alert(data.Msg);
+            }
+        }
+
+        function OnFailure(err)
+        {
+            alert("请求发生异常");
+        }
+    </script>
+}

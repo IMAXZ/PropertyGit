@@ -1,0 +1,286 @@
+﻿@{
+    ViewBag.Title = "群发消息";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.UserListSocialCircleMassTextingModel
+
+<div style="margin-bottom:48px">
+
+    <p style="margin:20px 20px 5px 20px;font-size:14px;">你将发消息给<span> @Model.Count </span>位朋友:</p>
+    <div class="talk_recordbox">
+        <div class="talk_recordtext" style="margin:0 10px;">
+            <h4 style="padding: 5px; word-break: break-all">@Model.NameList</h4>
+        </div>
+    </div>
+
+    <div id="msg_content">
+    </div>
+</div>
+
+<div class="weui_search_bar" id="search_bar" style="background-color: #f6f7fb; position: fixed; bottom: 0; width: 100%">
+    <input type="image" accept="image/*" name="input_img" id="input_img" style="display:none" onclick="sendImg()" />
+    <span style="margin-right: 10px; margin-top: 2.5px" onclick="$('#input_img').click()"><i class="takephoto_icon"></i></span>
+    <div class="weui_search_outer" style="background-color:#fff">
+        <div class="weui_search_inner" style="padding:0 10px">
+            @Html.HiddenFor(m => m.MemberIds)
+            <input type="text" class="weui_search_input" id="message" name="message" style="padding:6px 0">
+        </div>
+    </div>
+    <button id="send_btn" class="weui_btn weui_btn_mini weui_btn_default" style="width:55px;text-align:center;margin-left:10px;background-color:#fff;display:none" onclick="send()">发送</button>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .container {
+            background-color: #f2f2f2;
+        }
+
+        h3, h4 {
+            font-weight: 500;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .weui_search_outer:after {
+            border: #808080 solid 1px;
+        }
+
+        .takephoto_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 27px;
+            height: 27px;
+            background: url(/Images/Weixin/take_photo_btn.png) no-repeat;
+            background-size: 27px 27px;
+        }
+
+            .takephoto_icon:active {
+                background: url(/Images/Weixin/take_photo_btn_press.png) no-repeat;
+                background-size: 27px 27px;
+            }
+
+        .talk_recordbox {
+            padding: 5px 10px 10px 10px;
+        }
+
+            .talk_recordbox .talk_recordtextbg {
+                float: left;
+                width: 10px;
+                height: 30px;
+                display: block;
+                background: url(/Images/Weixin/talk_recordtextme.png) no-repeat;
+                background-position: left top;
+            }
+
+            .talk_recordbox .talk_recordtext {
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #fff;
+                height: auto;
+                min-height: 39px;
+                display: block;
+                padding: 2px;
+                margin-left: 60px;
+                margin-right: 20px;
+                color: #333;
+                word-break: break-all;
+            }
+
+            .talk_recordbox .user {
+                float: left;
+                display: inline;
+                height: 45px;
+                width: 45px;
+                margin-top: 0px;
+                margin-right: 5px;
+                margin-bottom: 0px;
+                margin-left: 0px;
+                line-height: 20px;
+                text-align: center;
+            }
+
+        .time {
+            background: #b7b0b0;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+
+    <script type="text/javascript">
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+              'chooseImage',
+              'previewImage',
+              'uploadImage',
+              'downloadImage',
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        });
+
+        var id =@Html.Raw(Model.Id)
+
+        $(document).ready(function () {
+
+            $('#message').bind('input', function () {
+
+                if ($("#message").val() == undefined || $("#message").val() == "") {
+                    $("#send_btn").hide();
+                } else {
+                    $("#send_btn").show();
+                }
+            });
+        })
+
+        //发送
+        function send() {
+
+            var memberIds = $("#MemberIds").val();
+            var msg = $("#message").val();
+
+            if (msg != undefined && msg != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "/WeixinSocialCircle/SendMessage",
+                    data: { id: id, memberIds: memberIds, content: msg },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+
+                            var itemHtmlStr = '';
+                            itemHtmlStr += '<div class="talk_recordbox">';
+                            itemHtmlStr += '<div style="text-align:center"><span class="time">' + data.Result.ChatTime + '</apan></div>';
+                            itemHtmlStr += '<div class="user"><img class="img-circle" src="@Model.CreaterHeadPath" style="width:45px;height:45px" /></div>';
+                            itemHtmlStr += '<h4 style="text-align:left">@Model.CreaterName&nbsp;</h4>';
+                            itemHtmlStr += '<div class="talk_recordtextbg">&nbsp;</div>';
+
+                            itemHtmlStr += '<div class="talk_recordtext">';
+                            itemHtmlStr += '<h4 style="padding:5px;word-break: break-all">' + data.Result.Content + '</h4>';
+                            itemHtmlStr += '</div>';
+                            itemHtmlStr += '</div>';
+                            $("#msg_content").append(itemHtmlStr);
+                            $("#message").val("");
+                            $("#send_btn").hide();
+
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("发送失败");
+                    }
+                });
+            }
+        }
+
+        var imglocalIds = [];
+        var imgserverIds = "";
+
+        //发送图片
+        function sendImg() {
+
+            var memberIds = $("#MemberIds").val();
+
+            wx.chooseImage({
+                success: function (res) {
+
+                    imglocalIds = res.localIds;
+                    var i = 0, length = imglocalIds.length;
+
+                    function upload() {
+                        wx.uploadImage({
+                            localId: imglocalIds[i],
+                            success: function (res) {
+                                i++;
+                                if (i < length) {
+
+                                    imgserverIds += res.serverId + ",";
+                                    upload();
+                                }
+                                if (i == length) {
+
+                                    imgserverIds += res.serverId;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/WeixinSocialCircle/SendImg",
+                                        data: { id: id, memberIds: memberIds, imgs: imgserverIds },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            if (data.Code == "OK") {
+
+                                                $.each(data.Result.MassImgPaths, function (index, entry) {
+
+                                                    var itemHtmlStr = '';
+                                                    itemHtmlStr += '<div class="talk_recordbox">';
+                                                    if (index == 0) {
+                                                        itemHtmlStr += '<div style="text-align:center"><span class="time">' + data.Result.ChatTime + '</apan></div>';
+                                                    }
+                                                    itemHtmlStr += '<div class="user"><img class="img-circle" src="@Model.CreaterHeadPath" style="width:45px;height:45px" /></div>';
+                                                    itemHtmlStr += '<h4 style="text-align:left">@Model.CreaterName&nbsp;</h4>';
+                                                    itemHtmlStr += '<div class="talk_recordtextbg">&nbsp;</div>';
+
+                                                    itemHtmlStr += '<div class="talk_recordtext">';
+                                                    itemHtmlStr += '<img src="' + entry + '" style="width:100%;height:200px;border-radius:5px" />';
+                                                    itemHtmlStr += '</div>';
+                                                    itemHtmlStr += '</div>';
+                                                    $("#msg_content").append(itemHtmlStr);
+                                                });
+
+                                                $("#message").val("");
+                                                $("#send_btn").hide();
+
+                                            } else {
+                                                alert(data.Msg);
+                                            }
+                                        }, error: function (error) {
+                                            alert("发送失败");
+                                        }
+                                    });
+                                }
+                            },
+                            fail: function (res) {
+                                alert(JSON.stringify(res));
+                            }
+                        });
+                    }
+                    upload();
+                }
+            });
+        }
+
+        $(document).on('click', '.talk_recordtext img', function (event) {
+            var imgArray = [];
+            var curImageSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+            if (curImageSrc) {
+                $('.talk_recordtext img').each(function (index, el) {
+                    var itemSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+
+    </script>
+}

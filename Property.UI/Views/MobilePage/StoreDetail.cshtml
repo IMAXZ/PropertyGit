@@ -1,0 +1,210 @@
+﻿@model Property.Entity.T_Shop
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.ShopName</title>
+
+    <!-- Add jQuery Style direct - used for jQGrid plugin -->
+    <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+
+    <!-- Primary Inspinia style -->
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/font-awesome/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+
+    <style type="text/css">
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 0px;
+            }
+    </style>
+
+    <script type="text/javascript">
+
+        var pageIndex = 1;
+        var Total = 0;
+
+        $(document).ready(function () {
+
+            refresher.init({
+                id: "wrapper",
+                pullDownAction: Refresh,
+                pullUpAction: Load
+            });
+            Load();
+        });
+
+        //刷新
+        function Refresh() {
+            window.location.reload();
+        }
+
+        //加载
+        function Load() {
+
+            var shopId = @Html.Raw(Model.Id)
+            $.ajax({
+                type: "get",
+                url: "/MobilePage/ShopSaleList",
+                data: { shopId: shopId, pageIndex: pageIndex },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+
+                    //如果总个数有变化
+                    if (pageIndex > 1 && data.Total != Total) {
+                        Refresh();
+                    } else {
+
+                        if (data.Total <= 0) {
+                            wrapper.refresh();
+                            $(".pullUp").remove();
+                            wrapper.stop();
+                            $("#sale_div").hide();
+                        } else {
+                            $("#sale_div").show();
+                            $.each(data.result, function (index, entry) {
+
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<li><a href="/MobilePage/SaleDetail?id=' + entry["Id"] + '">';
+                                itemHtmlStr += '<div class="vote-item" style="padding:10px;">';
+                                itemHtmlStr += '<div class="row">';
+
+                                itemHtmlStr += '<div class="col-xs-4">';
+                                itemHtmlStr += '<img alt="暂无图片" class="img-container" src="' + entry["SaleImg"] + '" style="height:70px;">';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '<div class="col-xs-8">';
+                                itemHtmlStr += '<h4 style="color:#000">' + entry["Title"] + '</h4>';
+                                itemHtmlStr += '<div class="text-muted">' + entry["Content"] + '</div>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '</div>';
+                                itemHtmlStr += '</div>';
+                                itemHtmlStr += '</a></li>';
+                                $("#list").append(itemHtmlStr);
+                            });
+                            wrapper.refresh();
+                            if (pageIndex * 10 >= data.Total) {
+
+                                $(".pullUp").text("已全部加载");
+                                wrapper.stop();
+                            } else {
+                                pageIndex = pageIndex + 1;
+                            }
+                        }
+                    }
+                    Total = data.Total;
+
+                }, error: function (error) {
+
+                    //加载失败
+                    wrapper.refresh();
+                }
+            });
+        }
+    </script>
+</head>
+<body class="gray-bg" style="width: 100%; font-family:黑体; color: #000">
+
+    <div id="wrapper">
+        <ul id="list">
+            <li>
+                @if (!string.IsNullOrEmpty(Model.ImgPath))
+                {
+                    <div>
+                        <img alt="门店图片" class="img-container" src="@Model.ImgPath" style="width: 100%; max-height:150px">
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <img alt="门店图片" class="img-container" src="~/Images/shop_img_default_1.png" style="width:100%">
+                    </div>
+                }
+                <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;"><img src="~/Images/position2.png" style="width:16px;height:16px;" /> @Model.Address</span>
+                        @if (!string.IsNullOrEmpty(Model.Phone))
+                        {
+                            <span class="pull-right" style="font-size:16px;"><strong><a href="tel:@Model.Phone" style="color: #0172ff;"><img src="~/Images/phone2.png" style="width:21px;height:21px;" /> 拨打</a></strong></span>
+                        }
+                    </div>
+                </div>
+
+                <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0 0 0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;">营业时间</span>
+                        <span class="pull-right" style="font-size:16px;">@Model.StartBusinessTime：00 - @Model.EndBusinessTime：00</span>
+                    </div>
+                </div>
+
+                <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0 0 0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;">配送说明</span>
+
+                        @if (Model.ShopShippingCosts.FirstOrDefault() == null || Model.ShopShippingCosts.FirstOrDefault().IsFree == 1)
+                        {
+                            <span class="pull-right" style="font-size:16px;">免运费</span>
+                        }
+                        else
+                        {
+                            <span class="pull-right" style="font-size:16px;">
+
+                                @if (Model.ShopShippingCosts.FirstOrDefault().OrderExpense != null)
+                                {
+                                    <span>运费</span>@Model.ShopShippingCosts.FirstOrDefault().Price<span>元;满</span>@Model.ShopShippingCosts.FirstOrDefault().OrderExpense<span>元免运费</span>
+                                }
+                                else
+                                {
+                                    <span>运费</span>@Model.ShopShippingCosts.FirstOrDefault().Price<span>元</span>
+                                }
+                            </span>
+                        }
+                    </div>
+                </div>
+                <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0 0 0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;">主营内容</span>
+                        <p style="font-size:14px;margin:10px 0 0 0">
+                            @Model.MainSale
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;">商家介绍</span>
+                        <p>
+                            @Html.Raw(Model.Content)
+                        </p>
+                    </div>
+                </div>
+
+                <div id="sale_div" class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:0">
+                    <div class="media-body" style="padding:10px">
+                        <span style="font-size:16px;">上架商品</span>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+﻿@model Property.UI.Models.HouseUserExpenseTemplateModel
+<tr>
+    <td class="text-nowrap text-center col-md-6">
+        @Html.LabelFor(m => m.DoorName, Model.DoorName)
+    </td>
+    <td class="text-nowrap col-md-6">
+        @*@Html.TextBoxFor(m => m.Expense, new { @class = "form-control", @placeholder = "请输入费用" })*@
+        <input name="Expense[@Model.index]" class="form-control" placeholder="请输入费用" data-rel="@Model.DoorId" maxlength="10" value="@Model.Expense" />
+    </td>
+</tr>

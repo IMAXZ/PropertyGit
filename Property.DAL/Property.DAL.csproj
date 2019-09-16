@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C6BFDE34-8B29-4043-835A-3E553B4F16C8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Property.DAL</RootNamespace>
+    <AssemblyName>Property.DAL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Webdiyer.MvcPager">
+      <HintPath>..\packages\Webdiyer.MvcPager.3.0.1.1\lib\Webdiyer.MvcPager.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionDAL.cs" />
+    <Compile Include="ActionItemDAL.cs" />
+    <Compile Include="ApplyInfoDAL.cs" />
+    <Compile Include="AppUserShippingAddressDAL.cs" />
+    <Compile Include="BaseDAL.cs" />
+    <Compile Include="BuildCompanyDAL.cs" />
+    <Compile Include="BuildDAL.cs" />
+    <Compile Include="BuildDoorDAL.cs" />
+    <Compile Include="BuildUnitDAL.cs" />
+    <Compile Include="CityDAL.cs" />
+    <Compile Include="CompanyOpreateLogDAL.cs" />
+    <Compile Include="CompanyPostDAL.cs" />
+    <Compile Include="CompanyRoleDAL.cs" />
+    <Compile Include="CompanyUserDAL.cs" />
+    <Compile Include="ContextFactory.cs" />
+    <Compile Include="CountyDAL.cs" />
+    <Compile Include="DisposeQuestionDAL.cs" />
+    <Compile Include="ExpressCompanyDAL.cs" />
+    <Compile Include="FeedbackDAL.cs" />
+    <Compile Include="GoodsCategoryDAL.cs" />
+    <Compile Include="HouseUserDAL.cs" />
+    <Compile Include="HouseUserExpenseDetailsDAL.cs" />
+    <Compile Include="HouseUserExpenseTemplateDAL.cs" />
+    <Compile Include="InspectionCategoryDAL.cs" />
+    <Compile Include="InspectionExceptionDisposeDAL.cs" />
+    <Compile Include="InspectionPlanDAL.cs" />
+    <Compile Include="InspectionPointDAL.cs" />
+    <Compile Include="InspectionResultDAL.cs" />
+    <Compile Include="InspectionTimePlanDAL.cs" />
+    <Compile Include="LifeBillDAL.cs" />
+    <Compile Include="LifeBillTypeDAL.cs" />
+    <Compile Include="LifePayTypeDAL.cs" />
+    <Compile Include="MenuDAL.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="MobileVersionDAL.cs" />
+    <Compile Include="OrderDAL.cs" />
+    <Compile Include="OrderDetailsDAL.cs" />
+    <Compile Include="PhoneValidateDAL.cs" />
+    <Compile Include="PostBarTopicDAL.cs" />
+    <Compile Include="PostBarTopicDiscussDAL.cs" />
+    <Compile Include="PostBarTopicTypeDAL.cs" />
+    <Compile Include="PropertyAccountDAL.cs" />
+    <Compile Include="PropertyExpenseNoDAL.cs" />
+    <Compile Include="PropertyExpenseTypeDAL.cs" />
+    <Compile Include="PropertyIdentityVerificationDAL.cs" />
+    <Compile Include="PropertyOpreateLogDAL.cs" />
+    <Compile Include="PlatformOpreateLogDAL.cs" />
+    <Compile Include="PeopertyDbContext.cs" />
+    <Compile Include="PlatformRoleDAL.cs" />
+    <Compile Include="PlatformUserDAL.cs" />
+    <Compile Include="PostDAL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyCompanyDAL.cs" />
+    <Compile Include="PropertyPlaceDAL.cs" />
+    <Compile Include="PropertyRoleDAL.cs" />
+    <Compile Include="PropertyUserDAL.cs" />
+    <Compile Include="PropertyUserPushDAL.cs" />
+    <Compile Include="ProvinceDAL.cs" />
+    <Compile Include="ShopAccountDAL.cs" />
+    <Compile Include="ShopDAL.cs" />
+    <Compile Include="ShopPaymentManagementDAL.cs" />
+    <Compile Include="ShopSaleDAL.cs" />
+    <Compile Include="ShopShippingCostDAL.cs" />
+    <Compile Include="ShopUserDAL.cs" />
+    <Compile Include="ShopUserPushDAL.cs" />
+    <Compile Include="SocialCircleChatDAL.cs" />
+    <Compile Include="SocialCircleDAL.cs" />
+    <Compile Include="SocialCircleMassTextingDAL.cs" />
+    <Compile Include="SystemMessageDAL.cs" />
+    <Compile Include="UserPlaceDAL.cs" />
+    <Compile Include="UserDAL.cs" />
+    <Compile Include="QuestionDAL.cs" />
+    <Compile Include="UserPushDAL.cs" />
+    <Compile Include="UserSocialCircleDAL.cs" />
+    <Compile Include="UserSocialCircleMassTextingDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Property.Common\Property.Common.csproj">
+      <Project>{b0c11b9f-32a9-44e3-a3d0-77d4c4fc414d}</Project>
+      <Name>Property.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.Entity\Property.Entity.csproj">
+      <Project>{c07a9f18-0858-4e01-8ac4-7bc920fcc8ea}</Project>
+      <Name>Property.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.FactoryBLL\Property.FactoryBLL.csproj">
+      <Project>{3e574457-998c-47fc-88d3-c6be84b6161d}</Project>
+      <Name>Property.FactoryBLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.IBLL\Property.IBLL.csproj">
+      <Project>{7605edaf-9557-449c-bf8f-91b478e89ab9}</Project>
+      <Name>Property.IBLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.IDAL\Property.IDAL.csproj">
+      <Project>{ccde6e9d-39a3-41af-bf6b-6d6f7b82f6ce}</Project>
+      <Name>Property.IDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

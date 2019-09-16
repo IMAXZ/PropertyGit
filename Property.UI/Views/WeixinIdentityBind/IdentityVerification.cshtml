@@ -1,0 +1,332 @@
+﻿@{
+    ViewBag.Title = "绑定小区";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.PlaceIdentityVerifyModel
+
+<div>
+    @using (Ajax.BeginForm("IdentityVerification", "WeixinIdentityBind", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+    {
+        @Html.HiddenFor(model => model.PlaceId)
+        if (Model.PlaceType == Property.Common.ConstantParam.PLACE_TYPE_HOUSE)
+        {
+            <div class="weui_cells weui_cells_form" style="font-size:16px">
+
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">物业小区</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.TextBoxFor(model => model.PlaceName, new { @class = "weui_input", @maxlength = 50, @readonly = true })
+                    </div>
+                </div>
+            </div>
+            <div class="weui_cells weui_cells_form" style="font-size:16px">
+                <div class="weui_cell weui_cell_select weui_select_after">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label" style="margin-bottom:0">楼座</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.DropDownListFor(model => model.BuildId, Model.BuildList, "请选择楼座", new { @class = "weui_select" })
+                    </div>
+                </div>
+                <div class="weui_cell weui_cell_select weui_select_after">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label" style="margin-bottom:0">单元</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.DropDownListFor(model => model.UnitId, Model.UnitList, "请选择单元", new { @class = "weui_select" })
+                    </div>
+                </div>
+                <div class="weui_cell weui_cell_select weui_select_after">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label" style="margin-bottom:0">门牌号</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.DropDownListFor(model => model.DoorId, Model.DoorList, "请选择门牌号", new { @class = "weui_select" })
+                    </div>
+                </div>
+            </div>
+            <div class="weui_cells weui_cells_form" style="font-size:16px">
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">业主姓名</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.TextBoxFor(model => model.OwnerName, new { @class = "weui_input text-left", @maxlength = 50, @placeholder = "请输入业主姓名" })
+                    </div>
+                </div>
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">业主电话</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.TextBoxFor(model => model.Phone, new { @class = "weui_input text-left", @maxlength = 50, @placeholder = "业主预留电话" })
+                    </div>
+                    <div class="weui_cell_ft">
+                        <a href="#" id="getCodeLink" class="weui_btn weui_btn_plain_blue" style="font-size: 12px; line-height: 22px;" onclick="getCode();">获取验证码</a>
+                    </div>
+                </div>
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">验证码</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.TextBoxFor(model => model.VerityCode, new { @class = "weui_input text-left", @maxlength = 6, @type = "number" })
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="weui_cells weui_cells_form" style="font-size:16px">
+
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">物业小区</label></div>
+                    <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                        @Html.TextBoxFor(model => model.PlaceName, new { @class = "weui_input", @maxlength = 50, @readonly = true })
+                    </div>
+                </div>
+                <div class="weui_cell weui_cell_select weui_select_after">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label" style="margin-bottom:0">单位名称</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.DropDownListFor(model => model.DoorId, Model.BuildCompanyList, "请选择单位名称", new { @class = "weui_select" })
+                    </div>
+                </div>
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">单位电话</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        @Html.TextBoxFor(model => model.Phone, new { @class = "weui_input", @maxlength = 50, @placeholder = "请输入单位电话" })
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="submitApply();">提交申请</button>
+    </div>
+</div>
+@section Styles{
+
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_btn_plain_blue {
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+        button.weui_btn_plain_blue,
+        input.weui_btn_plain_blue {
+            border-width: 1px;
+            background-color: transparent;
+        }
+
+        .weui_btn_plain_blue:active {
+            color: #1a31ea;
+            border-color: #1a31ea;
+        }
+
+        .weui_btn_plain_blue:after {
+            border-width: 0;
+        }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        input {
+            text-align: right;
+        }
+
+        select, select option {
+            direction: rtl;
+        }
+    </style>
+}
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        var placeType = @Html.Raw(Model.PlaceType)
+
+        $(document).ready(function () {
+
+            //楼座下拉框发生变化
+            $("#BuildId").change(function () {
+                var buildId = $("#BuildId").val();
+                var reqUrl = "";
+                if (buildId != "" && buildId != undefined) {
+                    reqUrl = "/Common/GetUnitList?buildId=" + buildId;
+                }
+                else {
+                    $('#UnitId').empty();
+                    $('#UnitId').append("<option value=\"\">请选择单元</option>");
+                    $('#DoorId').empty();
+                    $('#DoorId').append("<option value=\"\">请选择门牌号</option>");
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: reqUrl,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#UnitId').empty();
+                        $('#UnitId').append("<option value=\"\">请选择单元</option>");
+                        $.each(data, function (index, entry) {
+                            $('#UnitId').append("<option value=\"" + entry["Value"] + "\">" + entry["Text"] + "</option>");
+                        });
+                        $('#UnitId').change();
+                    }, error: function (error) {
+
+                    }
+                });
+            });
+
+            //单元下拉框发生变化
+            $("#UnitId").change(function () {
+
+                var unitId = $("#UnitId").val();
+                var reqUrl = "";
+                if (unitId != "" && unitId != undefined) {
+                    reqUrl = "/Common/GetDoorList?unitId=" + unitId;
+                } else {
+                    $('#DoorId').empty();
+                    $('#DoorId').append("<option value=\"\">请选择门牌号</option>");
+                    return;
+                }
+
+                $.ajax({
+                    type: "post",
+                    url: reqUrl,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#DoorId').empty();
+                        $('#DoorId').append("<option value=\"\">请选择门牌号</option>");
+                        $.each(data, function (index, entry) {
+                            $('#DoorId').append("<option value=\"" + entry["Value"] + "\">" + entry["Text"] + "</option>");
+                        });
+                        $('#DoorId').change();
+                    }, error: function (error) {
+
+                    }
+                });
+            });
+        });
+
+
+        //获取验证码
+        function getCode() {
+
+            var mobileRegular = /^1[34578]\d{9}$/;
+            var phoneNum = $("#Phone").val();
+            var wait = 60;
+
+            if (phoneNum == undefined || phoneNum.trim() == "") {
+                alert("请输入关联户业主手机号");
+            } else if (!mobileRegular.test($("#Phone").val())) {
+                alert("业主手机号格式不正确");
+            } else {
+                $.ajax({
+                    type: "post",
+                    url: "/Common/GetValidateCode?phoneNum=" + phoneNum + "&actionCode=2",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            time();
+                        } else {
+                            alert(data.Msg);
+                        }
+
+                    }, error: function (error) {
+                        alert("获取验证码失败，请重新获取");
+                    }
+                });
+            }
+        }
+
+        var wait = 60;
+        function time() {
+
+            if (wait == 0) {
+
+                $("#getCodeLink").attr('onclick', "getCode()");
+                $("#getCodeLink").text("获取验证码");
+                wait = 60;
+            } else {
+                $("#getCodeLink").attr('onclick', "");
+                $("#getCodeLink").text("重新发送(" + wait + ")");
+                wait--;
+                setTimeout(function () {
+                    time();
+                },
+                1000)
+            }
+        }
+
+        //提交
+        function submitApply() {
+
+            if (placeType == 0) {
+                var mobileRegular = /^1[34578]\d{9}$/;
+
+                if ($("#DoorId").val() == "" || $("#DoorId").val() == undefined) {
+                    alert("请选择关联单元户");
+                }
+                else if ($("#OwnerName").val() == undefined || $("#OwnerName").val().trim() == "") {
+                    alert("请输入关联户业主姓名");
+                }
+                else if ($("#Phone").val() == undefined || $("#Phone").val().trim() == "") {
+                    alert("请输入关联户业主手机号");
+                } else if (!mobileRegular.test($("#Phone").val().trim())) {
+                    alert("业主手机号格式不正确");
+                }
+                else if ($("#VerityCode").val() == undefined || $("#VerityCode").val().trim() == "") {
+                    alert("验证码不能为空");
+                }
+                else {
+                    $("#form").submit();
+                }
+            } else if (placeType == 1) {
+
+                var telRegular = /^\d{3,4}-?\d{7,9}$/;
+                var mobileRegular = /^1[34578]\d{9}$/;
+
+                if ($("#DoorId").val() == "" || $("#DoorId").val() == undefined) {
+                    alert("请选择关联办公楼单位");
+                } else if ($("#Phone").val() == undefined || $("#Phone").val().trim() == "") {
+                    alert("请输入关联单位电话");
+                } else if (!telRegular.test($("#Phone").val()) && !mobileRegular.test($("#Phone").val())) {
+                    alert("单位电话格式不正确");
+                } else {
+                    $("#form").submit();
+                }
+            }
+        }
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+
+                alert("申请成功");
+                //小区绑定成功
+                window.location.href = "/WeixinIdentityBind/Index";
+            }
+            else {
+                alert(data.Msg);
+            }
+        }
+        function OnFailure(err) {
+            alert("请求发生异常");
+        }
+    </script>
+}

@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "话题圈";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.TopicHomePageModel
+
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div class="weui_cells">
+            @foreach (var propertyInfo in Model.PropertyList)
+            {
+
+                <div class="weui_cell" onclick="Turn(@propertyInfo.PropertyId)">
+                    <div class="weui_cell_hd"><img src="@propertyInfo.PropertyHeadImg" width="45" height="45" style="border-radius: 100%;"></div>
+                    <div class="property_name weui_cell_bd weui_cell_primary" style="width:100%"><b>@propertyInfo.PropertyName</b><div class="i_propertyIsClick weui_cell_ft"></div></div>
+                </div>
+
+            }
+        </div>
+
+
+
+        <div id="myTopic" class="border-bottom white-bg title_size" style="width:100%;border-top: 1px solid #E7EAEC; margin: 15px 0 0 0;">
+            @if (Model.TopicList.Count > 0)
+            {
+                <div class="property">
+                    <b style="margin-left: 15px">我的主题</b><a id="moreTopic" style="float: right; margin-right: 16px; color: #0172ff;" href="/WeixinTopic/MyTopicList">更多</a>
+                </div>
+                foreach (var topicModel in Model.TopicList)
+                {
+                    <a href="/WeixinTopic/TopicDetailList?topicId=@topicModel.TopicId&floorId=0" style="color: #000000;">
+                        <div class="property title_size">
+                            <div>
+                                <div class="head_img" style="margin-left: 15px">
+                                    @if (string.IsNullOrEmpty(topicModel.PostUserHeadImg))
+                                    {
+                                        <img src="../Images/news_item_default.png">
+                                    }
+                                    else
+                                    {
+                                        <img src="@topicModel.PostUserHeadImg">
+                                    }
+                                </div>
+                                <div style="margin-left: 75px; color: #676a6c;"><b>@topicModel.PostUserName</b><i class="i_topicDiscusss"><em class="a_topicDiscusssCount" style="font-style:normal;text-align:right;">@topicModel.TopicDiscussTotal</em></i></div>
+                                <div style="margin-left: 75px; font-size: 14px; color: #676a6c;">@topicModel.PostDate</div>
+                            </div>
+                            <div style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;margin-left: 15px;margin-top:10px; color: #000000;"><b>【@topicModel.TopicType】@topicModel.TopicTitle</b></div>
+                            <div style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;margin-left: 15px;color:#000; font-size:14px;">@topicModel.TopicContent</div>
+                            <div id="imgs" class="media-body" style="margin-left: 15px;">
+                                @{
+                                    string[] imgs = string.IsNullOrEmpty(topicModel.TopicImgList) ? new string[] { } : topicModel.TopicImgList.Split(';');
+                                    for (var i = 0; i < imgs.Length; i++)
+                                    {
+                                        @*<img alt="image" src="@imgs[i].ToString()" style="width:30%;height:68px;margin:8px 6px 0 0;">*@
+
+                                        if (i == 1)
+                                        {
+                                            <div style="width: 32%; float: left;margin:0 2%"><img src="@imgs[i]" style="width:100%;height:68px;margin:0"></div>
+                                        }
+                                        else
+                                        {
+                                            <div style="width: 32%; float: left"><img src="@imgs[i]" style="width:100%;height:68px;margin:0"></div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="property">
+                    <b style="margin-left: 15px">我的主题</b>
+                </div>
+                //无数据的时候
+                <div class="property title_size">
+                    <div class="noTopic">
+                        还没有发表主题
+                    </div>
+                </div>
+
+            }
+
+        </div>
+    </div>
+    <div id="tabTitle" class="weui_tabbar" style=" background:#fff">
+        <a href="/WeixinHome/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab1.png">
+            </div>
+            <p class="weui_tabbar_label">首页</p>
+        </a>
+        <a href="javascript:;" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab2_press.png">
+            </div>
+            <p class="weui_tabbar_label" style="color: #0172ff">社区话题</p>
+        </a>
+        <a href="/WeixinBanshi/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab3.png">
+            </div>
+            <p class="weui_tabbar_label">生活办事</p>
+        </a>
+        <a href="/WeixinPersonalCenter/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab4.png">
+            </div>
+            <p class="weui_tabbar_label">个人中心</p>
+        </a>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var bottomHeight = $("#tabTitle").height();
+            document.getElementById("myTopic").style.marginBottom = bottomHeight + "px"
+        });
+        function Turn(id) {
+            location.href = "/WeixinTopic/PlaceTopicList?placeId=" + id;
+        }
+    </script>
+}
+@section Styles{
+
+    <style type="text/css">
+        .title_size {
+            font-size: 15px;
+            font-family: 黑体;
+        }
+
+        .property {
+            width: 100%;
+            /*margin-left: 15px;*/
+            padding: 10px 10px 10px 0;
+            border-bottom: 1px solid #E7EAEC;
+        }
+
+        .property_name {
+            height: 45px;
+            line-height: 45px;
+            margin-left: 10px;
+        }
+
+        .noTopic {
+            background-image: url(/Images/WeiXin/topic.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 25%;
+            border-bottom: 0;
+            height: 200px;
+            text-align: center;
+            line-height: 200px;
+            padding-top: 17%;
+        }
+
+        .i_propertyIsClick {
+            float: right;
+            background-image: url(/Images/WeiXin/isclick.png);
+            background-repeat: no-repeat;
+            background-size: 45%;
+            background-position: center;
+            height: 45px;
+            width: 45px;
+        }
+
+        .i_topicDiscusss {
+            float: right;
+            background-image: url(/Images/WeiXin/topicCount.png);
+            background-repeat: no-repeat;
+            background-size: 38%;
+            height: 45px;
+            width: 45px;
+            /*margin-right: 5px;*/
+        }
+
+        .a_topicDiscusssCount {
+            float: left;
+            color: #000000;
+            margin-left: 45%;
+            margin-top: -4px;
+        }
+
+        .head_img {
+            float: left;
+            width: 45px;
+            height: 45px;
+            margin-right: 0.1rem;
+        }
+
+            .head_img img {
+                width: 100%;
+                height: 100%;
+                border-radius: 100%;
+            }
+
+        p {
+            margin: 0;
+        }
+
+        .weui_tabbar_icon {
+            width: 21px;
+            height: 21px;
+        }
+    </style>
+}

@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "产品介绍";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+<div id="MyPage">
+    <div>
+        <img src="~/Images/Weixin/owner_product_top.png" style="width:100%" />
+    </div>
+    <div style="margin-top:15px">
+        <a href="#" id="download_btn1">
+            <img src="~/Images/Weixin/download_btn.png" style="width:84%" />
+        </a>
+    </div>
+    <div>
+        <img src="~/Images/Weixin/owner_product_center.png" style="width:100%" />
+    </div>
+
+    <div style="margin-bottom:15px">
+        <a href="#" id="download_btn2">
+            <img src="~/Images/Weixin/download_btn.png" style="width:84%" />
+        </a>
+    </div>
+</div>
+
+<a id="download_store_btn" href="/WeixinProduct/Store"></a>
+@section Styles{
+
+    <style type="text/css">
+        #MyPage {
+            text-align: center;
+            height: 100%;
+        }
+
+        #download_store_btn {
+            -webkit-border-radius: 100px;
+            background: url(/Images/WeiXin/store_btn.png) no-repeat;
+            background-size: 50px 50px;
+            z-index: 2;
+            position: absolute;
+            height: 50px;
+            width: 50px;
+            right: 15px;
+            bottom: 15px;
+        }
+    </style>
+}
+
+@section Scripts {
+
+    <script type="text/javascript">
+        function isWeixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+            return false;
+        }
+        onload = function () {
+            //ios下载地址
+            var iosUrl = "https://itunes.apple.com/us/app/ai-wo-jia/id1088566171";
+            //android下载地址
+            var androidUrl = "http://v.homekeeper.com.cn/MobilePage/DownOwnerApk";
+            // 获取终端的相关信息
+            var Terminal = {
+                // 辨别移动终端类型
+                platform: function () {
+                    var u = navigator.userAgent, app = navigator.appVersion;
+                    return {
+                        // android终端或者uc浏览器
+                        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+                        // 是否为iPhone或者QQHD浏览器
+                        iPhone: u.indexOf('iPhone') > -1,
+                        // 是否iPad
+                        iPad: u.indexOf('iPad') > -1
+                    };
+                }(),
+                // 辨别移动终端的语言：zh-cn、en-us、ko-kr、ja-jp...
+                language: (navigator.browserLanguage || navigator.language).toLowerCase()
+            }
+
+            // 根据不同的终端，跳转到不同的地址
+            var theUrl = '';
+            if (Terminal.platform.android) {
+                theUrl = androidUrl;
+            } else if (Terminal.platform.iPhone) {
+                theUrl = iosUrl;
+            } else if (Terminal.platform.iPad) {
+                theUrl = iosUrl;
+            }
+            url = '';
+            if (isWeixin()) {
+                url = "http://a.app.qq.com/o/simple.jsp?pkgname=com.sarnasea.ownerclient";
+            } else {
+                url = theUrl;
+            }
+
+            $url1 = document.getElementById('download_btn1');
+            $url1.setAttribute('href', url);
+
+            $url2 = document.getElementById('download_btn2');
+            $url2.setAttribute('href', url);
+        }
+    </script>
+}

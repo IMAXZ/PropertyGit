@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "公告详情";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+    //Layout = null;
+}
+
+@model Property.UI.Models.Weixin.PropertyNoticeDetailModel
+
+<div class="border-top white-bg divPagePadding" style="margin:0.8rem 0 0 0;">
+    <div class="media-body" style="padding:0 10px;">
+        <h4 style="text-align:center;">@Model.Title</h4>
+        <p class="place">@Model.PlaceName&nbsp;&nbsp;<span class="timeColor">@Model.PublishedTime</span></p>
+    </div>
+</div>
+<div class="border-bottom white-bg divPagePadding">
+    <div class="media-body" style="padding:0 10px;">
+        <small class="text-muted" style="font-size: 13px;">
+            @*@Server.HtmlDecode(Model.Content);*@
+            @*<p>测试数据---------测试图片顶顶顶顶顶顶顶顶顶顶顶顶顶顶 的发生法大使馆发大水发大水哥发的噶额定发噶地方噶订购的发过来 噶地方干大事</p><p><img src="/Ueditor/net/upload/image/20160217/test.jpg" title="test.jpg" alt="test.jpg" /></p><p><img src="/Ueditor/net/upload/image/20160217/test1.jpg" title="test.jpg" alt="test1.jpg" /></p>*@
+            @Html.Raw(HttpUtility.HtmlDecode(Model.Content))
+        </small>
+    </div>
+</div>
+
+@section Styles{
+
+    <style type="text/css">
+        .border-top {
+            border-top: 1px solid #e7eaec !important;
+        }
+
+        .timeColor {
+            color: #A9A9B4;
+        }
+
+        .place {
+            color: #0172ff;
+            font-family: 黑体;
+        }
+
+        .divPagePadding {
+            padding: 6px;
+        }
+
+        .text-muted img {
+            max-width: 100%;
+        }
+    </style>
+}
+
+
+

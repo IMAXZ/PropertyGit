@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "修改手机号";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+
+@model Property.UI.Models.Weixin.PhoneInfoModel
+
+<div>
+    @using (Ajax.BeginForm("PhoneInfo", "WeixinPersonalCenter", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+    {
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            @Html.HiddenFor(m => m.Id)
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">手机号</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(m => m.Phone, new { @class = "weui_input text-left", @maxlength = 15, @placeholder = "请输入手机号" })
+                </div>
+                <div class="weui_cell_ft" style="margin:0 -5px 0 auto;">
+                    <a href="#" id="getCodeLink" class="weui_btn weui_btn_plain_blue" style="font-size: 12px; line-height: 22px;" onclick="getCode();">获取验证码</a>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">验证码</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(m => m.VerityCode, new { @class = "weui_input text-left", @maxlength = 6, @type = "number", @placeholder = "请输入验证码" })
+                </div>
+            </div>
+        </div>
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="submitPersonInfo();">确认</button>
+    </div>
+</div>
+
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .weui_btn_plain_blue {
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+            .weui_btn_plain_blue:active {
+                color: #1a31ea;
+                border-color: #1a31ea;
+            }
+
+            .weui_btn_plain_blue:after {
+                border-width: 0;
+            }
+    </style>
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+
+
+        //获取验证码
+        function getCode()
+        {
+
+            var mobileRegular = /^1[34578]\d{9}$/;
+            var phoneNum = $("#Phone").val();
+            var wait = 60;
+
+            if (phoneNum == undefined || phoneNum.trim() == "")
+            {
+                alert("请输入手机号");
+                return;
+            }
+            else if ($("#Phone").val())
+            {
+                if (!mobileRegular.test(phoneNum))
+                {
+                    alert("手机号格式不正确");
+                    return;
+                }
+            }
+
+            $.ajax({
+                type: "post",
+                url: "/Common/GetValidateCode?phoneNum=" + phoneNum + "&actionCode=0",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data)
+                {
+                    if (data.Code == "OK")
+                    {
+                        time();
+                    } else
+                    {
+                        alert(data.Msg);
+                    }
+
+                }, error: function (error)
+                {
+                    alert("获取验证码失败，请重新获取");
+                }
+            });
+        }
+
+        var wait = 60;
+        function time()
+        {
+            if (wait == 0)
+            {
+                $("#getCodeLink").attr('onclick', "getCode()");
+
+                $("#getCodeLink").text("获取验证码");
+                wait = 60;
+            } else
+            {
+                $("#getCodeLink").attr('onclick', "");
+                $("#getCodeLink").text("重新发送(" + wait + ")");
+                wait--;
+                setTimeout(function ()
+                {
+                    time();
+                },
+                1000)
+            }
+        }
+
+        //提交
+        function submitPersonInfo()
+        {
+            if ($("#Phone").val() == undefined || $("#Phone").val().trim() == "")
+            {
+                alert("请输入手机号");
+                return;
+            }
+            if ($("#Phone").val())
+            {
+                var mobileRegular = /^1[34578]\d{9}$/;
+                if (!mobileRegular.test($("#Phone").val()))
+                {
+                    alert("手机号格式不正确");
+                    return;
+                }
+                if ($("#VerityCode").val().trim() == "")
+                {
+                    alert("请输入验证码");
+                    return;
+                }
+            }
+            $("#form").submit();
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                //保存成功
+                window.location.href = "/WeixinPersonalCenter/PersonInfo";
+                //history.go(-1);
+                //location.reload(true);
+            }
+            else
+            {
+                alert(data.Msg);
+            }
+        }
+
+        function OnFailure(err)
+        {
+            alert("请求发生异常");
+        }
+    </script>
+}

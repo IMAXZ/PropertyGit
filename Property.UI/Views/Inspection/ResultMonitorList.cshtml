@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "巡检实施监控";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>巡检实施监控</h5>
+                    
+                    <div class="pull-right">
+                        <label class="label label-default" style="color:#fff">未巡检</label>&nbsp;&nbsp;
+                        <label class="label label-info">巡检中</label>&nbsp;&nbsp;
+                        <label class="label label-primary">正&nbsp;常</label>&nbsp;&nbsp;
+                        <label class="label label-warning">异&nbsp;常</label>&nbsp;&nbsp;
+                        <label class="label label-inverse">已过期</label>&nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="calendar"></div>
+                    <div id="calendar1"></div>
+                    <div id="calendar2"></div>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    @Styles.Render("~/plugins/fullCalendarStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/fullCalendar")
+    @Scripts.Render("~/bundles/jqueryui")
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            GetResult();
+
+            //点击月视图
+            $(".fc-month-button").click(function (e) {
+
+                $('#calendar').fullCalendar('prevYear');
+                $('#calendar').fullCalendar('today');
+            });
+            //点击周视图
+            $(".fc-basicWeek-button").click(function (e) {
+                $('#calendar').fullCalendar('prevYear');
+                $('#calendar').fullCalendar('today');
+            });
+            //点击日视图
+            $(".fc-agendaDay-button").click(function (e) {
+                $('#calendar').fullCalendar('prevYear');
+                $('#calendar').fullCalendar('today');
+            });
+        });
+
+        //获取数据
+        function GetResult() {
+
+            $('#calendar').fullCalendar({
+                lang: 'zh-cn',
+                header: {
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'month,basicWeek,agendaDay'
+                },
+                droppable: false,
+                events: function (start, end, timezone, callback) {
+
+                    var selectDate = new Date($('#calendar').fullCalendar('getDate'));
+                    var year = selectDate.getFullYear();
+                    var month = selectDate.getMonth() + 1;
+
+                    var view = $('#calendar').fullCalendar('getView');
+                    var viewName = view.name;
+                    if (viewName == 'month') {
+                        $.ajax({
+                            url: "/Inspection/GetMonthPlanResultMonitorData",
+                            data: { Year: year, Month: month },
+                            dataType: "json",
+                            type: "get",
+                            success: function (data) {
+                                var events = [];
+                                $.each(data, function (i) {
+                                    events.push(
+                                    {
+                                        title: data[i].title,
+                                        start: data[i].start,
+                                        end: data[i].end,
+                                        url: data[i].url,
+                                        color: data[i].color
+                                    });
+                                });
+                                callback(events);
+                            },
+                            error: function (err) {
+                                swal({
+                                    title: "请求出现异常，巡检实施监控数据获取失败",
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        });
+                    } else if (viewName == 'basicWeek')
+                    {
+                        var StartDate = year + "-" + month + "-" + selectDate.getDate();
+                        $.ajax({
+                            url: "/Inspection/GetWeekPlanResultMonitorData",
+                            data: { SelectDate: StartDate },
+                            dataType: "json",
+                            type: "get",
+                            success: function (data) {
+                                var events = [];
+                                $.each(data, function (i) {
+                                    events.push(
+                                    {
+                                        title: data[i].title,
+                                        start: data[i].start,
+                                        end: data[i].end,
+                                        url: data[i].url,
+                                        color: data[i].color
+                                    });
+                                });
+                                callback(events);
+                            },
+                            error: function (err) {
+                                swal({
+                                    title: "请求出现异常，巡检实施监控数据获取失败",
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        });
+
+                    } else if (viewName == 'agendaDay')
+                    {
+                        var CurrentDate = year + "-" + month + "-" + (selectDate.getDate());
+                        $.ajax({
+                            url: "/Inspection/GetDayPlanResultMonitorData",
+                            data: { Date: CurrentDate },
+                            dataType: "json",
+                            type: "get",
+                            success: function (data) {
+                                var events = [];
+                                $.each(data, function (i) {
+                                    events.push(
+                                    {
+                                        title: data[i].title,
+                                        start: data[i].start,
+                                        end: data[i].end,
+                                        url: data[i].url,
+                                        color: data[i].color
+                                    });
+                                });
+                                callback(events);
+                            },
+                            error: function (err) {
+                                swal({
+                                    title: "请求出现异常，巡检实施监控数据获取失败",
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        });
+                    }
+                   
+                }
+            });
+        }
+    </script>
+}

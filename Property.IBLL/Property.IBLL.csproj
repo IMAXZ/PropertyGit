@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7605EDAF-9557-449C-BF8F-91B478E89AB9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Property.IBLL</RootNamespace>
+    <AssemblyName>Property.IBLL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IActionBLL.cs" />
+    <Compile Include="IActionItemBLL.cs" />
+    <Compile Include="IApplyInfoBLL.cs" />
+    <Compile Include="IAppUserShippingAddressBLL.cs" />
+    <Compile Include="IBaseBLL.cs" />
+    <Compile Include="IBuildCompanyBLL.cs" />
+    <Compile Include="IBuildBLL.cs" />
+    <Compile Include="IBuildDoorBLL.cs" />
+    <Compile Include="IBuildUnitBLL.cs" />
+    <Compile Include="ICityBLL.cs" />
+    <Compile Include="ICompanyOpreateLogBLL.cs" />
+    <Compile Include="ICompanyPostBLL.cs" />
+    <Compile Include="ICompanyRoleBLL.cs" />
+    <Compile Include="ICompanyUserBLL.cs" />
+    <Compile Include="ICountyBLL.cs" />
+    <Compile Include="IDisposeQuestionBLL.cs" />
+    <Compile Include="IExpressCompanyBLL.cs" />
+    <Compile Include="IFeedbackBLL.cs" />
+    <Compile Include="IGoodsCategoryBLL.cs" />
+    <Compile Include="IHouseUserBLL.cs" />
+    <Compile Include="IHouseUserExpenseDetailsBLL.cs" />
+    <Compile Include="IHouseUserExpenseTemplateBLL.cs" />
+    <Compile Include="IInspectionCategoryBLL.cs" />
+    <Compile Include="IInspectionExceptionDisposeBLL.cs" />
+    <Compile Include="IInspectionPlanBLL.cs" />
+    <Compile Include="IInspectionPointBLL.cs" />
+    <Compile Include="IInspectionResultBLL.cs" />
+    <Compile Include="IInspectionTimePlanBLL.cs" />
+    <Compile Include="ILifeBillBLL.cs" />
+    <Compile Include="ILifeBillTypeBLL.cs" />
+    <Compile Include="ILifePayTypeBLL.cs" />
+    <Compile Include="IMenuBLL.cs" />
+    <Compile Include="IMobileVersionBLL.cs" />
+    <Compile Include="IOrderBLL.cs" />
+    <Compile Include="IOrderDetailsBLL.cs" />
+    <Compile Include="IPhoneValidateBLL.cs" />
+    <Compile Include="IPostBarTopicBLL.cs" />
+    <Compile Include="IPostBarTopicDiscussBLL.cs" />
+    <Compile Include="IPostBarTopicTypeBLL.cs" />
+    <Compile Include="IPropertyAccountBLL.cs" />
+    <Compile Include="IPropertyExpenseNoBLL.cs" />
+    <Compile Include="IPropertyExpenseTypeBLL.cs" />
+    <Compile Include="IPropertyIdentityVerificationBLL.cs" />
+    <Compile Include="IPropertyOpreateLogBLL.cs" />
+    <Compile Include="IPlatformOpreateLogBLL.cs" />
+    <Compile Include="IPlatformRoleBLL.cs" />
+    <Compile Include="IPlatformUserBLL.cs" />
+    <Compile Include="IPostBLL.cs" />
+    <Compile Include="IPropertyCompanyBLL.cs" />
+    <Compile Include="IPropertyPlaceBLL.cs" />
+    <Compile Include="IPropertyRoleBLL.cs" />
+    <Compile Include="IPropertyUserBLL.cs" />
+    <Compile Include="IPropertyUserPushBLL.cs" />
+    <Compile Include="IProvinceBLL.cs" />
+    <Compile Include="IShopAccountBLL.cs" />
+    <Compile Include="IShopBLL.cs" />
+    <Compile Include="IShopSaleBLL.cs" />
+    <Compile Include="IShopShippingCostBLL.cs" />
+    <Compile Include="IShopUserBLL.cs" />
+    <Compile Include="IShopUserPushBLL.cs" />
+    <Compile Include="ISocialCircleBLL.cs" />
+    <Compile Include="ISocialCircleChatBLL.cs" />
+    <Compile Include="ISocialCircleMassTextingBLL.cs" />
+    <Compile Include="ISystemMessageBLL.cs" />
+    <Compile Include="IUserPlaceBLL.cs" />
+    <Compile Include="IUserBLL.cs" />
+    <Compile Include="IQuestionBLL.cs" />
+    <Compile Include="IUserPushBLL.cs" />
+    <Compile Include="IUserSocialCircleBLL.cs" />
+    <Compile Include="IUserSocialCircleMassTextingBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IShopPaymentManagementBLL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Property.Common\Property.Common.csproj">
+      <Project>{b0c11b9f-32a9-44e3-a3d0-77d4c4fc414d}</Project>
+      <Name>Property.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Property.Entity\Property.Entity.csproj">
+      <Project>{c07a9f18-0858-4e01-8ac4-7bc920fcc8ea}</Project>
+      <Name>Property.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

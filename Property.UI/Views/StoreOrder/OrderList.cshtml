@@ -1,0 +1,304 @@
+﻿@{
+    ViewBag.Title = "商家订单列表";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+@using Webdiyer.WebControls.Mvc
+
+@model Property.UI.Models.StoreOrderSearchModel
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "false" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox-content m-b-xs border-bottom">
+        <div class="row">
+            <div class="col-lg-12">
+                @using (Html.BeginForm("OrderList", "StoreOrder", FormMethod.Get, new { @class = "form-horizontal", @role = "form" }))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-1">订单状态</label>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(model => model.OrderStatus, Model.OrderStatusList, "请选择订单状态", new { @class = "form-control" })
+                        </div>
+                        <label class="control-label col-md-1">支付方式</label>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(model => model.PayWay, Model.PayWayList, "请选择支付方式", new { @class = "form-control" })
+                        </div>
+                        <label class="control-label col-md-1">提交时间</label>
+                        <div class="col-md-4">
+                            <div class="input-daterange input-group" id="datepicker">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                @Html.TextBox("StartDate", Model.StartDate.Value.ToString("yyyy-MM-dd"), new { @class = "form-control", @readonly = "readonly" })
+                                <span class="input-group-addon">到</span>
+                                @Html.TextBox("EndDate", Model.EndDate.Value.ToString("yyyy-MM-dd"), new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-right">
+                            <button class="btn btn-md btn-primary" type="submit">查询</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "OrderNo" }, { "DisplayName", "订单编号" } })
+                                    @Html.Partial("~/Views/Shared/_SortLink.cshtml", new ViewDataDictionary { { "SortName", "OrderDate" }, { "DisplayName", "提交时间" } })
+                                    <th class="text-nowrap">下单人</th>
+                                    <th class="text-nowrap">订单状态</th>
+                                    <th class="text-nowrap">支付方式</th>
+                                    <th class="text-center text-nowrap">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DataList)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.OrderNo</td>
+                                        <td class="text-nowrap">@item.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td class="text-nowrap">@item.User.UserName</td>
+                                        <td class="text-nowrap">
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_NOPAY)
+                                            {
+                                                <span>待付款</span>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_CONFIRM)
+                                            {
+                                                <span>待确认</span>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_RECEIPT)
+                                            {
+                                                <span>待收货</span>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_EXIT)
+                                            {
+                                                <span>已退单</span>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_FINISH)
+                                            {
+                                                <span>交易完成</span>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_CLOSE)
+                                            {
+                                                <span>交易关闭</span>
+                                            }
+                                        </td>
+                                        <td class="text-nowrap">
+                                            @if (item.PayWay == Property.Common.ConstantParam.DEFAULT_NO_PAY)
+                                            {
+                                                <span>未支付</span>
+                                            }
+                                            @if (item.PayWay == Property.Common.ConstantParam.WeChat_ONLINE_PAY)
+                                            {
+                                                <span>微信在线支付</span>
+                                            }
+                                            @if (item.PayWay == Property.Common.ConstantParam.AliPay_ONLINE_PAY)
+                                            {
+                                                <span>支付宝在线支付</span>
+                                            }
+                                            @if (item.PayWay == Property.Common.ConstantParam.DELIVER_CASH_PAY)
+                                            {
+                                                <span>货到现金支付</span>
+                                            }
+                                            @if (item.PayWay == Property.Common.ConstantParam.DELIVER_WeChat_PAY)
+                                            {
+                                                <span>货到微信支付</span>
+                                            }
+                                            @if (item.PayWay == Property.Common.ConstantParam.DELIVER_AliPay_PAY)
+                                            {
+                                                <span>货到支付宝支付</span>
+                                            }
+                                        </td>
+                                        <td class="text-center text-nowrap">
+                                            <a href="/StoreOrder/OrderDetail?id=@item.Id" class="btn btn-outline btn-primary btn-sm">订单详细</a>
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_CONFIRM)
+                                            {
+                                                <a href="#" class="btn btn-outline btn-default btn-sm" onclick="ReceiveOrder(@item.Id);">接单</a>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_CONFIRM
+                                                || item.OrderStatus == Property.Common.ConstantParam.OrderStatus_RECEIPT)
+                                            {
+                                                <a href="/StoreOrder/RecedeOrder/@item.Id" class="btn btn-outline btn-default btn-sm">退单</a>
+                                            }
+                                            @if (item.OrderStatus == Property.Common.ConstantParam.OrderStatus_RECEIPT)
+                                            {
+                                                <a href="#" class="btn btn-outline btn-default btn-sm" onclick="DealClose(@item.Id);">交易完成</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 text-left">
+                            共 @Model.DataList.TotalPageCount 页 @Model.DataList.TotalItemCount 条记录，当前为第 @Model.DataList.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-8 text-right">
+                            @Html.Pager(Model.DataList, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "PageIndex",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    @Styles.Render("~/plugins/dataPickerStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/dataPicker")
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            $('#datepicker').datepicker({
+                clearBtn: false
+            });
+        });
+
+        //接单
+        function ReceiveOrder(id)
+        {
+            swal({
+                title: "确定要接单吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm)
+            {
+                if (isConfirm)
+                {
+                    $.ajax({
+                        url: "/StoreOrder/UpdateOrderStatus",
+                        data: { OrderId: id, OrderStatus: 2 },
+                        type: "get",
+                        dataType: "json",
+                        success: function (data)
+                        {
+                            if (data.Code == "OK")
+                            {
+                                swal({
+                                    title: "接单成功!",
+                                    text: "",
+                                    type: "success"
+                                }, function ()
+                                {
+                                    window.location.reload();
+                                });
+                            } else
+                            {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        },
+                        error: function (err)
+                        {
+
+                            swal({
+                                title: "请求出现异常，接单失败",
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    });
+                }
+            })
+        }
+
+        //交易完成
+        function DealClose(id)
+        {
+            swal({
+                title: "确定要完成交易吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm)
+            {
+                if (isConfirm)
+                {
+                    $.ajax({
+                        url: "/StoreOrder/UpdateOrderStatus",
+                        data: { OrderId: id, OrderStatus: 4 },
+                        type: "get",
+                        dataType: "json",
+                        success: function (data)
+                        {
+                            if (data.Code == "OK")
+                            {
+                                swal({
+                                    title: "成功完成交易!",
+                                    text: "",
+                                    type: "success"
+                                }, function ()
+                                {
+                                    window.location.reload();
+                                });
+                            } else
+                            {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        },
+                        error: function (err)
+                        {
+
+                            swal({
+                                title: "请求出现异常，交易完成失败",
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}
+
+
+
+

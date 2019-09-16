@@ -1,0 +1,286 @@
+﻿@model Property.Entity.T_PostBarTopic
+@{
+    ViewBag.Title = "发布话题";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@section Styles{
+    <style type="text/css">
+        .* {
+            background-color: #f2f2f2;
+        }
+
+        .weui_btn {
+            width: 95%;
+            margin-top: 15px;
+            background-color: #0172ff;
+        }
+
+        .UploadDescribe {
+            float: left;
+            color: #afafaf;
+            line-height: 75px;
+        }
+
+        .weui_uploader_input_wrp {
+            width: 60px;
+            height: 60px;
+        }
+
+        #previewCon {
+            float: left;
+        }
+
+        .divClose {
+            margin-right: 9px;
+            margin-bottom: 9px;
+            display: block;
+            position: relative;
+            float: left;
+        }
+
+        .imgClose {
+            background: url(/Images/WeiXin/topicClose.png) no-repeat top right;
+            width: 20px;
+            height: 20px;
+            top: 0px;
+            right: 0px;
+            z-index: 101;
+            position: absolute;
+            cursor: pointer;
+            display: block;
+        }
+
+        .upImg {
+            position: relative;
+            z-index: 100;
+        }
+    </style>
+}
+
+@using (Ajax.BeginForm("TopicReport", "WeixinTopic", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+{
+    <div class="weui_cells">
+        <div class="weui_cell weui_cell_select">
+            <div class="weui_cell_bd weui_cell_primary">
+                @Html.DropDownList("TopicTypeId", (List<SelectListItem>)ViewBag.topicTypelist, new { @class = "weui_select" })
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="PropertyPlaceId" value="@ViewBag.propertyPlaceId" />
+    <input id="ImgPath" name="ImgPath" value="" type="hidden" />
+    <input id="Id" name="Id" value="0" type="hidden" />
+    <div class="weui_cells">
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" id="Title" name="Title" placeholder="标题" maxlength="100" />
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <textarea class="weui_textarea" id="Content" name="Content" placeholder="话题正文" rows="3" maxlength="500"></textarea>
+
+                <div>
+                    <div id="previewCon"></div>
+
+                    <div class="weui_uploader_input_wrp">
+                        <input id="chooseImage" class="weui_uploader_input" type="image" accept="image/jpg,image/jpeg,image/png,image/gif">
+                    </div>
+                    <div class="UploadDescribe">
+                        为您的主题配上美美的图片吧~~
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="weui_toptips weui_warn js_tooltips">格式不对</div>
+
+    <a class="weui_btn weui_btn_blue" onclick="FormSubmit()">发布</a>
+}
+
+
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+    <script>
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp:@ViewBag.timestamp,
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+              'chooseImage',
+              'previewImage',
+              'uploadImage',
+              'downloadImage'
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        })
+    </script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        // 5 图片接口
+        // 5.1 拍照、本地选图
+        var images = {
+            localId: [],
+            serverId: []
+        };
+
+        document.querySelector('#chooseImage').onclick = function () {
+            //禁止表单提交
+            $("#Id").val("1");
+            var imgCount=3;
+            var length=0;
+            if (images.localId.length>0) {
+                var arr = images.localId.toString().split(',');
+                length=arr.length;
+            }
+            if (length == 3) {
+                alert("最多上传3张图片！");
+                return;
+            }
+            if (length > 0) {
+                imgCount=3-length;
+            }
+            wx.chooseImage({
+                count: imgCount, // 默认9
+                success: function (res) {
+
+                    if (images.localId.length>0) {
+                        images.localId +="," + res.localIds;
+                    }
+                    else
+                    {
+                        images.localId = res.localIds;
+                    }
+                    for (var i in res.localIds) {
+                        var src = res.localIds[i];
+                        $("#previewCon").append('<div class="divClose"><a onclick="DeleteImg(this,\''+src+'\')" class="imgClose">&nbsp;</a><img class="upImg" src="'+src+'" width="60" height="60" /></div>');
+                    }
+
+                    var arr = images.localId.toString().split(',');
+                    if (arr.length==3) {
+                        $(".weui_uploader_input_wrp").hide();
+                    }
+                    if (arr.length>0) {
+                        $(".UploadDescribe").hide();
+                    }
+                }
+            });
+        };
+
+        //图片放大
+        $(document).on('click', '#previewCon img',function(event) {
+            var imgArray = [];
+            var curImageSrc = $(this).attr('src');
+            var oParent = $(this).parent();
+            if (curImageSrc && !oParent.attr('href')) {
+                $('#previewCon img').each(function(index, el) {
+                    var itemSrc = $(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+
+        //删除图片
+        function DeleteImg(imga,localId){
+            var str = localId+",";
+            var strPre = ","+localId;
+            images.localId = images.localId.toString().replace(str,"").replace(strPre,"").replace(localId,"");
+            $(imga).parent().remove();
+            var arr = images.localId.toString().split(',');
+            if (arr.length<3) {
+                $(".weui_uploader_input_wrp").show();
+            }
+            if ($("#previewCon").html()=="") {
+                $(".UploadDescribe").show();
+            }
+        }
+
+        //上传图片到服务器
+        function UploadImages(){
+            if (images.localId.length == 0) {
+                $("#form").submit();
+                return;
+            }
+            else{
+                var arr = images.localId.toString().split(',');
+                var i = 0, length = arr.length;
+                images.serverId = [];
+                function upload() {
+                    wx.uploadImage({
+                        localId: arr[i],
+                        success: function (res) {
+                            i++;
+                            images.serverId.push(res.serverId);
+                            if (i < length) {
+                                upload();
+                            }
+                            else if(i==length)
+                            {
+                                $("#ImgPath").val(images.serverId);
+                                $("#form").submit();
+                            }
+                        },
+                        fail: function (res) {
+                            alert(JSON.stringify(res));
+                        }
+                    });
+                }
+                upload();
+            }
+        }
+
+        function FormSubmit()
+        {
+            //表单可以提交
+            $("#Id").val("0");
+
+            if ($("#TopicTypeId").val() == "0") {
+                alert("请选择话题分类！");
+                return false;
+            }
+            if ($("#Title").val().trim() == "") {
+                alert("请填写标题！");
+                return false;
+            }
+            if ($("#Content").val().trim() == "") {
+                alert("请填写话题正文！");
+                return false;
+            }
+
+            UploadImages();
+
+        }
+
+        function OnSuccess(data) {
+
+            if(data != undefined && data != ""){
+
+                if (data.Code == "OK") {
+                    //保存成功
+                    alert("发布成功！");
+                    window.location.href = "/WeixinTopic/PlaceTopicList?placeId="+@ViewBag.propertyPlaceId;
+                }
+                else {
+                    alert(data.Msg);
+                }
+            }
+        }
+
+        function OnFailure(err) {
+            alert("请求发生异常");
+        }
+    </script>
+}

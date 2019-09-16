@@ -1,0 +1,123 @@
+﻿@model Property.UI.Models.LoggedInAccountModel
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "编辑个人信息";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @if (string.IsNullOrEmpty(Model.HeadPath))
+                            {
+                                <img src="~/Images/default.png" alt="" class="img-container" />
+                            }
+                            else
+                            {
+                                <img src="@Model.HeadPath" alt="" class="img-container" />
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <a class="btn btn-primary" href="/ShopPersonelSetting/UploadShopPic?id=@Model.UserId">设置头像</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>编辑个人信息</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("SetShopUserInfo", "ShopPersonelSetting", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(model => model.UserId)
+                            <div class="form-group">
+                                <label class="control-label col-md-3">用户名<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @placeholder = "用户名", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">姓名<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.TrueName, new { @class = "form-control", @placeholder = "姓名"})
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">电子邮箱<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @placeholder = "电子邮箱", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">手机号码<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", @placeholder = "手机号码" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">人员描述<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Memo, new { @class = "form-control", @placeholder = "人员描述" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/ShopPlatform/Index">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/validate/accountInfoValidate.js"></script>
+    <script type="text/javascript">
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/ShopPlatform/Index";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,修改失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

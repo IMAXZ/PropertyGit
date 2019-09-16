@@ -1,0 +1,49 @@
+﻿@{
+
+    //获取传递过来的排序名称
+    var ParamSortName = Request.QueryString["SortName"];
+
+    //排序类型
+    var ParamIsAsc = Request.QueryString["IsAsc"];
+
+    //排序的列名
+    var SortName = ViewData["SortName"].ToString();
+
+
+    //判断传过来的列名是否一致 是降序还是升序排列
+    bool isAsc = (ParamSortName == SortName) && (ParamIsAsc == "True");
+
+    //路由数据
+    var routeData = new RouteValueDictionary { { "SortName", SortName }, { "IsAsc", !isAsc } };
+
+    //获取请求参数
+    var param = Request.QueryString;
+    string[] keys = param.AllKeys;
+    if (keys != null && keys.Count() > 0)
+    {
+        foreach (var key in keys)
+        {
+            if (!routeData.ContainsKey(key))
+            {
+                routeData.Add(key, param[key]);
+            }
+        }
+    }
+    var className = "sorting";
+    if (ParamSortName == SortName)
+    {
+        if (!isAsc)
+        {
+            className = "sorting_desc";
+        }
+        else
+        {
+            className = "sorting_asc";
+        }
+    }
+    var thTitle = ViewData["DisplayName"].ToString();
+    var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
+    var action = Html.ViewContext.RouteData.Values["action"].ToString();
+    @Html.Raw("<th class=\"" + className + " text-nowrap\" onclick=\"javascript:window.location.href='" + @Url.Action(action, controller, routeData) + "'\" style=\"vertical-align:middle\">" + thTitle + "</th>");
+
+}

@@ -1,0 +1,201 @@
+﻿@{
+    ViewBag.Title = "订单详细";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.Entity.T_Order
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox product-detail">
+                <div class="ibox-title">
+                    <h5>订单详细</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2" class="text-center" style="background: #f1f4f6; ">
+                                                <label>订单信息</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>订单编号</label></td>
+                                            <td class="text-center">@Model.OrderNo</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>下单人</label></td>
+                                            <td class="text-center">@Model.User.UserName</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>订单时间</label></td>
+                                            <td class="text-center">@Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>订单状态</label></td>
+                                            <td class="text-center">
+                                                <label class="label label-primary">
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_NOPAY)
+                                                    {
+                                                        <span>待付款</span>
+                                                    }
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_CONFIRM)
+                                                    {
+                                                        <span>待确认</span>
+                                                    }
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_RECEIPT)
+                                                    {
+                                                        <span>待收货</span>
+                                                    }
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_EXIT)
+                                                    {
+                                                        <span>已退单</span>
+                                                    }
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_FINISH)
+                                                    {
+                                                        <span>交易完成</span>
+                                                    }
+                                                    @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_CLOSE)
+                                                    {
+                                                        <span>交易关闭</span>
+                                                    }
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>支付方式</label></td>
+                                            <td class="text-center">
+                                                @if (Model.PayWay == Property.Common.ConstantParam.DEFAULT_NO_PAY)
+                                                {
+                                                    <span>未支付</span>
+                                                }
+                                                @if (Model.PayWay == Property.Common.ConstantParam.WeChat_ONLINE_PAY)
+                                                {
+                                                    <span>微信在线支付</span>
+                                                }
+                                                @if (Model.PayWay == Property.Common.ConstantParam.AliPay_ONLINE_PAY)
+                                                {
+                                                    <span>支付宝在线支付</span>
+                                                }
+                                                @if (Model.PayWay == Property.Common.ConstantParam.DELIVER_CASH_PAY)
+                                                {
+                                                    <span>货到现金支付</span>
+                                                }
+                                                @if (Model.PayWay == Property.Common.ConstantParam.DELIVER_WeChat_PAY)
+                                                {
+                                                    <span>货到微信支付</span>
+                                                }
+                                                @if (Model.PayWay == Property.Common.ConstantParam.DELIVER_AliPay_PAY)
+                                                {
+                                                    <span>货到支付宝支付</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>订单总额</label></td>
+                                            <td class="text-center">@Model.OrderPrice</td>
+                                        </tr>
+                                        @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_EXIT)
+                                        {
+                                            <tr>
+                                                <td class="col-md-6 text-center"><label>退单时间</label></td>
+                                                <td class="text-center">@Model.RecedeTime.Value.ToString("yyyy-MM-dd HH:mm")</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-md-6 text-center"><label>退单原因</label></td>
+                                                <td class="text-center">@Model.Reason</td>
+                                            </tr>
+                                        }
+                                        @if (Model.OrderStatus == Property.Common.ConstantParam.OrderStatus_FINISH)
+                                        {
+                                            <tr>
+                                                <td class="col-md-6 text-center"><label>交易完成时间</label></td>
+                                                <td class="text-center">@Model.CompleteTime.Value.ToString("yyyy-MM-dd HH:mm")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2" class="text-center" style="background: #f1f4f6">
+                                                <label>收货信息</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>收货地址</label></td>
+                                            <td class="text-center">@Model.ShippingAddress.County.City.Province.ProvinceName@Model.ShippingAddress.County.City.CityName@Model.ShippingAddress.County.CountyName @Model.ShippingAddress.AddressDetails</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>收货人</label></td>
+                                            <td class="text-center">@Model.ShippingAddress.ShipperName</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>联系方式</label></td>
+                                            <td class="text-center">@Model.ShippingAddress.Telephone</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-6 text-center"><label>运费</label></td>
+                                            <td class="text-center">
+                                                @Convert.ToDouble(Convert.ToDecimal(Model.OrderPrice) - Convert.ToDecimal(Model.OrderDetails.Select(d => d.Price).ToArray().Sum())) 元
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="text-center" style="background: #f1f4f6">
+                                                <label>商品信息</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-3 text-center"><label>商品图片</label></td>
+                                            <td class="col-md-6 text-center"><label>商品名称</label></td>
+                                            <td class="col-md-3 text-center"><label>价格 x 数量</label></td>
+                                        </tr>
+                                        @foreach (var item in Model.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td class="col-md-3 text-center">
+                                                    <img src="@item.ShopSale.ImgThumbnail" style="width:50%;max-height:100px" />
+                                                </td>
+                                                <td class="col-md-6 text-center" style="vertical-align:middle">@item.ShopSale.Title</td>
+                                                <td class="col-md-3 text-center" style="vertical-align:middle">@Convert.ToDouble(Convert.ToDecimal(item.Price / item.SaledAmount)) x @item.SaledAmount</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+
+    <style type="text/css">
+        label {
+            margin-bottom: 0;
+        }
+    </style>
+}

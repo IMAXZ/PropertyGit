@@ -1,0 +1,107 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "新增系统消息";
+}
+@model Property.UI.Models.SystemMessageModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增系统消息</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("AddMessage", "SystemMessage", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">系统消息标题<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control", @placeholder = "系统消息标题", @required = true, @maxlength = 50 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">系统消息内容<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Content, new { @class = "form-control", @placeholder = "系统消息内容", @required = true,@maxlength = 200, @rows = 3 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/SystemMessage/MessageList">取消</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#form").validate({
+                rules: {
+                    Title: {
+                        required: true,
+                        maxlength: 50
+                    },
+                    Content: {
+                        required: true,
+                        maxlength: 200
+                    }
+                },
+                messages: {
+                    Title: {
+                        required: "请输入系统消息标题",
+                        maxlength: "长度不能超过50位"
+                    },
+                    Content: {
+                        required: "请输入系统消息内容",
+                        maxlength: "长度不能超过200位"
+                    }
+                }
+            });
+        });
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/SystemMessage/MessageList";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,新增失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}
+
+
+
+

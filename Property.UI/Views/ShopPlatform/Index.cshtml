@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "门店平台首页";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.Entity.T_Shop
+<div class="wrapper wrapper-content" style="padding:0;font-family:微软雅黑;background:#fff">
+    @if (Model != null)
+    {
+        <div class="row" style="margin-top:20px;border-bottom: 1px solid #e7eaec;padding-bottom:20px">
+            <div class="col-md-6">
+                <div class="ibox float-e-margins" style="margin-bottom:0">
+                    <div class="ibox-content no-padding">
+                        @if (!string.IsNullOrEmpty(Model.ImgPath))
+                        {
+                            <img alt="门店图片" class="img-responsive" src="@Model.ImgPath" style="width:100%;max-height:320px">
+                        }
+                        else
+                        {
+                            <img alt="门店图片" class="img-responsive" src="~/Images/shop_img_default.png" style="width: 100%; max-height: 320px">
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7 text-left">
+                        <h3>@Model.ShopName</h3>
+                    </div>
+                    <div class="col-md-5 text-right text-nowrap">
+                        <a class="btn btn-sm btn-primary" href="/ShopPlatform/EditShop?id=@Model.Id">编辑</a>
+                        <a class="btn btn-sm btn-primary" href="/ShopPlatform/SetCoverImg?id=@Model.Id">设置封面</a>
+                        <a class="btn btn-sm btn-primary" href="/ShopPlatform/SetupPayType?id=@Model.Id">设置支付类型</a>
+                    </div>
+                </div>
+                <div class="row" style="border-top:1px solid #e7eaec;border-right:1px solid #e7eaec;padding-left:22px;padding-right:22px;" id="inforight">
+                    <br>
+                    <h4>
+                        <span>商家类型</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        @if (Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_0.ToString()))
+                        {
+                            <span style="font-weight:500">@Property.Common.ConstantParam.SHOP_TYPE_String_0</span><span>&nbsp; &nbsp;</span>
+                        }
+                        @if (Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_1.ToString()))
+                        {
+                            <span style="font-weight:500">@Property.Common.ConstantParam.SHOP_TYPE_String_1<span></span>&nbsp; &nbsp;</span>
+                        }
+                        @if (Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_2.ToString()))
+                        {
+                            <span style="font-weight:500">@Property.Common.ConstantParam.SHOP_TYPE_String_2<span></span>&nbsp; &nbsp;</span>
+                        }
+                        @if (Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_3.ToString()))
+                        {
+                            <span style="font-weight:500">@Property.Common.ConstantParam.SHOP_TYPE_String_3<span></span>&nbsp; &nbsp;</span>
+                        }
+                    </h4>
+
+                    <h4>
+                        <span style="font-size:14px;"><b>营业时间</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style="font-weight:500">@Model.StartBusinessTime:00 - @Model.EndBusinessTime:00</span>
+                    </h4>
+                    <h4>主营内容</h4>
+                    <p>
+                        @Model.MainSale
+                    </p>
+                    @if (Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_2.ToString()) || Model.Type.Contains(Property.Common.ConstantParam.SHOP_TYPE_3.ToString()))
+                    {
+                        <h4>服务小区</h4>
+                        <p>
+                            @ViewBag.PlaceNames
+                        </p>
+                    }
+                    <h4>商家地址</h4>
+                    <p>
+                        @Model.Province.ProvinceName @Model.City.CityName
+                        @if (Model.CountyId != null)
+                        {
+                            @Model.County.CountyName
+                        }
+                        @Model.Address
+                    </p>
+                    <h4>
+                        <span style="font-size:14px;"><b>联系电话</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style="font-weight:500">@Model.Phone</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="label label-primary">送货上门</span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px;padding-bottom:40px">
+            <div class="col-md-12">
+                <h4>商家介绍</h4>
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row text-center" style="margin-top:100px">
+            <h1>门店正在建设中</h1>
+        </div>
+    }
+</div>
+@section Styles{
+    <style type="text/css">
+        .gray-bg {
+            background-color: white !important;
+        }
+    </style>
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryui")
+    <script type="text/javascript">
+    </script>
+}

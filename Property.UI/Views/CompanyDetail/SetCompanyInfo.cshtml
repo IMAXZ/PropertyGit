@@ -1,0 +1,121 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "设置图标";
+}
+
+@model Property.UI.Models.PropertyCompanyModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设置图标</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row text-center">
+                        
+                            @if (string.IsNullOrEmpty(Model.Img))
+                            {
+                                <img src="~/Images/default.png" alt="" class="" width="270" height="270" />
+                            }
+                            else
+                            {
+                                <img src="@Model.Img" alt="" class="" width="270" height="270" />
+                            }
+                    </div>
+                    <br />
+                    <div class="row text-center">
+                        @using (Ajax.BeginForm("SetCompanyInfo", "CompanyDetail", "", new AjaxOptions { HttpMethod = "Post" }, new { id = "form", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.Id)
+                            <div class="form-group">
+                                <label class="control-label col-md-4"></label>
+                                <div class="col-md-3">
+                                    @Html.TextBoxFor(model => model.UploadImg, new { @class = "form-control", @type = "file", @accept = "image/*", @required = true })
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <input type="button" value="设置图标" class="btn btn-primary" onclick="sub()" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        function sub()
+        {
+            if ($("#form").valid())
+            {
+                $('form').ajaxSubmit({
+                    beforeSend: ImportBegin,
+                    success: OnSuccess,
+                    error: OnFailure
+                });
+            }
+
+        }
+
+        function ImportBegin()
+        {
+
+            var str = "";
+            str += '<div class="sk-spinner sk-spinner-wave">';
+            str += '    <div class="sk-rect1"></div>';
+            str += '    <div class="sk-rect2"></div>';
+            str += '    <div class="sk-rect3"></div>';
+            str += '    <div class="sk-rect4"></div>';
+            str += '    <div class="sk-rect5"></div>';
+            str += '</div>';
+
+            swal({
+                title: "上传中...",
+                text: "",
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            //填充loading
+            $(".sweet-alert p").html(str);
+        }
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                window.location.href = "/CompanyDetail/Detail";
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err)
+        {
+            swal({
+                title: "请求出现异常,设置失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

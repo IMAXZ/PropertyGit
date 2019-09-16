@@ -1,0 +1,54 @@
+﻿@using MvcBreadCrumbs
+@{
+
+
+    //是否包含返回按钮
+    var hasBack = Convert.ToBoolean(ViewData["HasBack"]);
+
+    //获取面包屑
+    var state = BreadCrumb.GetBreadCrumbState();
+
+    //当前的标题
+    var ActiveTitle = state.Current.Label;
+
+    var backUrl="#";
+    if (state != null) {
+        if(state.Crumbs!=null&&state.Crumbs.Count>=2){
+            var Crumb= state.Crumbs[state.Crumbs.Count - 2];
+            //返回按钮的URL
+            backUrl = Crumb.Url;
+        }
+    }
+
+}
+<div class="col-lg-9">
+    <h2>@ActiveTitle</h2>
+    <ol class="breadcrumb">
+        @for (var i=0;i<state.Crumbs.Count();i++)
+            {
+                var item=state.Crumbs[i];
+                if (i==state.Crumbs.Count-1)
+                {
+                    <li class="active">
+                        <strong>@ActiveTitle</strong>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="@item.Url">@item.Label</a>
+                    </li>
+                }
+            }
+
+    </ol>
+</div>
+@if (hasBack)
+    {
+    <div class="col-lg-3">
+        <div class="title-action">
+            <a href="@backUrl" class="btn btn-primary">返回</a> 
+        </div>
+
+    </div>
+    }

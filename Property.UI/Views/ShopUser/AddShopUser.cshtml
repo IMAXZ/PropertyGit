@@ -1,0 +1,118 @@
+﻿@model Property.UI.Models.ShopUserModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "新增门店用户";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增门店用户</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("AddShopUser", "ShopUser", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(model => model.Id)
+                            <div class="form-group">
+                                <label class="control-label col-md-3">用户名称<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @placeholder = "用户名", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">姓名<span class="text-danger">&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.TrueName, new { @class = "form-control", @placeholder = "姓名" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">登录密码<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", @placeholder = "密码", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">确认密码<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", @placeholder = "确认密码", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">性别<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(model => model.Gender, Model.GenderList, "请选择性别", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">电子邮箱<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @placeholder = "电子邮箱", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">手机号码<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", @placeholder = "手机号码", @required = true })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-3">备注<span>&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Memo, new { @class = "form-control", @placeholder = "备注" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/ShopUser/ShopUserList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/validate/ShopUserVaildate.js"></script>
+    <script type="text/javascript">
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/ShopUser/ShopUserList";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,新增失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

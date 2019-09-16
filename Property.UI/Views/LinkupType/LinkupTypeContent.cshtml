@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "沟通内容";
+}
+
+@model Property.Entity.T_PostBarTopic
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="social-feed-separated">
+                <div class="social-avatar">
+                    <a href="">
+                        <img alt="image" src="@Model.PostUser.HeadPath">
+                    </a>
+                </div>
+                <div class="social-feed-box">
+                    <div class="social-avatar">
+                        <h5>@Model.Title</h5>
+                    </div>
+                    <div class="social-body">
+                        <p>
+                            @Model.Content
+                        </p>
+                        <br />
+                        @if (!string.IsNullOrEmpty(Model.ImgPath))
+                        {
+                            string[] Imgss = Model.ImgPath.Split(';');
+                            for (int i = 0; i < Imgss.Count(); i++)
+                            {
+                                <img alt="image" src="@Imgss[i]" width="173" height="173">
+
+                                @*if (i == 0)
+                                    {
+                                        <img alt="image" class="img-responsive" src="@Imgss[i]">
+                                    }
+                                    else
+                                    {
+                                        <img alt="image" class="img-responsive" src="@Imgss[i]">
+                                    }*@
+                            }
+                        }
+                        <div>
+                            <a>@Model.PostUser.UserName </a>&nbsp;
+                            <small class="text-muted">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                        </div>
+                    </div>
+                    <div class="social-footer">
+
+                        @foreach (var item in Model.PostBarTopicDiscusss.Where(u => u.ParentId == null))
+                        {
+                            <div class="social-comment">
+                                <a href="" class="pull-left">
+                                    <img alt="image" src="@item.PostUser.HeadPath" style="width:40px;height:40px">
+                                </a>
+                                <div class="media-body">
+                                    <a href="#">
+                                        @item.PostUser.UserName :
+                                    </a>
+                                    @item.Content
+                                    <br />
+                                    @if (!string.IsNullOrEmpty(item.ImgPath))
+                                    {
+                                        string[] Imgs = item.ImgPath.Split(';');
+                                        for (int i = 0; i < Imgs.Count(); i++)
+                                        {
+                                            <img alt="image" src="@Imgs[i]" style="width:100px;height:100px">
+                                        }
+                                    }
+                                    <br />
+                                    <small class="text-muted">@item.PostTime.ToString("yyyy-MM-dd HH:mm:ss")</small>&nbsp;&nbsp;
+
+                                    @if (Html.IsHasButton("/LinkupType/DeleteReply"))
+                                    {
+                                        <a href="#" class="btn btn-outline btn-default btn-xs" onclick="confirmDel(@item.Id);">删除</a>
+                                    }
+                                </div>
+
+                                @foreach (var item2 in item.PostBarTopicDiscusses.Where(u => u.PostBarTopic.Id == item.PostBarTopic.Id))
+                                {
+                                    <div class="social-comment">
+                                        <a href="" class="pull-left">
+                                            <img alt="image" src="@item2.PostUser.HeadPath" style="width:40px;height:40px">
+                                        </a>
+                                        <div class="media-body">
+                                            @if (item2.ParentId.Value == item.Id && item2.ReplyId == item.PostUserId)
+                                            {
+                                                <a href="#">
+                                                    @item2.PostUser.UserName :
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="#">
+                                                    @item2.PostUser.UserName &nbsp;回复 &nbsp;@item2.ReplyUser.UserName :
+                                                </a>
+                                            }
+                                            @item2.Content
+                                            <br />
+                                            <small class="text-muted">@item2.PostTime.ToString("yyyy-MM-dd HH:mm:ss")</small>&nbsp;&nbsp;
+
+                                            @if (Html.IsHasButton("/LinkupType/DeleteReply"))
+                                            {
+                                                <a href="#" class="btn btn-outline btn-default btn-xs" onclick="confirmDel(@item2.Id);">删除</a>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/sweetAlert")
+    <script type="text/javascript">
+        function confirmDel(id)
+        {
+            swal({
+                title: "确定要删除该回复吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm)
+            {
+                if (isConfirm)
+                {
+                    $.ajax({
+                        url: "/LinkupType/DeleteReply",
+                        data: { id: id },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data)
+                        {
+                            if (data.Code == "OK")
+                            {
+
+                                swal({
+                                    title: "删除成功!",
+                                    text: "",
+                                    type: "success"
+                                }, function ()
+                                {
+                                    window.location.reload();
+                                });
+                            } else
+                            {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        },
+                        error: function (err)
+                        {
+
+                            swal({
+                                title: "请求出现异常，删除失败",
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}
+
+
+@*foreach (var item3 in item2.PostUser.ReplyPostBarTopicDiscussList)
+    {
+         <div class="social-comment">
+        <a href="" class="pull-left">
+            <img alt="image" src="@item3.PostUser.HeadThumbnail">
+        </a>
+        <div class="media-body">
+            <a href="#">
+                @item3.PostUser.UserName 回复 @item2.PostUser.UserName :
+            </a>
+            @item3.Content
+            <br />
+            <small class="text-muted">@item3.PostTime.ToString("yyyy-MM-dd HH:mm:ss")</small>&nbsp;&nbsp;
+
+            @if (Html.IsHasButton("/LinkupType/DeleteReplye"))
+            {
+                <a href="#" class="btn btn-outline btn-default btn-xs" onclick="confirmDel(@item3.Id);">删除</a>
+            }
+        </div>
+    </div>
+    }*@

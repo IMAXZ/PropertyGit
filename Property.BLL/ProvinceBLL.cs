@@ -1,0 +1,27 @@
+﻿using Property.Entity;
+using Property.IBLL;
+using Property.IDAL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Property.BLL
+{
+    /// <summary>
+    /// 省份业务层访问类
+    /// </summary>
+    public class ProvinceBLL : BaseBLL<M_Province>, IProvinceBLL
+    {
+        private const string _Type = "ProvinceDAL";
+
+        private IProvinceDAL _Dal;
+
+        public ProvinceBLL()
+            : base(_Type)
+        {
+            this._Dal = base.CurrentDAL as IProvinceDAL;
+        }
+    }
+}

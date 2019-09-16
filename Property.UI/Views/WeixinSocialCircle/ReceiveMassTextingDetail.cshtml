@@ -1,0 +1,268 @@
+﻿@{
+    ViewBag.Title = "群发消息";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.SocialCircleChatModel
+
+@{
+    var Name = Model.Name.Length > 10 ? Model.Name.Substring(0, 10) + ".." : Model.Name;
+}
+<div style="background: #0172ff; height: 50px; line-height: 50px; text-align: center;color:#fff;position:fixed;top:0;width:100%">
+    <span style="vertical-align:middle;font-size:18px">@Name</span>
+</div>
+
+<div id="wrapper">
+    <ul id="list"></ul>
+</div>
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        .container {
+            background-color: #f2f2f2;
+        }
+
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            top: 50px;
+            bottom: 0;
+            width: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 15px;
+                background-color: #f2f2f2;
+            }
+
+        h3, h4 {
+            font-weight: 500;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        p {
+            margin:0
+        }
+        .talk_recordbox {
+            padding: 5px 10px 10px 10px;
+        }
+
+            .talk_recordbox .talk_recordtextbg {
+                float: left;
+                width: 10px;
+                height: 30px;
+                display: block;
+                background: url(/Images/Weixin/talk_recordtextme.png) no-repeat;
+                background-position: left top;
+            }
+
+            .talk_recordbox .talk_recordtext {
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #fff;
+                height: auto;
+                min-height: 39px;
+                display: block;
+                padding: 2px;
+                margin-left: 60px;
+                margin-right: 20px;
+                color: #000;
+                word-break: break-all;
+            }
+
+            .talk_recordbox .user {
+                float: left;
+                display: inline;
+                height: 45px;
+                width: 45px;
+                margin-top: 0px;
+                margin-right: 5px;
+                margin-bottom: 0px;
+                margin-left: 0px;
+                font-size: 12px;
+                line-height: 20px;
+                text-align: center;
+            }
+
+        .time {
+            background: #b7b0b0;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+    </style>
+}
+
+@section Scripts{
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/weixin/jweixin-1.0.0.js"></script>
+
+    <script type="text/javascript">
+
+        wx.config({
+            debug: false,
+            appId: '@ViewBag.appId',
+            timestamp: '@ViewBag.timestamp',
+            nonceStr: '@ViewBag.nonceStr',
+            signature: '@ViewBag.signature',
+            jsApiList: [
+                'previewImage'
+            ]
+        });
+        wx.error(function (res) {
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+        wx.ready(function () {
+            wx.hideOptionMenu();
+        });
+
+        var pageIndex = 1;
+        var Total = 0;
+        var IsLoadComplete = false;
+        var circleId = @Html.Raw(Model.Id)
+
+        $(document).ready(function () {
+
+            refresher.info = {
+                "pullDownLable": "下拉加载更多...",
+                "pullingDownLable": "松开加载...",
+                "pullUpLable": "上拉加载更多...",
+                "pullingUpLable": "松开加载更多...",
+                "loadingLable": "加载中..."
+            };
+            refresher.init({
+                id: "wrapper",
+                pullDownAction: Load
+            });
+            $(".pullUp").remove();
+            wrapper.refresh();
+
+            //加载数据
+            Load();
+
+        });
+
+        //图片放大
+        $(document).on('click', '.talk_recordtext img', function (event) {
+            var imgArray = [];
+            var curImageSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+            if (curImageSrc) {
+                $('.talk_recordtext img').each(function (index, el) {
+                    var itemSrc = "http://v.homekeeper.com.cn" + $(this).attr('src');
+                    imgArray.push(itemSrc);
+                });
+                wx.previewImage({
+                    current: curImageSrc,
+                    urls: imgArray
+                });
+            }
+        });
+
+        var timeInterval = @Html.Raw((int)ViewBag.TimeInterval)
+        //加载
+        function Load() {
+
+            //如果加载完毕
+            if (IsLoadComplete) {
+                $(".pullDown").children().hide();
+                $(".pullDown").css("height", "40px");
+                wrapper.refresh();
+            } else {
+
+                $.ajax({
+                    type: "get",
+                    url: "/WeixinSocialCircle/GetReceiveMassTextingJsonList",
+                    data: { id: circleId, PageIndex: pageIndex },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+
+                        //如果总个数有变化
+                        if (pageIndex > 1 && data.Total != Total) {
+                            location.reload(true);
+                        } else {
+                            $.each(data.Result, function (index, entry) {
+
+                                var ChatTime = new Date(entry["ChatTime"]).getTime();
+                                var LastChatTime = new Date(entry["LastTime"]).getTime();
+
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<li class="talk_recordbox">';
+                                if (entry["LastTime"] == undefined || entry["LastTime"] == ""
+                                    || ChatTime - LastChatTime > parseInt(timeInterval) * 60 * 1000) {
+
+                                    var d = new Date(entry["ChatTime"]);
+                                    itemHtmlStr += '<div style="text-align:center"><span class="time">' + getFormatDate(d) + '</apan></div>';
+                                }
+                                itemHtmlStr += '<div class="user"><img class="img-circle" src="' + entry["HeadPath"] + '" style="width:45px;height:45px" /></div>';
+                                itemHtmlStr += '<h4 style="text-align:left">' + entry["Name"] + '&nbsp;</h4>';
+                                itemHtmlStr += '<div class="talk_recordtextbg">&nbsp;</div>';
+
+                                itemHtmlStr += '<div class="talk_recordtext">';
+                                if (entry["Content"] != undefined && entry["Content"] != "") {
+                                    itemHtmlStr += '<p style="padding:8px 5px">' + entry["Content"] + '</p>';
+                                }
+                                if (entry["Img"] != undefined && entry["Img"] != "") {
+                                    itemHtmlStr += '<img src="' + entry["Img"] + '" style="width:100%;height:200px;border-radius:5px" />';
+                                }
+                                itemHtmlStr += '</div>';
+                                itemHtmlStr += '</li>';
+                                $("#list").prepend(itemHtmlStr);
+                            });
+                            //如果已经加载完毕
+                            if (pageIndex * 5 >= data.Total) {
+
+                                IsLoadComplete = true;
+                            } else {
+                                pageIndex = pageIndex + 1;
+                            }
+                            wrapper.refresh();
+                        }
+                        Total = data.Total;
+
+                    }, error: function (error) {
+
+                        //加载失败
+                        wrapper.refresh();
+                    }
+                });
+            }
+        }
+
+        var currentYear = @Html.Raw(DateTime.Now.Year)
+
+        function getFormatDate(date) {
+
+            var seperator1 = '/';
+            var seperator2 = ':';
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+
+            if (month >= 1 && month <= 9) {
+                month = '0' + month;
+            }
+            if (day >= 0 && day <= 9) {
+                day = '0' + day;
+            }
+            if (hour >= 0 && hour <= 9) {
+                hour = '0' + hour;
+            }
+            if (minute >= 0 && minute <= 9) {
+                minute = '0' + minute;
+            }
+
+            if (date.getYear() == currentYear) {
+                return month + seperator1 + day + ' ' + hour + seperator2 + minute;
+            } else {
+                return date.getFullYear() + seperator1 + month + seperator1 + day;
+            }
+        }
+    </script>
+}

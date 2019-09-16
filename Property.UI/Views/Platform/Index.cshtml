@@ -1,0 +1,154 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "后台管理首页";
+}
+@using Webdiyer.WebControls.Mvc
+@model Property.UI.Models.PlatformIndexModel
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-3 col-xs-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">Count</span>
+                    <h5>物业小区</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">@(Model.PlaceCount)个</h1>
+                    <small>Property Place</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-warning pull-right">Count</span>
+                    <h5>业主</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">@(Model.OwnerCount)个</h1>
+                    <small>owner</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">Count</span>
+                    <h5>一周内</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">@(Model.OwnerWeekLoginCount)个</h1>
+                    <small>Week Visit Count</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger pull-right">Count</span>
+                    <h5>一月内</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">@(Model.OwnerMonthLoginCount)个</h1>
+                    <small>Month Visit Count</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>小区与业主统计</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="morris-bar-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>物业小区</th>
+                                    <th>所属物业公司</th>
+                                    <th>业主数量</th>
+                                </tr>
+                            </thead>
+
+                            @foreach (var own in Model.OwnerDatas)
+                            {
+                                <tr>
+                                    <td>@own.PlaceName</td>
+                                    <td>@own.CompanyName </td>
+                                    <td>@own.OwnerCount</td>
+                                </tr>
+                            }
+                        </table>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-left">
+                            共 @Model.OwnerDatas.TotalPageCount 页 @Model.OwnerDatas.TotalItemCount 条记录，当前为第 @Model.OwnerDatas.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-7 text-right">
+                            @Html.Pager(Model.OwnerDatas, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "id",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/morrisStyles")
+    @Styles.Render("~/plugins/morrisStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/flot")
+    @Scripts.Render("~/plugins/morris")
+
+    <script>
+        $(document).ready(function () {
+
+            var barData = @Html.Raw(Model.BarJsonData);
+            //空数据处理
+            if(barData == ""){
+                $("#morris-bar-chart").html('<h3 class="text-navy no-margins text-center" style="padding-top:60px;">暂无数据</h3>');
+            }else{
+
+                //柱状图数据填充
+                Morris.Bar({
+                    element: 'morris-bar-chart',
+                    data: barData,
+                    xkey: 'CompanyName',
+                    ykeys: ['PlaceCount','OwnerCount'],
+                    labels: ['小区个数','业主个数'],
+                    hideHover: 'auto',
+                    resize: true,
+                    barColors: ['#1ab394','#919191'],
+                });
+            }
+        });
+    </script>
+}

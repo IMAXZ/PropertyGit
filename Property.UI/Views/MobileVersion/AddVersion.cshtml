@@ -1,0 +1,226 @@
+﻿@model Property.UI.Models.MobileVersionModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "新增APP版本";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增APP版本</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("AddVersion", "MobileVersion", "", new AjaxOptions { HttpMethod = "post"}, new { id = "form", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            <input type="hidden" id="Id" name="Id" value="0" />
+                            <div class="form-group">
+                                <label class="control-label col-md-3">版本类型</label>
+                                <div class="col-md-6">
+                                    <div class="radio radio-info radio-inline">
+                                        <label>
+                                            <input type="radio" id="Type" value="0" name="Type" checked="checked">业主端
+                                        </label>
+                                    </div>
+                                    <div class="radio radio-inline">
+                                        <label>
+                                            <input type="radio" id="Type" value="1" name="Type">物业端
+                                        </label>
+                                    </div>
+                                    <div class="radio radio-inline">
+                                        <label>
+                                            <input type="radio" id="Type" value="2" name="Type">商户端
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">版本编号<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.VersionCode, new { @class = "form-control", @placeholder = "版本编号" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">版本名称<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.VersionName, new { @class = "form-control", @placeholder = "版本名称", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">版本描述</label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Desc, new { @class = "form-control", @placeholder = "版本描述" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">选择APK文件<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.ApkFile, new { @class = "form-control", @type = "file" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" onclick="sub();"/>
+                                    <a class="btn btn-white" href="/MobileVersion/VersionList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/animate.css" rel="stylesheet">
+<link href="~/Content/style.css" rel="stylesheet">
+<script src="~/Scripts/jquery-2.1.1.js"></script>
+<script src="~/Scripts/jquery-2.1.1.intellisense.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/common.js"></script>
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            $('input:radio').click(function () {
+                $('.form-control').val("");
+            });
+        })
+
+        $(document).ready(function ()
+        {
+            $("#form").validate({
+                rules: {
+                    VersionCode: {
+                        required: true,
+                        maxlength: 30,
+                        digits: true
+                    },
+                    VersionName: {
+                        required: true,
+                        maxlength: 30,
+                        remote: {
+                            type: "POST",
+                            url: "/MobileVersion/RemoteCheckExist",
+                            data: {
+                                Id: function () { return $("#Id").val(); },
+                                type: function () { return $("input[name='Type']:checked").val(); },
+                                versionName: function () { return $("#VersionName").val(); }
+                            }
+                        }
+                    },
+                    Desc: {
+                        maxlength: 200
+                    },
+                    ApkFile: {
+                        required: true,
+                        maxlength: 200
+                    }
+                },
+                messages: {
+                    VersionCode: {
+                        required: "请输入版本编号",
+                        maxlength: "长度不能超过30位",
+                        digits: "必须为大于0的整数"
+                    },
+                    VersionName: {
+                        required: "请输入版本名称",
+                        maxlength: "长度不能超过30位",
+                        remote: "该版本名称已存在"
+                    },
+                    Desc: {
+                        maxlength: "长度不能超过200位"
+                    },
+                    ApkFile: {
+                        required: "请导入APK文件",
+                        maxlength: "长度不能超过200位"
+                    }
+                },
+            });
+        });
+
+        function sub()
+        {
+            if ($("#form").valid())
+            {
+                $('form').ajaxSubmit({
+                    beforeSend: UploadBegin,
+                    success: UploadSuccess,
+                    error: UploadFailure
+                });
+            }
+
+        }
+
+        //上传开始
+        function UploadBegin()
+        {
+            var str = "";
+            str += '<div class="sk-spinner sk-spinner-wave">';
+            str += '    <div class="sk-rect1"></div>';
+            str += '    <div class="sk-rect2"></div>';
+            str += '    <div class="sk-rect3"></div>';
+            str += '    <div class="sk-rect4"></div>';
+            str += '    <div class="sk-rect5"></div>';
+            str += '</div>';
+
+            swal({
+                title: "上传中...",
+                text: "",
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            //填充loading
+            $(".sweet-alert p").html(str);
+        }
+
+        //上传成功
+        function UploadSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                swal({
+                    title: "上传成功!",
+                    text: "",
+                    type: "success"
+                }, function ()
+                {
+                    window.location.href = "/MobileVersion/VersionList";
+                });
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+
+        //上传失败
+        function UploadFailure(err)
+        {
+            swal({
+                title: "请求出现异常，上传失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

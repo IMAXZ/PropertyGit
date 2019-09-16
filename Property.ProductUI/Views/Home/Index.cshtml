@@ -1,0 +1,326 @@
+﻿@model Property.ProductUI.Models.ApplyModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>物业生活通-全方位的物业服务平台</title>
+    <meta name="keywords" content="物业，物业生活通，物业管理，智慧社区，物业家庭服务，物业巡检，萨纳斯物业，Ai我家，Ai物业">
+    <meta name="description" content="物业生活通，萨纳斯投资开发的物业生活服务平台，致力于为广大用户提供全方位的物业家庭服务，以及物业巡检/问题反馈/物业缴费/周边门店等生活服务应用。">
+    <link rel="shortcut icon" href="~/favicon.ico" />
+
+    <link href="/Content/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/Content/css/font-awesome.css" rel="stylesheet" />
+    <link href="/Content/css/style.css" rel="stylesheet" />
+    <link href="/Content/css/toastr.min.css" rel="stylesheet" />
+    <style type="text/css">
+        * {
+            font-family: 微软雅黑;
+        }
+
+        input.error {
+            border: 1px solid red;
+            color: #8a1f11;
+        }
+
+        .right_bottom {
+            position: fixed;
+            z-index: 8;
+            right: 20px;
+            top: 285px;
+            overflow: hidden;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .consult-us {
+            padding: 14px 0;
+            font-family: 微软雅黑;
+            font-size: 13px;
+            line-height: 1.1;
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-default navbar-fixed-top" style="background:url(/Images/top_bg.png);height:78px">
+        <div class="container" style="margin-top:10px">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">
+                    <img src="/Images/logo.png" alt="物业生活通" class="img-responsive" />
+                </a>
+            </div>
+            <div class="navbar-collapse collapse navbar-right scroll-me">
+                <ul class="nav navbar-nav">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#tab1">产品介绍</a></li>
+                    <li><a href="#tab2">技术支持</a></li>
+                    <li><a href="#tab3">联系我们</a></li>
+                    <li><button class="btn btn-primary" data-toggle="modal" data-target="#apply_modal" style="margin-top:11px;margin-left:15px">立即申请</button></li>
+                    <li class="light-blue">
+                        <div data-toggle="dropdown" class="dropdown-toggle" aria-expanded="false">
+                            <button class="btn btn-primary" style="margin-top:11px;margin-left:15px;width:82px">登录 <i class="fa fa-caret-down"></i></button>
+                        </div>
+
+                        <ul class="user-menu dropdown-menu-left dropdown-menu dropdown-yellow dropdown-caret dropdown-close" style="margin-top:20px">
+                            <li>
+                                <a href="http://v.homekeeper.com.cn/Account/CompanyPlatformLogin" target="_blank">
+                                    <i class="fa fa-building-o"></i>  总公司平台登录
+                                </a>
+                            </li>
+                            <li class="divider" style="margin:5px 0"></li>
+                            <li>
+                                <a href="http://v.homekeeper.com.cn/Account/PropertyLogin" target="_blank">
+                                    <i class="fa fa-female"></i>  物业平台登录
+                                </a>
+                            </li>
+                            <li class="divider" style="margin:5px 0"></li>
+                            <li>
+                                <a href="http://v.homekeeper.com.cn/Account/ShopPlatformLogin" target="_blank">
+                                    <i class="fa fa-gift"></i>  门店平台登录
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="home">
+        <div class="overlay">
+            <!-- overylay class usage -->
+            <div>
+                <div class="carousel slide" id="carousel1" data-ride="carousel" data-interval="3000">
+                    <ol class="carousel-indicators">
+                        <li data-slide-to="0" data-target="#carousel1" class="active"></li>
+                        <li data-slide-to="1" data-target="#carousel1" class=""></li>
+                        <li data-slide-to="2" data-target="#carousel1" class=""></li>
+                        <li data-slide-to="3" data-target="#carousel1" class=""></li>
+                    </ol>
+                    <div class="carousel-inner">
+                        <div class="item active">
+                            <img alt="物业生活" class="img-responsive" src="/Images/page1.png" style="min-height:520px">
+                        </div>
+                        <div class="item">
+                            <img alt="Ai物业" class="img-responsive" src="/Images/page2.png" style="min-height:520px">
+                        </div>
+                        <div class="item">
+                            <img alt="Ai我家" class="img-responsive" src="/Images/page3.png" style="min-height:520px">
+                        </div>
+                        <div class="item">
+                            <img alt="Ai我家-商家版" class="img-responsive" src="/Images/page4.png" style="min-height:520px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <section id="tab1">
+        <div style="background:#fff;height:70px"></div>
+        <div>
+            <img alt="物业产品介绍" class="img-responsive" src="/Images/product_introduce.png">
+            <div style="background: #FBD252; height: 50px"></div>
+            <img alt="物业产品介绍-Ai物业" class="img-responsive" src="/Images/product_introduce_1.png">
+            <div style="background: #FBD252; height: 70px"></div>
+            <div style="background: #53A7F7; height: 50px"></div>
+            <img alt="物业产品介绍-Ai我家" class="img-responsive" src="/Images/product_introduce_2.png">
+            <div style="background: #53A7F7; height: 70px"></div>
+            <div style="background: #59dfbe; height: 50px"></div>
+            <img alt="物业产品介绍-Ai我家商家版" class="img-responsive" src="/Images/product_introduce_3.png">
+        </div>
+    </section>
+
+    <section id="tab2">
+        <div style="background: #59dfbe; height: 70px"></div>
+        <div>
+            <img alt="物业平台技术支持" class="img-responsive" src="/Images/technical_support.png">
+        </div>
+    </section>
+
+    <section id="tab3">
+        <div style="background:#fff;height:70px"></div>
+        <div>
+            <img alt="萨纳斯" class="img-responsive" src="/Images/contact_us.png">
+        </div>
+        <div style="cursor:pointer" data-toggle="modal" data-target="#apply_modal">
+            <img alt="物业产品申请试用" class="img-responsive" src="/Images/apply_use.png">
+        </div>
+    </section>
+
+    <footer style="background-color:#000">
+        <div style="width:300px;margin:0 auto; padding:0;">
+            <i class="c-icon-jgwablogo"></i>
+            <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=37021202000217" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+                <img src="~/Images/wangjin.png" style="float:left;" />
+                <p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#fff;">鲁公网安备 37021202000217号</p>
+            </a>
+        </div>
+    </footer>
+
+    <div class="right_bottom">
+        <button class="btn btn-success consult-us" onclick="easemobim.bind({ tenantId: @ViewBag.TenantId })"><i class="fa fa-comments-o" style="margin-bottom:3px"></i><br>在<br>线<br>咨<br>询</button>
+        <br /><br />
+        <div id="weixin_qr_btn" class="btn-success" style="width: 40px; height: 40px;border-radius:50%;text-align:center;cursor:pointer">
+            <img src="~/Images/weixin.png" style="height:24px;margin-top:8px" />
+        </div>
+    </div>
+
+    <div class="modal inmodal fade" id="apply_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" style="width:400px;margin-top:78px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="ApplyCancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" style="text-align:center;font-size:16px">申请试用</h4>
+                </div>
+                <div class="modal-body">
+                    @using (Ajax.BeginForm("ApplyProbation", "Home", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "applyForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CompanyName, new { @placeholder = "请输入您的公司名称", @class = "form-control", @maxlength = "50", @required = "true" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Name, new { @placeholder = "请输入您的姓名/称呼", @class = "form-control", @maxlength = "50", @required = "true" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Tel, new { @placeholder = "请输入您的联系方式：固话/手机", @class = "form-control", @maxlength = "50", @required = "true" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OtherContactInfo, new { @placeholder = "请输入其他联系方式：邮箱/QQ等（选填)", @class = "form-control", @maxlength = "50" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextAreaFor(m => m.Memo, new { @placeholder = "留言/备注（限300字以内）", @class = "form-control", @rows = "4", @style = "resize:none", @maxlength = "300" })
+                        </div>
+                    }
+                    <div style="text-align:center">
+                        <button type="button" class="btn btn-primary" style="padding:6px 30px" onclick="ApplySubmit()">提交</button>
+                        <button type="button" class="btn btn-white" style="padding:6px 30px" onclick="ApplyCancel()">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="weixin_qr_modal" style="position: fixed; z-index: 999; right: 80px; top: 260px; padding: 3px; background: #fff; border: 1px solid #BFBFBF; border-radius: 3px; box-shadow: 0 6px 12px rgba(0,0,0,.175);display: none; ">
+        <img src="~/Images/weixin_qr.jpg" style="width:200px;height:200px" alt="Ai我家微信公众号" />
+        @*<div style="text-align:center">扫码关注微信公众号</div>*@
+    </div>
+
+    <script src="/Scripts/jquery-1.11.1.js" type="text/javascript"></script>
+    <script src="/Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.mb.YTPlayer.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.easing.min.js" type="text/javascript"></script>
+    <script src="/Scripts/custom.js" type="text/javascript"></script>
+    <script src="/Scripts/toastr.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src='//kefu.easemob.com/webim/easemob.js?tenantId=@ViewBag.TenantId&hide=false&sat =false' async='async'></script>
+    <script type="text/javascript">
+        $(function () {
+
+            window.easemobim = window.easemobim || {};
+            easemobim.config = {
+                hide: true,		//是否隐藏小的悬浮按钮
+                autoConnect: true,    //自动连接
+                resources: true
+            };
+
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "progressBar": false,
+                "preventDuplicates": false,
+                "positionClass": "toast-top-left",
+                "onclick": null,
+                "showDuration": "100",
+                "hideDuration": "100",
+                "timeOut": "2000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+            $('.form-control').bind('input', function () {
+                $(this).removeClass("error");
+            });
+
+            $("#weixin_qr_btn").mouseenter(function () {
+                $('#weixin_qr_modal').show();
+            });
+            $("#weixin_qr_btn").mouseleave(function () {
+                $('#weixin_qr_modal').hide();
+            });
+        });
+
+        //提交申请
+        function ApplySubmit() {
+
+            var flag = true;
+            var telRegular = /^\d{3,4}-?\d{7,9}$/;
+            var mobileRegular = /^1[34578]\d{9}$/;
+
+            if ($("#CompanyName").val() == undefined || $("#CompanyName").val().trim() == "" || $("#CompanyName").length > 50) {
+                $("#CompanyName").addClass("error");
+                flag = false;
+            }
+            if ($("#Name").val() == undefined || $("#Name").val().trim() == "" || $("#Name").length > 50) {
+                $("#Name").addClass("error");
+                flag = false;
+            }
+            if ($("#Tel").val() == undefined || $("#Tel").val().trim() == "" || $("#Tel").length > 50) {
+                $("#Tel").addClass("error");
+                flag = false;
+            } else if (!telRegular.test($("#Tel").val()) && !mobileRegular.test($("#Tel").val())) {
+                $("#Tel").addClass("error");
+                flag = false;
+            }
+            if ($("#OtherContactInfo").length > 50) {
+                $("#OtherContactInfo").addClass("error");
+                flag = false;
+            }
+            if ($("#Memo").length > 300) {
+                $("#Memo").addClass("error");
+                flag = false;
+            }
+            if (flag) {
+                $("#applyForm").submit();
+            }
+
+
+
+        }
+
+        //取消申请
+        function ApplyCancel() {
+
+            $('.form-control').val("");
+            $('.form-control').removeClass("error");
+            $('#apply_modal').modal('hide');
+        }
+
+        //申请请求成功
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+
+                toastr.success('您的申请已发送至客服邮箱，请耐心等待！', '申请成功！')
+                ApplyCancel();
+            }
+            else {
+                toastr.error(data.Msg + '，请重新申请！', '申请失败！')
+            }
+        }
+        //申请请求失败
+        function OnFailure(err) {
+            toastr.error('申请发生异常，请重新申请！', '申请失败！')
+        }
+    </script>
+</body>
+</html>

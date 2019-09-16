@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "商品上架";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.UI.Models.ShopSaleModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品上架</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("AddShopSales", "ShopSales", "", new AjaxOptions { HttpMethod = "post", OnFailure = "ShowError", OnBegin = "onBegin", OnSuccess = "ShowSuccess" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商品分类<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(model => model.GoodsCategoryId, Model.GoodsCategoryList, "请选择商品分类", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商品名称<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control", @placeholder = "商品名称", @required = true, @maxlength = 200 })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">详细描述<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.Content, new { @class = "form-control", @placeholder = "详细描述", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商品价格<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.Price, new { @class = "form-control", @placeholder = "商品价格" })
+                                        <span class="input-group-addon">元</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商品库存<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.RemainingAmout, new { @class = "form-control", @placeholder = "商品库存" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">联系电话<span class="text-danger">&nbsp;&nbsp;</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", @placeholder = "联系电话" })
+                                </div>
+                            </div>
+                            @if (((bool)ViewBag.IsHasPush))
+                            {
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">是否推送<span class="text-danger">&nbsp;&nbsp;</span></label>
+                                    <div class="col-md-6">
+                                        <div class="i-checks">
+                                            @Html.CheckBoxFor(model => model.IsPush)
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/ShopSales/SaleList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    <link href="~/Content/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="~/Content/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/iCheck")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script src="~/Scripts/validate/ShopSaleValidate.js"></script>
+
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script type="text/javascript">
+
+        $().ready(function () {
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green'
+            });
+        });
+
+        function onBegin() {
+            $("#form").valid()
+        }
+
+        //失败返回
+        function ShowError(message) {
+            swal({
+                title: '请求发生异常，上架失败',
+                type: "error",
+                text: ""
+            });
+        }
+
+        //成功返回
+        function ShowSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/ShopSales/SaleList";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+    </script>
+}
+
+
+
+

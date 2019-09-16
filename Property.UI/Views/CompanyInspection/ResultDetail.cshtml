@@ -1,0 +1,181 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "巡检结果查看";
+}
+@model Property.UI.Models.InspectionResultModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+
+                        <table class="table table-striped table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th colspan="7"><label>@Model.PlanName</label></th>
+                                </tr>
+                                <tr>
+                                    <th class="col-md-2"><label>巡检点名称</label></th>
+                                    <th class="col-md-3"><label>巡检点描述</label></th>
+                                    <th class="col-md-1"><label>异常状态</label></th>
+                                    <th class="col-md-2"><label>异常描述</label></th>
+                                    <th class="col-md-1"><label>提报人</label></th>
+                                    <th class="col-md-2"><label>提报时间</label></th>
+                                    <th class="col-md-1 text-center"><label>其他</label></th>
+                                </tr>
+
+                                @foreach (var result in Model.ResultList)
+                                {
+                                    <tr>
+                                        <td class="col-md-2">@result.InspectionPoint.PointName</td>
+                                        <td class="col-md-3">@result.InspectionPoint.Memo</td>
+                                        <td class="col-md-1">
+                                            @if (result.Status == 0)
+                                            {
+                                                <span class="label label-primary">正常</span>
+                                            }
+                                            @if (result.Status == 1)
+                                            {
+                                                <span class="label label-warning">异常</span>
+                                            }
+                                        </td>
+                                        <td class="col-md-2">@result.Desc</td>
+                                        @if (!string.IsNullOrEmpty(result.UploadUser.TrueName))
+                                        {
+                                            <td class="col-md-1">@result.UploadUser.TrueName</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="col-md-1">@result.UploadUser.UserName</td>
+                                        }
+                                        <td class="col-md-2">@result.UploadTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td class="col-md-1 text-center">
+                                            @if (!string.IsNullOrEmpty(result.Imgs))
+                                            {
+                                                string[] imgs = result.Imgs.Split(';');
+                                                string imgTarget = "imgModal" + result.Id;
+                                                string carousel = "carousel" + result.Id;
+                                                <a href="#" class="btn btn-xs btn-primary btn-outline btn-bitbucket" data-toggle="modal" data-target="#@imgTarget"><i class="fa fa-picture-o"></i></a>
+
+                                                <div class="modal inmodal" id="@imgTarget" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content animated fadeIn">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title">异常图片描述</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="carousel slide" id="@carousel">
+
+                                                                    <ol class="carousel-indicators">
+                                                                        @for (int i = 0; i < imgs.Count(); i++)
+                                                                        {
+                                                                            if (i == 0)
+                                                                            {
+                                                                                <li data-slide-to="@i" data-target="#@carousel" class="active"></li>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <li data-slide-to="@i" data-target="#@carousel"></li>
+                                                                            }
+                                                                        }
+                                                                    </ol>
+
+                                                                    <div class="carousel-inner">
+                                                                        @for (int i = 0; i < imgs.Count(); i++)
+                                                                        {
+                                                                            if (i == 0)
+                                                                            {
+                                                                                <div class="item active">
+                                                                                    <img alt="image" class="img-container" src="@imgs[i]">
+                                                                                </div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div class="item">
+                                                                                    <img alt="image" class="img-container" src="@imgs[i]">
+                                                                                </div>
+                                                                            }
+
+                                                                        }
+
+                                                                    </div>
+                                                                    <a data-slide="prev" href="#@carousel" class="left carousel-control">
+                                                                        <span class="icon-prev"></span>
+                                                                    </a>
+                                                                    <a data-slide="next" href="#@carousel" class="right carousel-control">
+                                                                        <span class="icon-next"></span>
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(result.AudioPath))
+                                            {
+                                                string audioTarget = "audioModal" + result.Id;
+                                                <a href="#" class="btn btn-xs btn-primary btn-outline btn-bitbucket" data-toggle="modal" data-target="#@audioTarget"><i class="fa fa-volume-up"></i></a>
+                                                <div class="modal inmodal" id="@audioTarget" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content animated fadeIn">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title">异常语音描述</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <audio src="@result.AudioPath" controls="controls" style="width:100%"></audio>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+
+                                @foreach (var point in Model.PointList)
+                                {
+                                    if (!Model.ResultList.Exists(r => r.PointId == point.Id))
+                                    {
+                                        <tr>
+                                            <td class="col-md-2">@point.PointName</td>
+                                            <td class="col-md-3">@point.Memo</td>
+                                            <td class="col-md-1"></td>
+                                            <td class="col-md-2"></td>
+                                            <td class="col-md-1"></td>
+                                            <td class="col-md-2"></td>
+                                            <td class="col-md-1 text-center"></td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        <div class="col-md-offset-5 col-md-4">
+                            <a href="/CompanyInspection/ResultMonitorList" class="btn btn-white">返回</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+}

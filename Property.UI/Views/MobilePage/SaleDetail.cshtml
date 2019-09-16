@@ -1,0 +1,145 @@
+﻿@model Property.Entity.T_ShopSale
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Title</title>
+
+    <!-- Add jQuery Style direct - used for jQGrid plugin -->
+    <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+
+    <!-- Primary Inspinia style -->
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/font-awesome/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <!--轮播图-->
+    <script type="text/javascript" src="~/Scripts/jquery.event.drag-1.5.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.touchSlider.js"></script>
+
+    <style type="text/css">
+        .main_visual {
+            height: 30%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        div.indicators {
+            position: absolute;
+            top: 90%;
+            right: 10px;
+            z-index: 1;
+            height: 10px;
+        }
+
+            div.indicators a span.on {
+                background: #5EC6D0;
+            }
+
+            div.indicators a span {
+                width: 10px;
+                height: 10px;
+                display: block;
+                float: left;
+                margin-left: 10px;
+                border-radius: 50%;
+                font-size: 0px;
+                background: #fff;
+            }
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".main_image").touchSlider({
+                flexible: true,
+                speed: 200,
+                paging: $(".indicators a"),
+                counter: function (e) {
+                    $(".indicators a span").removeClass("on").eq(e.current - 1).addClass("on");
+                }
+            });
+        });
+    </script>
+</head>
+<body class="gray-bg" style="width: 100%; font-family:黑体; color: #000">
+
+    <!--轮播图-->
+    @if (!string.IsNullOrEmpty(Model.ImgPath))
+    {
+        string[] imgs = Model.ImgPath.Split(';');
+        //如果只有一张图片
+        if (imgs.Count() == 1)
+        {
+            <div class="main_visual">
+                <img alt="商品图片" class="img-container" src="@imgs[0]" style="height:100%;">
+            </div>
+        }
+        else
+        {
+            <div class="main_visual">
+                <div class="indicators text-center">
+                    @for (int i = 0; i < imgs.Count(); i++)
+                    {
+                        <a href="#"><span></span></a>
+                    }
+                </div>
+                <div class="main_image">
+                    <ul>
+                        @for (int i = 0; i < imgs.Count(); i++)
+                        {
+                            <li><img alt="促销图片" class="img-container" src="@imgs[i]" style="height:100%;"></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0">
+            <div class="media-body" style="padding:10px">
+                <span style="font-size:16px;">商品名称</span>
+                <p style="font-size:14px;margin:10px 0 0 0">
+                    @Model.Title&nbsp;&nbsp;&nbsp;&nbsp;@Model.CreateTime.ToString("yyyy-MM-dd")
+                </p>
+            </div>
+        </div>
+
+        <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:0">
+            <div class="media-body" style="padding:10px">
+                <span style="font-size:16px;">商品描述</span>
+                <p style="font-size:14px;margin:10px 0 0 0">
+                    @Html.Raw(Model.Content)
+                </p>
+            </div>
+        </div>
+
+    }
+    else
+    {
+
+        <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:6px 0">
+            <div class="media-body" style="padding:10px">
+                <span style="font-size:16px;">商品名称</span>
+                <p style="font-size:14px;margin:10px 0 0 0">
+                    @Model.Title&nbsp;&nbsp;&nbsp;&nbsp;@Model.CreateTime.ToString("yyyy-MM-dd")
+                </p>
+            </div>
+        </div>
+
+        <div class="border-bottom white-bg" style="border-top:1px solid #E7EAEC;margin:0">
+            <div class="media-body" style="padding:10px">
+                <span style="font-size:16px;">商品描述</span>
+                <p style="font-size:14px;margin:10px 0 0 0">
+                    @Html.Raw(Model.Content)
+                </p>
+            </div>
+        </div>
+    }
+</body>
+</html>

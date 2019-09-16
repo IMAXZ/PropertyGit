@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "商品图片管理";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+@model Property.UI.Models.ShopSaleModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品图片管理</h5>
+                </div>
+                <div class="ibox-content">
+                    <form id="my-awesome-dropzone" class="dropzone dz-clickable" action="/ShopSales/Upload" method="post" enctype="multipart/form-data">
+                        <div class="dropzone-previews"></div>
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <a class="btn btn-white pull-right" href="/ShopSales/SaleList">取消</a>
+                        <button type="submit" class="btn btn-primary pull-right">上传</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="pic">
+            @if (Model.ThumPathList != null)
+            {
+                for (int i = 0; i < Model.ThumPathList.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(Model.ThumPathList[i]))
+                    {
+                        <div class="col-md-2 col-sm-4 picContainer lightBoxGallery">
+                            <div class="text-center">
+                                <a href="@Model.PathList[i]" data-gallery="">
+                                    <img src="@Model.ThumPathList[i]" style="width:100px;height:70px;" />
+                                </a>
+                                <div class="text-center">
+                                    <a class="btn btn-xs btn-danger" thum="@Model.PathList[i]" op="@Model.ThumPathList[i]" onclick="delPic(@Model.Id,this)"><i class="fa fa-minus"></i>删除</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+        <div id="blueimp-gallery" class="blueimp-gallery">
+            <div class="slides"></div>
+            <h3 class="title"></h3>
+            <a class="prev">‹</a>
+            <a class="next">›</a>
+            <a class="close">×</a>
+            <a class="play-pause"></a>
+            <ol class="indicator"></ol>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section Styles {
+
+    @Styles.Render("~/Content/plugins/dropzone/dropZoneStyles")
+    @*@Styles.Render("~/Content/plugins/blueimp/css/")*@
+    <link href="~/Content/plugins/blueimp/css/blueimp-gallery.min.css" rel="stylesheet" />
+    @Styles.Render("~/plugins/sweetAlertStyles")
+    <style>
+        .lightBoxGallery {
+            text-align: center;
+        }
+
+            .lightBoxGallery img {
+                margin: 5px;
+            }
+
+        .picContainer {
+            padding: 5px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <!-- DROPZONE -->
+    @Scripts.Render("~/plugins/lightboxGallery")
+
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/plugins/dropZone")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //加载上传控件和配置
+            Dropzone.options.myAwesomeDropzone = {
+                autoProcessQueue: false,
+                uploadMultiple: true,
+                parallelUploads: 100,
+                maxFiles: 6,
+                maxFilesize: 512,
+                acceptedFiles: ".jpg,.png,.gif,.jpeg,.bmp",
+                dictInvalidFileType: '您不能上传该类型的文件',
+                dictCancelUpload: "取消上传",
+                dictRemoveFile: "移除文件",
+                maxThumbnailFilesize: 100,
+                dictMaxFilesExceeded: "您一次最多只能上传{{maxFiles}}个文件",
+                //dictDefaultMessage:
+                //    '<span ><i ></i> 拖动文件至该处</span> \
+                //    <span >(或点击此处)</span> <br /> \
+                //    <i ></i>',
+                dictResponseError: '文件上传失败!',
+                // Dropzone settings
+                init: function () {
+                    var myDropzone = this;
+
+                    this.element.querySelector("button[type=submit]").addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        myDropzone.processQueue();
+                    });
+                    this.on("sendingmultiple", function () {
+                    });
+                    this.on("successmultiple", function (files, response) {
+
+                        if(response.Code == "OK"){
+                            window.location.reload();
+                        }else{
+                            swal({
+                                title: response.Msg,
+                                type: "error",
+                                text: ""
+                            }, function (isConfirm) {
+                                if (isConfirm) {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    });
+                    this.on("errormultiple", function (files, response) {
+
+                        swal({
+                            title: "促销图片上传失败",
+                            type: "error",
+                            text: ""
+                        });
+                    });
+                }
+
+            }
+        });
+
+        //删除图片
+        function delPic(id, obj) {
+            swal({
+                title: "确定要删除该商品图片吗?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    //缩略图地址
+                    var href = $(obj).attr("op");
+                    //大图地址
+                    var thum = $(obj).attr("thum");
+                    $.ajax({
+                        url: '/ShopSales/DelFile',
+                        type: 'post',
+                        data: { id: id, href: href, thum: thum },
+                        success: function (data) {
+                            if (data.Code == 'OK') {
+                                window.location.reload();
+                            } else {
+                                swal({
+                                    title: data.Msg,
+                                    type: "error",
+                                    text: ""
+                                });
+                            }
+                        }, error: function (data) {
+                            swal({
+                                title: '删除失败',
+                                type: "error",
+                                text: ""
+                            });
+                        }
+                    })
+                }
+            })
+        }
+    </script>
+}

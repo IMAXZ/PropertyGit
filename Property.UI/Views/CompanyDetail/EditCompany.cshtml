@@ -1,0 +1,112 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "编辑物业总公司";
+}
+
+@model Property.UI.Models.PropertyCompanyModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>编辑物业总公司</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("EditCompany", "CompanyDetail", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.Id)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-md-2">物业公司名称<span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "物业公司名称", @required = true, @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">联系方式</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.Tel, new { @class = "form-control", @placeholder = "联系方式" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">地址</label>
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.Address, new { @class = "form-control", @placeholder = "地址" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2">介绍</label>
+                                <div class="col-md-8">
+                                    @Html.TextAreaFor(model => model.Content, new { @style = "width:100%;height:400px" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/CompanyDetail/Detail">取消</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/validate/companyValidate.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="~/Ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" src="~/Ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script type="text/javascript">
+
+        //编辑器源码文件
+        $().ready(function ()
+        {
+            UE.getEditor('Content');
+            var validator = $("#form").submit(function ()
+            {
+                UE.getEditor('Content').sync("form");
+            })
+        });
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                window.location.href = "/CompanyDetail/Detail";
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err)
+        {
+            swal({
+                title: "请求出现异常,编辑失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}
+
+

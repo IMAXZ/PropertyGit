@@ -1,0 +1,284 @@
+﻿@{
+    ViewBag.Title = "业主圈子";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+<div class="weui_search_bar" id="search_bar" style="background-color: #fff; position: fixed; top: 0; width: 100%">
+    <div class="weui_search_outer" style="background-color:#fff">
+        <div class="weui_search_inner" style="padding:0 36px 0 10px">
+            <input type="text" class="weui_search_input" id="Kwords" name="Kwords" placeholder="搜索感兴趣的圈子..." style="padding:6px 0" oninput="Refresh()">
+            <i class="search_icon"></i>
+            <i class="search_cancel_icon" onclick="emptyKwords()" style="display:none"></i>
+        </div>
+    </div>
+</div>
+<div id="page_content" style="position: fixed; top: 48px; width: 100%">
+    <div style="text-align: center; padding: 6px 0; border-bottom: 1px solid #d9d9d9">
+        <span style="font-size: 13px">您所在业主小区共有<span id="TotalCount" style="color:#0172ff;font-weight:600">&nbsp;@ViewBag.Count </span>个圈子在热聊</span>
+    </div>
+
+    <div class="weui_tab">
+        <div class="weui_navbar" style="color:#000;background:#fff;font-weight:600">
+            <div style="width: 50%; text-align: center; padding: 8px 0" class="now">
+                <span style="font-size:16px">业主圈子</span>
+            </div>
+            <div style="width: 50%;text-align:center; padding: 8px 0" onclick="location.href = '/WeixinSocialCircle/Index2'">
+                <span style="font-size: 16px">我的圈子</span>
+            </div>
+        </div>
+        <div class="weui_tab_bd" style="padding-top:43px">
+            <div id="wrapper">
+                <ul id="list" style="border-bottom:1px solid #d9d9d9"></ul>
+            </div>
+            <div id="no_data_div" style="width:100%;text-align:center;padding:20px 0;display:none">
+                <img src="~/Images/Weixin/null.png" style="width:210px" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+
+    <link rel="stylesheet" href="~/Content/pullToRefresh.css" />
+    <style type="text/css">
+        #wrapper {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+            #wrapper ul li {
+                padding: 15px;
+                background: #FFF;
+            }
+
+        .now {
+            color: #0172ff;
+            border-bottom: 2px solid #0172ff;
+        }
+
+        .search_icon {
+            background: url(/Images/Weixin/search_icon.png) no-repeat;
+            background-size: 25px 25px;
+            position: absolute;
+            right: 6px;
+            top: 3.5px;
+            line-height: 25px;
+            width: 25px;
+            height: 25px;
+            vertical-align: middle;
+        }
+
+        .search_cancel_icon {
+            background: url(/Images/Weixin/search_cancel.png) no-repeat;
+            background-size: 25px 25px;
+            position: absolute;
+            right: 6px;
+            top: 3.5px;
+            line-height: 25px;
+            width: 25px;
+            height: 25px;
+            vertical-align: middle;
+        }
+
+        .weui_btn_plain_blue {
+            line-height: 22px;
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 0 8px;
+            color: #0172ff;
+            border: 1px solid #0172ff;
+        }
+
+        button.weui_btn_plain_blue,
+        input.weui_btn_plain_blue {
+            border-width: 1px;
+            background-color: transparent;
+        }
+
+        .weui_btn_plain_blue:active {
+            color: #1a31ea;
+            border-color: #1a31ea;
+        }
+
+        .weui_btn_plain_blue:after {
+            border-width: 0;
+        }
+
+        .marker_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 11px;
+            height: 13px;
+            background: url(/Images/Weixin/quanz_marker.png) no-repeat;
+            background-size: 11px 13px;
+            margin-right: 2px;
+        }
+    </style>
+}
+
+@section Scripts{
+    <!--列表刷新加载-->
+    <script type="text/javascript" src="~/Scripts/app/iscroll.js"></script>
+    <script type="text/javascript" src="~/Scripts/app/pullToRefresh.js"></script>
+    <script type="text/javascript">
+
+        var pageIndex = 1;
+        var Total = 0;
+        var IsLoadComplete = false;
+
+        $(document).ready(function () {
+
+            var height = $(".container").height();
+            var h = height - 81
+            $(".weui_tab").css("height", h);
+            $(".weui_tab_bd").css("height", h);
+
+            refresher.init({
+                id: "wrapper",
+                pullUpAction: Load,
+                pullDownAction: Refresh
+            });
+            wrapper.refresh();
+            Load();
+            $("#loading_page").show();
+
+        });
+
+        //跳转到详细
+        function gotoDetail(id) {
+            location.href = '/WeixinSocialCircle/Deatil/' + id;
+        }
+
+        //申请加入
+        function applyJoin(Id) {
+
+            var result = confirm("确定要申请加入该圈子吗？");
+            if (result == true) {
+                //提交申请
+                $.ajax({
+                    type: "post",
+                    url: "/WeixinSocialCircle/ApplyJoin/" + Id,
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Code == "OK") {
+                            alert("申请成功");
+                            Refresh();
+                        } else {
+                            alert(data.Msg);
+                        }
+                    }, error: function (error) {
+                        alert("申请失败");
+                    }
+                });
+            }
+        }
+
+        //清空搜索关键字
+        function emptyKwords() {
+            $("#Kwords").val("");
+            Refresh();
+        }
+
+        //刷新
+        function Refresh() {
+
+            var kwords = $("#Kwords").val();
+            if (kwords == undefined || kwords == "") {
+
+                $(".search_cancel_icon").hide();
+                $(".search_icon").show();
+            } else {
+                $(".search_icon").hide();
+                $(".search_cancel_icon").show();
+            }
+
+            Total = 0;
+            pageIndex = 1;
+            IsLoadComplete = false;
+            $(".pullUp").children().remove();
+            $("#list").css("border-bottom", "none");
+            $("#no_data_div").hide();
+            $("#list").empty();
+            $("#loading_page").show();
+            Load();
+        }
+
+        //加载
+        function Load() {
+
+            if (!IsLoadComplete) {
+
+                var kwords = $("#Kwords").val();
+                $.ajax({
+                    type: "get",
+                    url: "/WeixinSocialCircle/GetSocialCircleJsonList",
+                    data: { PageIndex: pageIndex, Kword: kwords },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+
+                        //如果没有圈子
+                        if (data.Total == 0) {
+                            wrapper.refresh();
+                            $(".pullUp").remove();
+                            IsLoadComplete = true;
+                            wrapper.stop();
+                            $("#list").css("border-bottom", "none");
+                            $("#no_data_div").show();
+                        }
+                            //如果总个数有变化
+                        else if (pageIndex > 1 && data.Total != Total) {
+                            Refresh();
+                        } else {
+                            $("#no_data_div").hide();
+                            $.each(data.Result, function (index, entry) {
+
+                                var itemHtmlStr = '';
+                                itemHtmlStr += '<li class="weui_cell">';
+
+                                itemHtmlStr += '<div class="weui_cell_hd" style="margin-right:10px">';
+                                itemHtmlStr += '<img src="' + entry["HeadPath"] + '" style="width:40px;height:40px" class="img-circle" onclick="gotoDetail(' + entry["Id"] + ')"/>';
+                                itemHtmlStr += '</div>';
+
+                                itemHtmlStr += '<div class="weui_cell_bd weui_cell_primary" onclick="gotoDetail(' + entry["Id"] + ')">';
+                                itemHtmlStr += '<h3 style="margin: 0;color:#000">' + entry["Name"] + '</h3>';
+                                itemHtmlStr += '<h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">' + entry["PlaceName"] + '</span></h5>';
+                                itemHtmlStr += '</div>';
+                                if (entry["IsApplyed"]) {
+                                    itemHtmlStr += '<div><button class="weui_btn weui_btn_plain_blue" onclick="applyJoin(' + entry["Id"] + ');">再次申请</button></div>';
+                                } else {
+                                    itemHtmlStr += '<div><button class="weui_btn weui_btn_plain_blue" onclick="applyJoin(' + entry["Id"] + ');">申请加入</button></div>';
+                                }
+                                itemHtmlStr += '</li>';
+                                $("#list").append(itemHtmlStr);
+                            });
+                            $("#list").css("border-bottom", "1px solid #d9d9d9");
+                            wrapper.refresh();
+                            if (pageIndex * 10 >= data.Total) {
+
+                                $(".pullUp").children().remove();
+                                IsLoadComplete = true;
+                                wrapper.stop();
+                            } else {
+                                pageIndex = pageIndex + 1;
+                                $(".pullUp").html('<div class="loader" style="display: none;"><span></span><span></span><span></span><span></span></div><div class="pullUpLabel">上拉加载更多...</div>')
+                                wrapper.refresh();
+                            }
+                        }
+                        Total = data.Total;
+                        $("#loading_page").hide();
+
+                    }, error: function (error) {
+
+                        //加载失败
+                        wrapper.refresh();
+                        $("#loading_page").hide();
+                    }
+                });
+            }
+        }
+    </script>
+}
+

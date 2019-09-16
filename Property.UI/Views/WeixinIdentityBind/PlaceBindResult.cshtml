@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "绑定小区";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.Entity.R_PropertyIdentityVerification
+<div>
+
+    @if ((int)ViewBag.PlaceType == 0)
+    {<div class="weui_cells weui_cells_form" style="font-size:16px">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">物业小区</label></div>
+            <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                @Model.BuildDoor.BuildUnit.Build.PropertyPlace.Name
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">关联单元户</label></div>
+            <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                @Model.BuildDoor.BuildUnit.Build.BuildName @Model.BuildDoor.BuildUnit.UnitName @Model.BuildDoor.DoorName
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">业主姓名</label></div>
+            <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                @Model.Name
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">业主电话</label></div>
+            <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                @Model.Phone
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">审批状态</label></div>
+            <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                @switch (Model.IsVerified)
+                {
+                    case 0:
+                        <span style="color:#ff6300">审核中</span>
+                        break;
+                    case 1:
+                    <span style="color:#00BC00">已通过</span>
+                        break;
+                    case 2:
+                    <span style="color:#ff0000">已驳回</span>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+        if (Model.IsVerified == 2)
+        {
+            <div style="margin:20px 10px">
+                <a class="weui_btn weui_btn_blue" href="/WeixinIdentityBind/IdentityVerification?placeId=@Model.BuildDoor.BuildUnit.Build.PropertyPlace.Id">重新申请</a>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">物业小区</label></div>
+                <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                    @Model.BuildCompany.PropertyPlace.Name
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">关联单位名称</label></div>
+                <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                    @Model.BuildCompany.Name
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">单位电话</label></div>
+                <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                    @Model.Phone
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">审批状态</label></div>
+                <div class="weui_cell_bd weui_cell_primary" style="text-align:right">
+                    @switch (Model.IsVerified)
+                    {
+                        case 0:
+                            <span style="color:#ff6300">审核中</span>
+                            break;
+                        case 1:
+                        <span style="color:#00BC00">已通过</span>
+                            break;
+                        case 2:
+                        <span style="color:#ff0000">已驳回</span>
+                            break;
+                    }
+                </div>
+            </div>
+        </div>
+        if (Model.IsVerified == 2)
+        {
+            <div style="margin:20px 10px">
+                <a class="weui_btn weui_btn_blue" href="/WeixinIdentityBind/IdentityVerification?placeId=@Model.BuildCompany.PropertyPlace.Id">重新申请</a>
+            </div>
+        }
+    }
+
+</div>
+@section Styles{
+
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+    </style>
+}

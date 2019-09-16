@@ -1,0 +1,112 @@
+﻿@model Property.UI.Models.BuildUnitAddModel
+@{
+    ViewBag.Title = "新增单元";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增单元</h5>
+                </div>
+                <div class="ibox-content">
+                    @using (Ajax.BeginForm("AddUnit", "BuildUnit", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-horizontal">
+                            <input type="hidden" id="Id" name="Id" value="0" />
+                            <div class="form-group">
+                                <label class="control-label col-md-3">所属楼座<span class="text-danger"> *</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(model => model.BuildId, Model.BuildList, "请选择楼座", new { @class = "form-control", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">单元名称<span class="text-danger"> *</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.UnitName, new { @class = "form-control", @placeholder = "单元名称", @required = true })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/BuildUnit/UnitList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        $("#form").validate({
+            rules: {
+                UnitName: {
+                    required: true,
+                    maxlength: 50,
+                    //remote: {
+                    //    type: "POST",
+                    //    url: "/BuildUnit/RemoteCheckExist",
+                    //    data: {
+                    //        Id: function () { return $("#Id").val(); },
+                    //        UnitName: function () { return $("#UnitName").val(); },
+                    //        BuildId: function () { return $("#BuildId").val();}
+                    //    }
+                    //}
+                },
+                BuildId: {
+                    required: true
+                }
+            },
+            messages: {
+                UnitName: {
+                    required: "请输入单元名称",
+                    maxlength: "长度不能超过50位",
+                    //remote: "该单元名称已存在"
+                },
+                BuildId: {
+                    required: "请选择所属楼座"
+                }
+            }
+        });
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+                window.location.href = "/BuildUnit/UnitList";
+            }
+            else {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err) {
+            swal({
+                title: "请求出现异常,新增失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}

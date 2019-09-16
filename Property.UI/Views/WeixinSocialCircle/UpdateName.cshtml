@@ -1,0 +1,78 @@
+﻿@{
+    ViewBag.Title = "修改圈子名称";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.EditNameModel
+<div>
+    @using (Ajax.BeginForm("UpdateName", "WeixinSocialCircle", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+    {
+        <input type="text" readonly="readonly" style="display:none" />
+        <div class="weui_cells weui_cells_form" style="font-size:16px">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" style="margin-bottom:0">圈子名称</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    @Html.TextBoxFor(model => model.Name, new { @class = "weui_input", @maxlength = 30, @placeholder = "给圈子起个名字吧" })
+                </div>
+            </div>
+        </div>
+    }
+    <div style="margin:20px 10px">
+        <button class="weui_btn weui_btn_blue" onclick="updateSubmit();">提交</button>
+    </div>
+</div>
+@section Styles{
+    <style type="text/css">
+        .weui_btn_blue {
+            background-color: #0172ff;
+        }
+
+            .weui_btn_blue:not(.weui_btn_disabled):visited {
+                color: #FFFFFF;
+            }
+
+            .weui_btn_blue:not(.weui_btn_disabled):active {
+                color: rgba(255, 255, 255, 0.8);
+                background-color: #1a31ea;
+            }
+
+        .weui_label {
+            color: #000;
+            font-weight: 500;
+        }
+
+        input {
+            text-align: right;
+        }
+    </style>
+}
+@section Scripts{
+    @Scripts.Render("~/plugins/validate")
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        //修改提交
+        function updateSubmit() {
+
+            if ($("#Name").val().trim() == "" || $("#Name").val() == undefined) {
+                alert("请输入圈子名称");
+            } else {
+                $("#form").submit();
+            }
+        }
+
+        function OnSuccess(data) {
+            if (data.Code == "OK") {
+
+                alert("修改成功");
+                location.replace(document.referrer);
+            }
+            else {
+                alert(data.Msg);
+            }
+        }
+        function OnFailure(err) {
+            alert("请求发生异常");
+        }
+    </script>
+
+}

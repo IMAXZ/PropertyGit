@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "设置微信账户";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+@model Property.UI.Models.ShopAccountModel
+<div class="row wrapper border-bottom white-bg page-heading">
+    @Html.Partial("~/Views/Shared/_BreadCrumb.cshtml", new ViewDataDictionary { { "HasBack", "true" } })
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设置微信账号</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Ajax.BeginForm("SetWeChatAccount", "ShopAccount", "", new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnSuccess", OnFailure = "OnFailure" }, new { id = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.WeChatId)
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">微信APP ID<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.WeChatNumber, new { @class = "form-control", @placeholder = "微信APP ID" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">商户号<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(model => model.WeChatMerchantNo, new { @class = "form-control", @placeholder = "商户号" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3">秘钥<span class="text-danger">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.TextAreaFor(model => model.WeChatKey, new { @class = "form-control", @placeholder = "秘钥" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="确定" class="btn btn-primary" />
+                                    <a class="btn btn-white" href="/ShopAccount/AccountList">取消</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+@section Scripts {
+    @Scripts.Render("~/plugins/sweetAlert")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/plugins/validate")
+    <script src="~/Scripts/validate/AddWeChatAccount.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        function OnSuccess(data)
+        {
+            if (data.Code == "OK")
+            {
+                window.location.href = "/ShopAccount/AccountList";
+            }
+            else
+            {
+                swal({
+                    title: data.Msg,
+                    type: "error",
+                    text: ""
+                });
+            }
+        }
+        function OnFailure(err)
+        {
+            swal({
+                title: "请求出现异常,设置失败",
+                type: "error",
+                text: ""
+            });
+        }
+    </script>
+}
+
+

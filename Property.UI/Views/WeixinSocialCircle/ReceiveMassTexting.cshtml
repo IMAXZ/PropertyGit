@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "群发消息";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model List<Property.UI.Models.Weixin.ReceiveMassTextSocialCircleItemModel>
+
+@foreach (var item in Model)
+{
+    <div style="text-align:center;margin:10px 0"><span style="background: #d9d9d9; color: #fff; font-size: 10px; padding: 3px 8px; border-radius: 3px; ">@item.NewestChatTime</span></div>
+
+    <div class="weui_cells weui_cells_access" style="margin-top: 0">
+        <div class="weui_cell" style="padding:15px" onclick="location.href = '/WeixinSocialCircle/ReceiveMassTextingDetail/@item.Id'">
+            <div class="weui_cell_hd" style="margin-right:10px">
+                <img src="@item.HeadPath" style="width:40px;height:40px" class="img-circle" />
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <h3 style="margin: 0;color:#000">@item.Name</h3>
+                <h5 class="text-muted" style="margin:10px 0 0 0;font-weight:500;color:#c4bdc0;font-size:13px;vertical-align:middle"><i class="marker_icon"></i><span style="vertical-align:middle">@item.PlaceName</span></h5>
+            </div>
+            @if (item.NoReadMassCount > 0)
+            {
+                <div style="font-size:10px"><span style="font-size: 10px; color: #fff; background: #ff6300; padding: 3px 8px; border-radius: 3px; ">@item.NoReadMassCount<span>条未读消息</span></span></div>
+            }
+            else
+            {
+                <div style="font-size:10px"><span style="font-size: 10px; color: #fff; background: #d9d9d9; padding: 3px 8px; border-radius: 3px; ">@item.TotalMassCount<span>条群发记录</span></span></div>
+            }
+
+        </div>
+
+    </div>
+}
+
+

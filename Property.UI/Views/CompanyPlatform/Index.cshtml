@@ -1,0 +1,179 @@
+﻿@{
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    ViewBag.Title = "总公司平台首页";
+}
+@using Webdiyer.WebControls.Mvc
+@model Property.UI.Models.CompanyPlatformIndexModel
+<div class="wrapper wrapper-content">
+    <div class="ibox-content">
+        <div class="row" style="background-image:url(/Images/index_line.png)">
+            <div class="col-md-4">
+                <h2 style="color: #ffffff;margin-top:10px;margin-bottom:10px"><span style="font-size:20px">累计物业用户数：</span><b>@(Model.PlaceUserCount)</b></h2>
+            </div>
+            <div class="col-md-4">
+                <h2 style="color: #ffffff; text-align: center; margin-top: 10px; margin-bottom: 10px; "><span style="font-size:20px">累计住宅业主数：</span><b>@(Model.HouseUserCount)</b></h2>
+            </div>
+            <div class="col-md-4">
+                <h2 style="color: #ffffff; text-align: right; margin-top: 10px; margin-bottom: 10px; "><span style="font-size:20px">累计办公楼单位数：</span><b>@(Model.BuildCompanyCount)</b></h2>
+            </div>
+        </div>
+    </div>
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <img src="~/Images/index_bar.png" style="height:25px" /><b><span style="font-size:20px;vertical-align:bottom"> 数据统计</span></b>
+                </div>
+            </div>
+            <br />
+            <div class="row" style="color:white">
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg3.png) no-repeat;padding:8px 15px">
+                        <h3>物业小区数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.PlaceCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_place.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg1.png) no-repeat;padding:8px 15px">
+                        <h3>已发布物业公告数</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <h1 class="font-bold title-font">
+                                    @(Model.PlacePostCount)
+                                </h1>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_news.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg2.png) no-repeat;padding:8px 15px">
+                        <h3>业主上报问题处理率</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+
+                                @if (double.IsNaN(Model.QuestionDisposedRate))
+                                {
+                                    <h3>
+                                        @("暂时没有上报问题")
+                                    </h3>
+                                }
+                                else
+                                {
+                                    <h1 class="font-bold title-font">
+                                        @Model.QuestionDisposedRate.ToString("P")
+                                    </h1>
+                                }
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_question.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-xs-6">
+                    <div style="background:url(/Images/bg4.png) no-repeat;padding:8px 15px">
+                        <h3>巡检异常处理率</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                @if (double.IsNaN(Model.InspectionExceptionDisposedRate))
+                                {
+                                    <h3>
+                                        @("暂时没有巡检异常")
+                                    </h3>
+                                }
+                                else
+                                {
+                                    <h1 class="font-bold title-font">
+                                        @Model.InspectionExceptionDisposedRate.ToString("P")
+                                    </h1>
+                                }
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <img src="~/Images/data_ins.png" height="60" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div><br /></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <img src="~/Images/index_bar.png" style="height:25px" /><b><span style="font-size:20px;vertical-align:bottom"> 业主缴费统计</span></b>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>物业小区名称</th>
+                                    <th>统计单元户（单位）</th>
+                                    <th>缴费率</th>
+                                </tr>
+                            </thead>
+
+                            @foreach (var item in Model.ExpenseCountList)
+                            {
+                                <tr>
+                                    <td>@item.PlaceName</td>
+                                    <td>@item.DoorCount</td>
+                                    @if (item.DoorCount > 0)
+                                    {
+                                        <td>@item.ExpensedRate.ToString("P")</td>
+                                    }
+                                    else
+                                    {
+                                        <td>- -</td>
+                                    }
+                                </tr>
+                            }
+                        </table>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-left">
+                            共 @Model.ExpenseCountList.TotalPageCount 页 @Model.ExpenseCountList.TotalItemCount 条记录，当前为第 @Model.ExpenseCountList.CurrentPageIndex 页
+                        </div>
+                        <div class="col-md-7 text-right">
+                            @Html.Pager(Model.ExpenseCountList, new PagerOptions
+                                       {
+                                           PageIndexParameterName = "id",
+                                           ContainerTagName = "ul",
+                                           CssClass = "pagination",
+                                           CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>",
+                                           DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>",
+                                           PagerItemTemplate = "<li>{0}</li>",
+                                           Id = "bootstrappager"
+                                       })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

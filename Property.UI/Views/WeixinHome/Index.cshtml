@@ -1,0 +1,314 @@
+﻿@{
+    ViewBag.Title = "首页";
+    Layout = "~/Views/Shared/_WeixinLayout.cshtml";
+}
+@model Property.UI.Models.Weixin.HomeDataModel
+
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div style="width: 100%" onclick="location.href = 'http://weidian.com/s/382033745?wfr=c/'">
+            <img src="~/Images/Weixin/home_0.png" style="width:100%;height:100%" />
+        </div>
+        <div id="topmenu" class="weui_panel" style="margin-top:0">
+            <div style="width: 25%; float: left;padding:8px 0;text-align:center" onclick="location.href = '/WeixinIdentityBind/Index'">
+                <img src="~/Images/Weixin/home_menu_1.png" style="width: 53px; height: 53px">
+                <h4 style="font-weight:500;color:#000;margin-bottom:0">绑定小区</h4>
+            </div>
+            <div style="width: 25%; float: left;padding:8px 0;text-align:center" onclick="location.href = '/WeixinSocialCircle/Index'">
+                <img src="~/Images/Weixin/home_menu_2.png" style="width: 53px;height:53px">
+                <h4 style="font-weight:500;color:#000;margin-bottom:0">业主圈子</h4>
+            </div>
+            <div style="width: 25%; float: left;padding:8px 0;text-align:center" onclick="location.href = '/WeixinProduct/Index'">
+                <img src="~/Images/Weixin/home_menu_3.png" style="width: 53px;height:53px">
+                <h4 style="font-weight:500;color:#000;margin-bottom:0">APP下载</h4>
+            </div>
+            <div style="width: 25%; float: left;padding:8px 0;text-align:center" onclick="location.href = '/WeixinProduct/QrCodeShare'">
+                <img src="~/Images/Weixin/home_menu_4.png" style="width: 53px;height:53px">
+                <h4 style="font-weight:500;color:#000;margin-bottom:0">分享友邻</h4>
+            </div>
+        </div>
+
+        @foreach (var expenseItem in Model.ExpenseList)
+        {
+            <div class="weui_panel" style="margin-top:0">
+                <div class="weui_panel_bd">
+                    <a href="/WeixinExpenseNotice/ExpenseNoticeList" class="weui_media_box weui_media_appmsg" style="padding:8px">
+                        <div class="weui_media_hd" style="width: 43px; height: 37px; line-height: 37px; border-right: 1px solid #E7EAEC; vertical-align: middle; text-align: left">
+                            <img class="weui_media_appmsg_thumb" src="~/Images/Weixin/home_1.png" style="width:33px;height:33px">
+                        </div>
+                        <div class="weui_media_bd">
+                            <h4 class="weui_media_title" style="margin-top:0;margin-bottom:5px;font-size:16px">@expenseItem.ExpenseType<span>缴费通知</span> <i class="news_icon"></i></h4>
+                            <h4 style="font-size:13px;font-weight:500;color:#999;margin:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">@expenseItem.PlaceName@expenseItem.OwnerDoor<span>的业主您好，您</span>@expenseItem.ExpenseDateDes<span>总计</span>@expenseItem.Cost</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <div class="weui_tab" style="height: auto; margin-top: 10px; border-top: 1px solid #ebebeb">
+            <div id="tab_div_now_" class="weui_navbar" style="color: #000; background: #ebebeb; font-weight:600">
+                <div style="width: 50%; text-align: center; padding: 8px 0" class="now">
+                    <span style="font-size:16px">物业公告</span>
+                </div>
+                <div style="width: 50%;text-align:center; padding: 8px 0">
+                    <span style="font-size: 16px">上报问题</span>
+                </div>
+            </div>
+            <div class="weui_tab_bd" style="padding-top:43px;height:auto">
+                <div id="tab_1" style="display:block">
+                    <div class="weui_panel weui_panel_access">
+                        <div class="weui_panel_bd">
+                            @if (Model.NewsList.Count > 0)
+                            {
+                                foreach (var newItem in Model.NewsList)
+                                {
+                                    <a href="/WeixinPropertyNotice/PropertyNoticeDetail/@newItem.Id" class="weui_media_box weui_media_appmsg" style="padding:10px">
+                                        <div class="weui_media_hd" style="width:50px;height:66px;line-height:66px;margin-right:0px;vertical-align:top">
+                                            <img class="weui_media_appmsg_thumb img-circle" src="@newItem.propertyPic" style="width: 35px; height: 35px; border-radius: 50%;vertical-align:top">
+                                        </div>
+                                        <div class="weui_media_bd">
+                                            <h4 class="weui_media_title" style="margin-top: 0; margin-bottom: 5px; font-size: 16px; color: #0172ff">@newItem.PlaceName</h4>
+                                            <p class="weui_media_desc">
+                                                @newItem.PublishTime
+                                            </p>
+                                            <h4 style="margin-top: 10px; color: #000; font-size: 16px;font-weight:500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap">@newItem.Title</h4>
+                                        </div>
+                                    </a>
+                                }
+                                <a href="/WeixinPropertyNotice/PropertyNoticeList" class="weui_media_box weui_media_appmsg" style="padding: 8px; text-align: center; color: #0172ff">
+                                    <span style="text-align:center;width:100%">查看更多>></span>
+                                </a>
+                            }
+                            else
+                            {
+                                <div style="width:100%;text-align:center;padding:20px 0">
+                                    <img src="~/Images/Weixin/null.png" style="width:210px" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div id="tab_2" style="display:none">
+                    <div class="weui_panel weui_panel_access">
+                        <div class="weui_panel_bd">
+                            @if (Model.QuestionList.Count > 0)
+                            {
+                                foreach (var questionItem in Model.QuestionList)
+                                {
+                                    <a href="/WeixinQuestion/QuestionDetail/@questionItem.Id" class="weui_media_box weui_media_appmsg" style="padding:10px">
+                                        <div class="weui_media_bd">
+                                            <h4 class="weui_media_title" style="margin-top: 0; margin-bottom: 5px; font-size: 16px; color: #0172ff;vertical-align:middle">
+                                                <i class="question_icon"></i> @questionItem.PlaceName @questionItem.Title
+                                            </h4>
+                                            <h4 style="margin-top: 10px; color: #000; font-weight:500;font-size: 16px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap">@questionItem.Desc</h4>
+                                            @if (questionItem.Imgs.Count() > 0)
+                                            {
+                                                <table style="width:100%;margin-top:10px">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="100%">
+                                                                @{
+                                                int count = 3;
+                                                if (questionItem.Imgs.Count() < 3)
+                                                {
+                                                    count = questionItem.Imgs.Count();
+                                                }
+                                                for (int i = 0; i < count; i++)
+                                                {
+                                                    if (i == 1)
+                                                    {
+                                                        <div style="width: 32%; float: left;margin:0 2%"><img src="@questionItem.Imgs[i]" style="width:100%;height:68px;margin:0"></div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div style="width: 32%; float: left"><img src="@questionItem.Imgs[i]" style="width:100%;height:68px;margin:0"></div>
+                                                    }
+                                                }
+                                                                }
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            <table style="width:100%;margin-top:10px">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="50%">
+                                                            @if (questionItem.Status == Property.Common.ConstantParam.NO_DISPOSE)
+                                                            {
+                                                                <img src="/Images/WeiXin/unhandled.png" style="width:68px;height:29px;border-radius: 10%">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img src="/Images/WeiXin/handled.png" style="width:68px;height:29px;border-radius: 10%">
+                                                            }
+                                                        </td>
+                                                        <td width="50%" style="text-align:right">
+                                                            <p class="weui_media_desc">
+                                                                <i class="time_icon"></i> @questionItem.UploadTime
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </a>
+                                }
+                                <a href="/WeixinQuestion/QuestionList" class="weui_media_box weui_media_appmsg" style="padding: 8px; text-align: center; color: #0172ff">
+                                    <span style="text-align:center;width:100%">查看更多>></span>
+                                </a>
+                            }
+                            else
+                            {
+                                <div style="width:100%;text-align:center;padding:20px 0">
+                                    <img src="~/Images/Weixin/null.png" style="width:210px" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui_panel weui_panel_access" style="margin-bottom:8px">
+            <div class="weui_panel_hd" style="font-size:16px;color:#000;padding:10px 15px">业主圈子</div>
+            <div style="width: 100%" onclick="location.href = '/WeixinSocialCircle/Index'">
+                <img src="~/Images/Weixin/home_3.png" style="width:100%;height:100%" />
+                <p style="color:#0172ff;padding:5px 0;text-align:center">进入业主圈子>></p>
+            </div>
+        </div>
+
+    </div>
+    <div class="weui_tabbar" style="background:#fff">
+        <a href="javascript:;" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab1_press.png">
+            </div>
+            <p class="weui_tabbar_label" style="color: #0172ff">首页</p>
+        </a>
+        <a href="/WeixinTopic/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab2.png">
+            </div>
+            <p class="weui_tabbar_label">社区话题</p>
+        </a>
+        <a href="/WeixinBanshi/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab3.png">
+            </div>
+            <p class="weui_tabbar_label">生活办事</p>
+        </a>
+        <a href="/WeixinPersonalCenter/Index" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="~/Images/Weixin/tab4.png">
+            </div>
+            <p class="weui_tabbar_label">个人中心</p>
+        </a>
+    </div>
+</div>
+
+@section Styles{
+
+    <style type="text/css">
+        p {
+            margin: 0;
+        }
+
+        .weui_navbar:after {
+            border-bottom: none;
+        }
+
+        #topmenu:after {
+            border-bottom: none;
+        }
+
+        .now {
+            color: #0172ff;
+            border-bottom: 2px solid #0172ff;
+            background: #fff;
+        }
+
+        .weui_tabbar_icon {
+            width: 21px;
+            height: 21px;
+        }
+
+        .news_icon {
+            display: inline-block;
+            vertical-align: top;
+            width: 24px;
+            height: 12px;
+            background: url(/Images/Weixin/home_2.png) no-repeat;
+            background-size: 24px 12px;
+        }
+
+        .question_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 13px;
+            height: 16px;
+            background: url(/Images/Weixin/position.png) no-repeat;
+            background-size: 13px 16px;
+        }
+
+        .time_icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 12px;
+            height: 12px;
+            background: url(/Images/Weixin/time.png) no-repeat;
+            background-size: 12px 12px;
+        }
+    </style>
+}
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        window.onload = function () {
+            new tab('tab_div_now_');
+        }
+
+        //tab切换方法
+        function tab(o, s, cb, ev) {
+            var $ = function (o) { return document.getElementById(o) };
+            var css = o.split((s || '_'));
+            if (css.length != 4) return;
+            this.event = ev || 'onclick';
+            o = $(o);
+            if (o) {
+                this.ITEM = [];
+                o.id = css[0];
+                var item = o.getElementsByTagName(css[1]);
+                var j = 1;
+                for (var i = 0; i < item.length; i++) {
+                    if (item[i].className.indexOf(css[2]) >= 0 || item[i].className.indexOf(css[3]) >= 0) {
+                        if (item[i].className == css[2]) o['cur'] = item[i];
+                        item[i].callBack = cb || function () { };
+                        item[i]['css'] = css;
+                        item[i]['link'] = o;
+                        this.ITEM[j] = item[i];
+                        item[i]['Index'] = j++;
+                        item[i][this.event] = this.ACTIVE;
+                    }
+                }
+                return o;
+            }
+        }
+        tab.prototype = {
+            ACTIVE: function () {
+                var $ = function (o) { return document.getElementById(o) };
+                this['link']['cur'].className = this['css'][3];
+                this.className = this['css'][2];
+                try {
+                    $(this['link']['id'] + '_' + this['link']['cur']['Index']).style.display = 'none';
+                    $(this['link']['id'] + '_' + this['Index']).style.display = 'block';
+                } catch (e) { }
+                this.callBack.call(this);
+                this['link']['cur'] = this;
+            }
+        }
+    </script>
+}

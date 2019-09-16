@@ -1,0 +1,57 @@
+﻿<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element text-center">
+                    <span>
+                        @if (string.IsNullOrEmpty(Html.GetLoginUserHeadImgPath()))
+                        {
+                            <img alt="image" class="img-circle" src="/Images/default.png" width="60" height="60" />
+                        }
+                        else
+                        {
+                            <img alt="image" class="img-circle" src="@Html.GetLoginUserHeadImgPath()" width="60" height="60" />
+                        }
+                    </span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            <span class="block m-t-xs">
+                            </span>
+                            <span class="text-xs block"><strong class="font-bold">@Html.GetLoginUserName()</strong><b class="caret"></b></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="@Url.Action("SetShopUserInfo", "ShopPersonelSetting")"><i class="fa fa-cog"></i>&nbsp;&nbsp;个人信息</a></li>
+                        <li><a href="@Url.Action("EditShopUserPwd", "ShopPersonelSetting")"><i class="fa fa-lock"></i>&nbsp;&nbsp;密码修改</a></li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    Sarnath
+                </div>
+            </li>
+            <li id="L1ShopPlatformIndex">
+                <a href="@Url.Action("Index", "ShopPlatform")"><i class="fa fa-home"></i> <span class="nav-label">首页</span></a>
+            </li>
+            <li id="L1ShopSaleMgr">
+                <a href="#"><i class="fa fa-gift"></i> <span class="nav-label">门店商品管理</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li id="L2GoodsCategoryList">
+                        <a href="@Url.Action("GoodsCategoryList", "GoodsCategory")">商品类别管理</a>
+                    </li>
+                    <li id="L2ShopSaleList">
+                        <a href="@Url.Action("SaleList", "ShopSales")">商品管理一览</a>
+                    </li>
+                </ul>
+            </li>
+            <li id="L1ShopAccount">
+                <a href="@Url.Action("AccountList", "ShopAccount")"><i class="fa fa-wrench"></i> <span class="nav-label">门店账户设定</span></a>
+            </li>
+            <li id="L1ShopShippingCost">
+                <a href="@Url.Action("SetupShippingCost", "ShopPlatform")"><i class="fa fa-cog"></i> <span class="nav-label">订单运费设置</span></a>
+            </li>
+            <li id="L1StoreOrder">
+                <a href="@Url.Action("OrderList", "StoreOrder")"><i class="fa fa-gift"></i> <span class="nav-label">商家订单管理</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>

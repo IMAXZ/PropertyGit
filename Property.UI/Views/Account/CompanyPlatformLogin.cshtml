@@ -1,0 +1,117 @@
+﻿@model Property.UI.Models.AccountModel
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总公司平台登录</title>
+    <link rel="shortcut icon" href="~/favicon1.ico" />
+    <!-- Add jQuery Style direct - used for jQGrid plugin -->
+    <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <!-- Primary Inspinia style -->
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/font-awesome/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script type="text/javascript">
+        $().ready(function () {
+            $("#valiCode").bind("click", function () {
+                this.src = "/Account/GetValidateCode?time=" + (new Date()).getTime();
+            });
+        });
+    </script>
+    <style>
+        .field-validation-error {
+            color: red;
+            font-weight: bold;
+            font-size: 1.0em;
+        }
+    </style>
+
+</head>
+<body style="background: #fff; overflow-x: auto; min-height: 600px; min-width: 1024px;">
+    <div style="position:relative;height:100%;">
+        <div style="height:20%;">
+            <div style="position: absolute; margin-left:10%;margin-top:30px;width: 396px; height: 76px; background: url(../../Images/login/login4_01.png) no-repeat">
+            </div>
+        </div>
+        <div style="height:70%;">
+            <div style="position: absolute; left: 0px; top: 20%; min-width: 1024px; height:70%;z-index: -1; width: 100%;">
+                <img src="~/Images/login/login4_02.png" style="width:100%;height:100%" />
+            </div>
+            <div style="margin-left:10%;width:80%;padding-top:60px;">
+                <table style="width:100%;">
+                    <tr>
+                        <td width="50%"></td>
+                        <td width="50%" style="padding:0 20px">
+                            <div style="width:100%; height: 340px; padding: 0 20px; background: #fff;border:2px solid #003cff">
+                                @using (Html.BeginForm("CompanyPlatformLogin", "Account", FormMethod.Post, new { id = "loginForm" }))
+                                {
+                                    <div>
+                                        <div class="col-md-12" style="padding-top:20px;padding-bottom:20px">
+                                            <h3 style="margin:0;font-family:微软雅黑">欢迎访问物业生活通总公司管理系统</h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.UserName)
+                                            <div class="input-group m-b-md">
+                                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                                @Html.TextBoxFor(m => m.UserName, new { placeholder = "请输入用户名", @Maxlength = "50", @class = "form-control" })
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.Password)
+                                            <div class="input-group m-b-md">
+                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                                @Html.PasswordFor(m => m.Password, new { placeholder = "请输入密码", @Maxlength = "50", @class = "form-control" })
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.CheckCode)
+                                        </div>
+                                        <div class="row col-md-12">
+                                            <div class="col-md-8 col-xs-8">
+                                                <div class="input-group m-b-md">
+                                                    <span class="input-group-addon"><i class="fa fa-sliders"></i></span>
+                                                    @Html.TextBoxFor(m => m.CheckCode, new { placeholder = "请输入验证码", @Maxlength = "5", @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-4 text-left">
+                                                <img id="valiCode" style="cursor: pointer;vertical-align:middle;width:100px" src="/Account/GetValidateCode" alt="验证码" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-lg">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="form-control" style="background-color:#003cff;color:#fff;font:bold">登录</button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="height:10%;background-color:#fff;width:100%;margin-bottom:0;margin-top:0">
+            @*<div class="text-center" style="width:100%;height:100%;padding-top:25px;">
+                Copyright ©2008-2016 青岛萨纳斯智能科技股份有限公司.
+            </div>*@
+            <div style="width:300px;margin:0 auto; padding:20px 0;">
+                <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=37021202000217" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="~/Images/wangjin.png" style="float:left;" /><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#939393;">鲁公网安备 37021202000217号</p></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

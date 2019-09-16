@@ -1,0 +1,134 @@
+﻿@model Property.UI.Models.AccountModel
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物业平台登录</title>
+
+    <!-- Add jQuery Style direct - used for jQGrid plugin -->
+    <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <!-- Primary Inspinia style -->
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/font-awesome/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script type="text/javascript">
+        $().ready(function () {
+            $("#valiCode").bind("click", function () {
+                this.src = "/Account/GetValidateCode?time=" + (new Date()).getTime();
+            });
+        });
+    </script>
+    <style>
+        .field-validation-error {
+            color: red;
+            font-weight: bold;
+            font-size: 1.0em;
+        }
+    </style>
+
+</head>
+
+<body style="overflow-x:auto;min-height:600px;min-width:1024px;">
+    <div style="position:absolute; left:0px; top:0px;min-width:1024px;height:95%;min-height:570px;z-index:-1;width:100%;">
+        <img src="~/Images/login/login2_01.png" style="width:100%;height:100%" />
+    </div>
+    <div style="position:relative;height:100%;">
+        <div style="height:20%;">
+            <div style="position:absolute;margin-left:8%;margin-top:50px;width:331px;height:66px;background:url(../../Images/login/login1_03.png) no-repeat">
+            </div>
+        </div>
+        <div style="height:75%;">
+            <div style="margin-left:8%;width:84%">
+                <table style="width:100%">
+                    <tr>
+                        <td width="55%" align="center" style="padding:0 20px">
+                            <div style="width:100%; height:100%">
+                                <img src="~/Images/login/login2_10.png" style="max-width: 555px; max-height: 358px;" class="img-container" />
+                            </div>
+                        </td>
+                        <td width="45%" style="padding:0 20px">
+                            <div style="width:100%;height:368px;">
+                                <div style="position:absolute; right:8%; top:20%;z-index:-1;width:37.5%;height:368px">
+                                    <img src="~/Images/login/login2_07.png" style="width:100%;height:100%" />
+                                </div>
+                                @using (Html.BeginForm("PropertyLogin", "Account", FormMethod.Post, new { id = "loginForm" }))
+                                {
+                                    <div>
+                                        <div class="col-md-12" style="padding-top:20px;padding-bottom:20px">
+                                            <h3 style="margin: 0;font-family:微软雅黑">欢迎访问物业生活通物业管理系统</h3>
+                                        </div>
+                                    </div>
+                                    <div style="width:100%" class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.UserName)
+                                            <div class="input-group m-b-md">
+                                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                                @Html.TextBoxFor(m => m.UserName, new { placeholder = "请输入用户名", @Maxlength = "50", @class = "form-control" })
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div style="width:100%" class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.Password)
+                                            <div class="input-group m-b-md">
+                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                                @Html.PasswordFor(m => m.Password, new { placeholder = "请输入密码", @Maxlength = "50", @class = "form-control" })
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div style="width:100%" class="form-group-lg">
+                                        <div class="col-md-12">
+                                            @Html.ValidationMessageFor(m => m.CheckCode)
+                                        </div>
+                                        <div class="row col-md-12">
+                                            <div class="col-md-8 col-xs-8">
+                                                <div class="input-group m-b-md">
+                                                    <span class="input-group-addon"><i class="fa fa-sliders"></i></span>
+                                                    @Html.TextBoxFor(m => m.CheckCode, new { placeholder = "请输入验证码", @Maxlength = "5", @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-4 text-left">
+                                                <img id="valiCode" style="cursor: pointer;vertical-align:middle;width:100px" src="/Account/GetValidateCode" alt="验证码" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="width:100%" class="form-group-lg">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="form-control text-white" style="background-color:#0ca7bd">登录</button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="height:5%;background-color:#fff;width:100%;margin-bottom:0;margin-top:0">
+        </div>
+
+        <div style="position:absolute; left:0px; bottom:0px;width:100%">
+            <hr style="margin:0 15%;border:1px solid #e5e4e4" />
+            @*<div class="text-center" style="width:100%;margin-top:20px;margin-bottom:20px">
+                Copyright ©2008-2016 青岛萨纳斯智能科技股份有限公司.
+            </div>*@
+            
+            <div style="width:300px;margin:0 auto; padding:20px 0;">
+                <i class="c-icon-jgwablogo"></i><a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=37021202000217" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="~/Images/wangjin.png" style="float:left;" /><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#939393;">鲁公网安备 37021202000217号</p></a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+
+
